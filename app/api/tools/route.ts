@@ -25,7 +25,8 @@ export async function GET(request: NextRequest) {
         tool.name.toLowerCase().includes(searchLower) ||
         tool.description.toLowerCase().includes(searchLower) ||
         tool.category.toLowerCase().includes(searchLower) ||
-        tool.tags.some(tag => tag.toLowerCase().includes(searchLower))
+        tool.features.some(feature => feature.toLowerCase().includes(searchLower)) ||
+        tool.useCases.some(useCase => useCase.toLowerCase().includes(searchLower))
       )
     }
 
