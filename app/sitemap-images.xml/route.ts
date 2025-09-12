@@ -45,8 +45,8 @@ export async function GET() {
     const blogImagesXml = publishedPosts
       .filter(post => post.image)
       .map((post) => {
-        const imageUrl = post.image.startsWith('http') ? post.image : `${baseUrl}${post.image}`
-        const escapeXml = (text) => text?.toString()
+        const imageUrl = post.image!.startsWith('http') ? post.image : `${baseUrl}${post.image}`
+        const escapeXml = (text: any) => text?.toString()
           .replace(/&/g, '&amp;')
           .replace(/</g, '&lt;')
           .replace(/>/g, '&gt;')
@@ -58,11 +58,11 @@ export async function GET() {
     <image:image>
       <image:loc>${imageUrl}</image:loc>
       <image:title>${escapeXml(post.title)}</image:title>
-      <image:caption>${escapeXml(post.excerpt || post.description)}</image:caption>
+      <image:caption>${escapeXml(post.excerpt)}</image:caption>
       <image:geo_location>United States</image:geo_location>
       <image:license>${baseUrl}/terms</image:license>
     </image:image>
-    <lastmod>${new Date(post.updatedAt || post.publishedAt || post.createdAt).toISOString()}</lastmod>
+    <lastmod>${new Date(post.updatedAt || post.publishedAt || post.date || new Date()).toISOString()}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>`

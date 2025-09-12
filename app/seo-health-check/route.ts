@@ -37,7 +37,7 @@ export async function GET() {
         toolCategories: Array.from(new Set(aiToolsData.map(tool => tool.category))).length,
         blogCategories: Array.from(new Set(publishedPosts.map(post => post.category))).length,
         recentPosts: publishedPosts.filter(post => {
-          const postDate = new Date(post.publishedAt || post.createdAt)
+          const postDate = new Date(post.publishedAt || post.date || new Date().toISOString())
           const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
           return postDate > weekAgo
         }).length

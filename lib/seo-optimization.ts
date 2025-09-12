@@ -85,7 +85,7 @@ export function generateOptimizedMetadata(
           '@context': 'https://schema.org',
           '@type': 'Article',
           headline: data.title,
-          description: data.excerpt || data.description,
+          description: data.excerpt,
           image: data.image,
           author: {
             '@type': 'Person',
@@ -99,8 +99,8 @@ export function generateOptimizedMetadata(
               url: `${baseUrl}/images/logo.png`
             }
           },
-          datePublished: data.publishedAt || data.createdAt,
-          dateModified: data.updatedAt || data.publishedAt || data.createdAt
+          datePublished: data.publishedAt || data.date,
+          dateModified: data.updatedAt || data.publishedAt || data.date
         }
       }
 

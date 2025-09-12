@@ -12,19 +12,19 @@ export async function GET() {
     // Get blog posts
     const blogPosts = await loadBlogPostsFromFile()
     const publishedPosts = blogPosts.filter(post => post.published)
-      .sort((a, b) => new Date(b.publishedAt || b.createdAt).getTime() - new Date(a.publishedAt || a.createdAt).getTime())
+      .sort((a, b) => new Date(b.publishedAt || b.date || new Date()).getTime() - new Date(a.publishedAt || a.date || new Date()).getTime())
 
     // Generate XML for blog posts with dynamic priorities
     const postsXml = publishedPosts.map((post, index) => {
       // Higher priority for newer posts and featured content
-      const isRecent = new Date(post.publishedAt || post.createdAt) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) // 30 days
+      const isRecent = new Date(post.publishedAt || post.date || new Date()) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) // 30 days
       const isFeatured = post.featured || false
       const priority = isFeatured ? 0.9 : isRecent ? 0.8 : index < 10 ? 0.7 : 0.6
       
       return `
   <url>
     <loc>${baseUrl}/blog/${post.id}</loc>
-    <lastmod>${new Date(post.updatedAt || post.publishedAt || post.createdAt || new Date()).toISOString()}</lastmod>
+    <lastmod>${new Date(post.updatedAt || post.publishedAt || post.date || new Date()).toISOString()}</lastmod>
     <changefreq>${isRecent ? 'weekly' : 'monthly'}</changefreq>
     <priority>${priority}</priority>
   </url>`

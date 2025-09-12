@@ -13,7 +13,7 @@ export async function GET() {
     const blogPosts = await loadBlogPostsFromFile()
     const publishedPosts = blogPosts
       .filter(post => post.published)
-      .sort((a, b) => new Date(b.publishedAt || b.createdAt).getTime() - new Date(a.publishedAt || a.createdAt).getTime())
+      .sort((a, b) => new Date(b.publishedAt || b.date || new Date()).getTime() - new Date(a.publishedAt || a.date || new Date()).getTime())
     
     // Enhanced Article Sitemap with Structured Data and News Support
     const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
@@ -21,8 +21,8 @@ export async function GET() {
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
         xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
   ${publishedPosts.map((post) => {
-    const publishedDate = new Date(post.publishedAt || post.createdAt || new Date())
-    const updatedDate = new Date(post.updatedAt || post.publishedAt || post.createdAt || new Date())
+    const publishedDate = new Date(post.publishedAt || post.date || new Date())
+    const updatedDate = new Date(post.updatedAt || post.publishedAt || post.date || new Date())
     const isRecent = (Date.now() - publishedDate.getTime()) < (7 * 24 * 60 * 60 * 1000) // 7 days
     const isNews = (Date.now() - publishedDate.getTime()) < (2 * 24 * 60 * 60 * 1000) // 2 days for news
     const isFeatured = post.featured || false
@@ -30,7 +30,7 @@ export async function GET() {
     const changefreq = isRecent ? 'hourly' : 'daily'
     
     // Safe text escaping function
-    const escapeXml = (text) => {
+    const escapeXml = (text: any) => {
       if (!text) return ''
       return text.toString()
         .replace(/&/g, '&amp;')
@@ -41,7 +41,7 @@ export async function GET() {
     }
     
     const title = escapeXml(post.title?.replace(/^#+\s*/, '') || 'AI Tools Article')
-    const excerpt = escapeXml(post.excerpt || post.description || 'AI Tools and Technology Insights')
+    const excerpt = escapeXml(post.excerpt || 'AI Tools and Technology Insights')
     const author = escapeXml(post.author || 'AI Tools Insights Editorial Team')
     const category = escapeXml(post.category || 'AI Tools')
     const keywords = escapeXml((post.tags || []).join(', '))
