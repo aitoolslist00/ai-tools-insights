@@ -75,14 +75,8 @@ Disallow: /
 User-agent: DataForSeoBot
 Disallow: /
 
-# Primary Sitemap Index (Recommended)
-Sitemap: https://www.aitoolsinsights.com/sitemap-index.xml
-
-# Individual Sitemaps (Backup References)
+# Main Sitemap (Dynamic Generation)
 Sitemap: https://www.aitoolsinsights.com/sitemap.xml
-Sitemap: https://www.aitoolsinsights.com/sitemap-blog.xml
-Sitemap: https://www.aitoolsinsights.com/sitemap-tools.xml
-Sitemap: https://www.aitoolsinsights.com/sitemap-articles.xml
 
 # Host specification for better SEO
 Host: https://www.aitoolsinsights.com
