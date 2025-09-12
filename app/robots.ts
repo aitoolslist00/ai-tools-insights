@@ -70,7 +70,6 @@ export default function robots(): MetadataRoute.Robots {
       `${baseUrl}/sitemap.xml`,
       `${baseUrl}/sitemap-tools.xml`,
       `${baseUrl}/sitemap-blog.xml`,
-      `${baseUrl}/sitemap-articles.xml`,
     ],
     host: baseUrl,
   }
