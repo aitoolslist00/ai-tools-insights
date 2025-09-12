@@ -1,6 +1,6 @@
 import { MetadataRoute } from 'next'
 
-// Pure Static Generation for robots
+// Pure Static Generation for robots - optimized for immediate indexing
 export const dynamic = 'force-static'
 export const revalidate = false
 
@@ -9,23 +9,7 @@ export default function robots(): MetadataRoute.Robots {
   
   return {
     rules: [
-      {
-        userAgent: '*',
-        allow: '/',
-        disallow: [
-          '/api/',
-          '/admin/',
-          '/dashboard/',
-          '/test-*',
-          '/_next/',
-          '/uploads/',
-          '/temp/',
-          '/*.json$',
-          '/search?*',
-          '/filter?*',
-        ],
-        crawlDelay: 1,
-      },
+      // Googlebot - Highest priority with aggressive crawling permissions
       {
         userAgent: 'Googlebot',
         allow: '/',
@@ -36,9 +20,25 @@ export default function robots(): MetadataRoute.Robots {
           '/_next/',
           '/temp/',
           '/blog/dashboard',
+          '/test-*',
+          '/*.json$',
         ],
-        crawlDelay: 0.5,
+        crawlDelay: 0.1, // Very fast crawling for Google
       },
+      // Google Image Bot - for AI tool images
+      {
+        userAgent: 'Googlebot-Image',
+        allow: '/',
+        disallow: [
+          '/api/',
+          '/admin/',
+          '/dashboard/',
+          '/_next/',
+          '/temp/',
+        ],
+        crawlDelay: 0.1,
+      },
+      // Bingbot - Second priority
       {
         userAgent: 'Bingbot',
         allow: '/',
@@ -47,10 +47,59 @@ export default function robots(): MetadataRoute.Robots {
           '/admin/',
           '/dashboard/',
           '/_next/',
+          '/temp/',
+          '/test-*',
+        ],
+        crawlDelay: 0.5,
+      },
+      // Other major search engines
+      {
+        userAgent: ['Slurp', 'DuckDuckBot', 'Baiduspider'],
+        allow: '/',
+        disallow: [
+          '/api/',
+          '/admin/',
+          '/dashboard/',
+          '/_next/',
+          '/temp/',
+          '/test-*',
+        ],
+        crawlDelay: 1,
+      },
+      // All other crawlers - more restrictive
+      {
+        userAgent: '*',
+        allow: [
+          '/',
+          '/ai-tools/',
+          '/blog/',
+          '/about',
+          '/contact',
+          '/search',
+          '/privacy',
+          '/terms',
+          '/cookie-policy',
+          '/privacy-policy',
+          '/terms-of-service',
+        ],
+        disallow: [
+          '/api/',
+          '/admin/',
+          '/dashboard/',
+          '/test-*',
+          '/_next/',
+          '/uploads/',
+          '/temp/',
+          '/*.json$',
+          '/*?*sort=*',
+          '/*?*filter=*',
+          '/*?utm_*',
+          '/*?ref=*',
+          '/*?source=*',
         ],
         crawlDelay: 2,
       },
-      // Block aggressive crawlers
+      // Block aggressive/commercial crawlers to preserve server resources
       {
         userAgent: [
           'AhrefsBot',
@@ -61,6 +110,13 @@ export default function robots(): MetadataRoute.Robots {
           'DataForSeoBot',
           'PetalBot',
           'YandexBot',
+          'SeznamBot',
+          'facebookexternalhit',
+          'Twitterbot',
+          'LinkedInBot',
+          'WhatsApp',
+          'SkypeUriPreview',
+          'Applebot',
         ],
         disallow: '/',
       },
@@ -70,6 +126,8 @@ export default function robots(): MetadataRoute.Robots {
       `${baseUrl}/sitemap.xml`,
       `${baseUrl}/sitemap-tools.xml`,
       `${baseUrl}/sitemap-blog.xml`,
+      `${baseUrl}/sitemap-articles.xml`,
+      `${baseUrl}/sitemap-images.xml`,
     ],
     host: baseUrl,
   }
