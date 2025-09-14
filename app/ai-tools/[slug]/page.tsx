@@ -97,15 +97,16 @@ export default async function DynamicToolPage({ params }: Props) {
     { name: tool.name, href: `/ai-tools/${tool.id}`, current: true }
   ]
 
-  // Generate structured data
-  const softwareSchema = SchemaGenerator.generateSoftwareApplicationSchema(tool)
+  // Generate comprehensive structured data for maximum rich snippets
+  const toolPageSchema = SchemaGenerator.generateToolPageSchema(tool)
   const breadcrumbSchema = SchemaGenerator.generateBreadcrumbSchema(
     [{ name: 'Home', url: 'https://www.aitoolslist.com' }, ...breadcrumbs.map(b => ({ name: b.name, url: `https://www.aitoolslist.com${b.href}` }))]
   )
   const faqSchema = SchemaGenerator.generateFAQSchema(aiToolsFAQs || [])
 
+  // Combine all schemas including Product, Review, AggregateRating, and Person schemas
   const combinedSchema = SchemaGenerator.generateCombinedSchema([
-    softwareSchema,
+    ...JSON.parse(toolPageSchema)['@graph'],
     breadcrumbSchema,
     faqSchema
   ])

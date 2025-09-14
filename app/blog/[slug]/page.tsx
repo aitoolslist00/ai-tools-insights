@@ -108,17 +108,37 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     { name: post.title.replace(/^#+\s*/, '').substring(0, 50) + '...', href: `/blog/${post.id}`, current: true }
   ]
 
-  // Generate structured data
+  // Generate comprehensive structured data for blog post
   const articleSchema = SchemaGenerator.generateArticleSchema(post)
-
+  const authorSchema = SchemaGenerator.generatePersonSchema({
+    name: post.author,
+    jobTitle: 'AI Technology Writer',
+    bio: `Expert writer specializing in AI tools and technology trends. Author of multiple articles on artificial intelligence and software solutions.`,
+    sameAs: [
+      'https://twitter.com/aitoolslist',
+      'https://linkedin.com/company/aitoolslist'
+    ]
+  })
   const breadcrumbSchema = SchemaGenerator.generateBreadcrumbSchema(
     [{ name: 'Home', url: 'https://www.aitoolslist.com' }, ...breadcrumbs.map(b => ({ name: b.name, url: `https://www.aitoolslist.com${b.href}` }))]
   )
 
-  const combinedSchema = SchemaGenerator.generateCombinedSchema([
-    articleSchema,
-    breadcrumbSchema
-  ])
+  // Add NewsArticle schema if it's a news-type post
+  const schemas = [articleSchema, authorSchema, breadcrumbSchema]
+  if (post.category.toLowerCase().includes('news') || post.tags.some(tag => tag.toLowerCase().includes('news'))) {
+    const newsSchema = SchemaGenerator.generateNewsArticleSchema({
+      headline: post.title.replace(/^#+\s*/, ''),
+      description: post.excerpt,
+      author: post.author,
+      datePublished: post.publishedAt || '',
+      dateModified: post.updatedAt || '',
+      url: `https://www.aitoolslist.com/blog/${post.id}`,
+      image: post.image
+    })
+    schemas.push(newsSchema)
+  }
+
+  const combinedSchema = SchemaGenerator.generateCombinedSchema(schemas)
 
   return (
     <div className="min-h-screen bg-white">

@@ -6,6 +6,7 @@ import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration'
 import PreloadResources from '@/components/PreloadResources'
 import InstantNavigation from '@/components/InstantNavigation'
 import { AdvancedPerformanceOptimizer as PerfOptimizer } from '@/lib/advanced-performance-optimizer'
+import SchemaValidator from '@/components/SchemaValidator'
 import './globals.css'
 
 // Optimized font loading with display swap for instant text rendering
@@ -128,6 +129,9 @@ export default function RootLayout({
         
         {/* Advanced Performance Monitoring Script */}
         <script dangerouslySetInnerHTML={{ __html: PerfOptimizer.generatePerformanceBudgetMonitor() }} />
+        
+        {/* Schema Validation in Development */}
+        <SchemaValidator enabled={process.env.NODE_ENV === 'development'} />
       </body>
     </html>
   )

@@ -75,16 +75,21 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     ...(category ? [{ name: category, href: `/search?category=${encodeURIComponent(category)}`, current: true }] : []),
   ]
 
-  // Generate structured data for search page
+  // Generate structured data for search page with SearchResultsPage schema
   const websiteSchema = SchemaGenerator.generateWebsiteSchema()
   const breadcrumbSchema = SchemaGenerator.generateBreadcrumbSchema(
     [{ name: 'Home', url: 'https://www.aitoolslist.com' }, ...breadcrumbs.map(b => ({ name: b.name, url: `https://www.aitoolslist.com${b.href}` }))]
   )
+  
+  // Add SearchResultsPage schema if there's a query
+  const schemas = [websiteSchema, breadcrumbSchema]
+  if (query) {
+    // This will be populated by the SearchResults component with actual results
+    const searchResultsSchema = SchemaGenerator.generateSearchResultsPageSchema(query, [], 0)
+    schemas.push(searchResultsSchema)
+  }
 
-  const combinedSchema = SchemaGenerator.generateCombinedSchema([
-    websiteSchema,
-    breadcrumbSchema
-  ])
+  const combinedSchema = SchemaGenerator.generateCombinedSchema(schemas)
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">

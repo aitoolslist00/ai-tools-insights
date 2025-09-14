@@ -77,29 +77,27 @@ export default function Home() {
     { name: 'Home', url: 'https://www.aitoolslist.com' }
   ]
 
-  const advancedStructuredData = AdvancedSEOOptimizer.generateAdvancedStructuredData('homepage', homePageData)
+  // Generate comprehensive homepage schema with all critical types
+  const homepageSchema = SchemaGenerator.generateHomepageSchema()
+  const faqSchema = SchemaGenerator.generateFAQSchema(homepageFAQs)
+  const breadcrumbSchema = SchemaGenerator.generateBreadcrumbSchema(breadcrumbs)
+  
+  // Combine all schemas for maximum SEO impact
+  const combinedSchema = SchemaGenerator.generateCombinedSchema([
+    JSON.parse(homepageSchema),
+    faqSchema,
+    breadcrumbSchema
+  ])
 
   return (
     <div>
-      {/* Advanced SEO Head - Commented out to fix build */}
-      {/* <AdvancedSEOHead 
-        pageType="homepage"
-        data={homePageData}
-        title={homePageData.title}
-        description={homePageData.description}
-        image={homePageData.image}
-        url={homePageData.url}
-        breadcrumbs={breadcrumbs}
-        faqs={homepageFAQs}
-      /> */}
-      
       {/* Advanced Analytics */}
       <AdvancedAnalytics />
       
-      {/* Enhanced Structured Data */}
+      {/* Comprehensive Structured Data with Rich Snippets */}
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(advancedStructuredData) }}
+        dangerouslySetInnerHTML={{ __html: combinedSchema }}
       />
       
       <SSGPerformanceMonitor />

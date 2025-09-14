@@ -32,12 +32,16 @@ export default function FAQSection({
     setOpenItems(newOpenItems)
   }
 
-  // Generate FAQ schema for SEO
+  // Generate enhanced FAQ schema for rich snippets
   const faqSchema = SchemaGenerator.generateFAQSchema(faqs)
 
   return (
-    <section className={`py-12 ${className}`}>
-      {/* FAQ Schema */}
+    <section 
+      className={`py-12 ${className}`}
+      itemScope 
+      itemType="https://schema.org/FAQPage"
+    >
+      {/* Enhanced FAQ Schema for Rich Snippets */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
@@ -58,6 +62,9 @@ export default function FAQSection({
             <div
               key={index}
               className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700"
+              itemScope
+              itemType="https://schema.org/Question"
+              itemProp="mainEntity"
             >
               <button
                 className="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
@@ -65,7 +72,10 @@ export default function FAQSection({
                 aria-expanded={openItems.has(index)}
                 aria-controls={`faq-answer-${index}`}
               >
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white pr-4">
+                <h3 
+                  className="text-lg font-semibold text-gray-900 dark:text-white pr-4"
+                  itemProp="name"
+                >
                   {faq.question}
                 </h3>
                 {openItems.has(index) ? (
@@ -79,8 +89,14 @@ export default function FAQSection({
                 <div
                   id={`faq-answer-${index}`}
                   className="px-6 pb-4"
+                  itemScope
+                  itemType="https://schema.org/Answer"
+                  itemProp="acceptedAnswer"
                 >
-                  <div className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                  <div 
+                    className="text-gray-700 dark:text-gray-300 leading-relaxed"
+                    itemProp="text"
+                  >
                     {faq.answer.split('\n').map((paragraph, pIndex) => (
                       <p key={pIndex} className={pIndex > 0 ? 'mt-4' : ''}>
                         {paragraph}
