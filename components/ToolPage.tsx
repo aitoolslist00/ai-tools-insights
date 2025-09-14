@@ -2,6 +2,7 @@ import { Metadata } from 'next'
 import Link from 'next/link'
 import { Star, ExternalLink, Users, Zap, Check, X, Calendar, Building, Target } from 'lucide-react'
 import { AITool, getToolAlternatives } from '@/lib/tools-data'
+import { SchemaGenerator } from '@/lib/schema-generator'
 
 interface ToolPageProps {
   tool: AITool
@@ -9,6 +10,20 @@ interface ToolPageProps {
 
 export default function ToolPage({ tool }: ToolPageProps) {
   const alternatives = getToolAlternatives(tool.id)
+  
+  // Generate comprehensive structured data for the tool
+  const toolSchema = SchemaGenerator.generateSoftwareApplicationSchema(tool)
+  const breadcrumbSchema = SchemaGenerator.generateBreadcrumbSchema([
+    { name: 'Home', url: 'https://www.aitoolslist.com' },
+    { name: 'AI Tools', url: 'https://www.aitoolslist.com/ai-tools' },
+    { name: tool.name, url: `https://www.aitoolslist.com/ai-tools/${tool.id}` }
+  ])
+  
+  // Combine schemas for better SEO
+  const combinedSchema = SchemaGenerator.generateCombinedSchema([
+    toolSchema,
+    breadcrumbSchema
+  ])
   
   // Color scheme based on category with full Tailwind classes
   const getColorScheme = (category: string) => {
@@ -118,6 +133,12 @@ export default function ToolPage({ tool }: ToolPageProps) {
 
   return (
     <div className="min-h-screen bg-white">
+      {/* Structured Data for SEO */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: combinedSchema }}
+      />
+      
       {/* Hero Section */}
       <section className={`bg-gradient-to-br ${colors.gradientFrom} ${colors.gradientTo} py-16`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

@@ -34,6 +34,18 @@ export default function FAQSection({
 
   // Generate enhanced FAQ schema for rich snippets
   const faqSchema = SchemaGenerator.generateFAQSchema(faqs)
+  
+  // Validate that we have a proper mainEntity array
+  if (!faqSchema.mainEntity || !Array.isArray(faqSchema.mainEntity)) {
+    console.warn('FAQ Schema validation failed: mainEntity is missing or not an array', faqSchema)
+  } else if (process.env.NODE_ENV === 'development') {
+    console.log('FAQ Schema generated successfully:', {
+      type: faqSchema['@type'],
+      context: faqSchema['@context'],
+      mainEntityCount: faqSchema.mainEntity.length,
+      firstQuestion: faqSchema.mainEntity[0]?.name
+    })
+  }
 
   return (
     <section 
@@ -42,10 +54,12 @@ export default function FAQSection({
       itemType="https://schema.org/FAQPage"
     >
       {/* Enhanced FAQ Schema for Rich Snippets */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
-      />
+      {faqSchema.mainEntity && Array.isArray(faqSchema.mainEntity) && faqSchema.mainEntity.length > 0 && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+        />
+      )}
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">

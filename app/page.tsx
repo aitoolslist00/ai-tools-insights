@@ -79,13 +79,11 @@ export default function Home() {
 
   // Generate comprehensive homepage schema with all critical types
   const homepageSchema = SchemaGenerator.generateHomepageSchema()
-  const faqSchema = SchemaGenerator.generateFAQSchema(homepageFAQs)
   const breadcrumbSchema = SchemaGenerator.generateBreadcrumbSchema(breadcrumbs)
   
-  // Combine all schemas for maximum SEO impact
+  // Combine all schemas for maximum SEO impact (FAQ schema is handled by FAQSection component)
   const combinedSchema = SchemaGenerator.generateCombinedSchema([
     JSON.parse(homepageSchema),
-    faqSchema,
     breadcrumbSchema
   ])
 

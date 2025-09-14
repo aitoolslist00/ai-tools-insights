@@ -171,15 +171,32 @@ export class SchemaGenerator {
       }
     }
 
+    // Filter out any invalid FAQ items and ensure proper structure
+    const validFAQs = faqs.filter(faq => 
+      faq && 
+      typeof faq.question === 'string' && 
+      faq.question.trim().length > 0 &&
+      typeof faq.answer === 'string' && 
+      faq.answer.trim().length > 0
+    )
+
+    if (validFAQs.length === 0) {
+      return {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: []
+      }
+    }
+
     return {
       '@context': 'https://schema.org',
       '@type': 'FAQPage',
-      mainEntity: faqs.map(faq => ({
+      mainEntity: validFAQs.map(faq => ({
         '@type': 'Question',
-        name: faq.question,
+        name: faq.question.trim(),
         acceptedAnswer: {
           '@type': 'Answer',
-          text: faq.answer
+          text: faq.answer.trim()
         }
       }))
     }
