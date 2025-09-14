@@ -32,15 +32,15 @@ export default function HeroSection() {
         <div className="text-center">
           {/* Main heading - optimized for LCP */}
           <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 animate-fade-in optimize-legibility">
-            Discover the Best{' '}
-            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">AI Tools</span>{' '}
-            for Your Business
+            AI Tools Directory: Find the Best{' '}
+            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">AI Software</span>{' '}
+            for Your Business in 2025
           </h1>
           
           {/* Subheading */}
           <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto animate-slide-up optimize-legibility">
-            From AI image generators to coding assistants, find the perfect AI solution 
-            to boost your productivity and creativity.
+            Comprehensive directory of 500+ artificial intelligence tools including AI image generators, 
+            video tools, writing assistants, coding tools, and chatbots. Compare features, pricing, and reviews.
           </p>
 
           {/* Search bar */}

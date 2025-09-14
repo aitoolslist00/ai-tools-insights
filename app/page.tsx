@@ -18,12 +18,12 @@ export const dynamic = 'force-static'
 export const revalidate = false
 
 export const metadata: Metadata = {
-  title: 'AI Tools Insights - Discover the Best AI Tools for Your Business | 2025',
-  description: 'Find the perfect AI tools for your business. Comprehensive directory featuring 2,500+ AI image generators, video tools, chatbots, writing assistants, and coding tools. Updated daily with expert reviews.',
-  keywords: 'AI tools, artificial intelligence directory, best AI tools 2025, AI software, machine learning tools, business AI solutions, AI image generators, AI video tools, AI writing assistants, AI coding tools',
+  title: 'AI Tools Directory 2025: 500+ Best AI Software Tools Compared & Reviewed',
+  description: 'Discover the best AI tools for your business from our comprehensive directory of 500+ AI software solutions. Compare features, pricing & reviews. Free & paid options. Updated 2025.',
+  keywords: 'AI tools directory, best AI tools 2025, AI software comparison, artificial intelligence tools, AI tools for business, free AI tools, AI image generators, AI video tools, AI writing tools, AI coding assistants, AI chatbots, machine learning tools, business AI solutions, enterprise AI tools, AI productivity tools',
   openGraph: {
-    title: 'AI Tools Insights - Discover the Best AI Tools for Your Business | 2025',
-    description: 'Find the perfect AI tools for your business. Comprehensive directory featuring 2,500+ AI tools with expert reviews, pricing comparisons, and detailed features analysis.',
+    title: 'AI Tools Directory 2025: 500+ Best AI Software Tools Compared & Reviewed',
+    description: 'Discover the best AI tools for your business from our comprehensive directory of 500+ AI software solutions. Compare features, pricing & reviews. Free & paid options.',
     url: 'https://www.aitoolsinsights.com',
     siteName: 'AI Tools Insights',
     images: [
@@ -39,8 +39,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'AI Tools List - Discover the Best AI Tools for Your Business | 2025',
-    description: 'Find the perfect AI tools for your business. 100+ AI tools with expert reviews and comparisons.',
+    title: 'AI Tools Directory 2025: 500+ Best AI Software Tools Compared & Reviewed',
+    description: 'Discover the best AI tools for your business from our comprehensive directory of 500+ AI software solutions. Compare features, pricing & reviews.',
     images: ['/og-home.jpg'],
     creator: '@aitoolslist',
     site: '@aitoolslist',
