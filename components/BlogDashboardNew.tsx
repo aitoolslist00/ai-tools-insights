@@ -38,6 +38,7 @@ import { optimizeImageUrl } from '@/lib/utils'
 import { getAuthToken } from '@/lib/auth-enhanced'
 import ModernArticleEditor from './ModernArticleEditor'
 import RealAISeoDashboard from './RealAISeoDashboard'
+import EnhancedAISeoDashboard from './EnhancedAISeoDashboard'
 
 interface DashboardStats {
   total: number
@@ -236,7 +237,7 @@ export default function BlogDashboardNew() {
         return
       }
 
-      const response = await fetch('/api/blog/unified', {
+      const response = await fetch('/api/blog/manage', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -957,7 +958,7 @@ export default function BlogDashboardNew() {
             <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
               <h2 className="text-2xl font-bold text-gray-900 flex items-center">
                 <Sparkles className="w-6 h-6 text-purple-600 mr-2" />
-                Real AI SEO Dashboard
+                Enhanced AI SEO Dashboard
               </h2>
               <button
                 onClick={() => setShowAIEditor(false)}
@@ -966,9 +967,10 @@ export default function BlogDashboardNew() {
                 <X className="w-6 h-6" />
               </button>
             </div>
-            <RealAISeoDashboard
+            <EnhancedAISeoDashboard
               onSave={handleSavePost}
               saving={saving}
+              editingPost={editingPost}
             />
           </div>
         </div>

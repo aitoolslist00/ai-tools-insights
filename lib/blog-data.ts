@@ -24,6 +24,20 @@ export interface BlogPost {
     twitterTitle?: string
     twitterDescription?: string
     twitterImage?: string
+    schema?: any
+    socialMedia?: {
+      ogTitle?: string
+      ogDescription?: string
+      twitterTitle?: string
+      twitterDescription?: string
+    }
+    imageOptimization?: {
+      altText: string
+      title: string
+      caption: string
+      filename: string
+      seoScore: number
+    }
   }
   analytics?: {
     views?: number

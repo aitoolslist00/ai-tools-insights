@@ -34,26 +34,30 @@ export async function POST(request: NextRequest) {
       await mkdir(uploadsDir, { recursive: true })
     }
 
-    // Generate unique filename
+    // Generate SEO-optimized filename
     const timestamp = Date.now()
-    const originalName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_')
-    const filename = `${timestamp}_${originalName}`
-    const filepath = join(uploadsDir, filename)
+    const originalName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_').toLowerCase()
+    const seoFilename = `ai-tools-${timestamp}-${originalName}`
+    const filepath = join(uploadsDir, seoFilename)
 
     // Convert file to buffer and save
     const bytes = await file.arrayBuffer()
     const buffer = Buffer.from(bytes)
     await writeFile(filepath, buffer)
 
-    // Return the public URL
-    const imageUrl = `/uploads/${filename}`
+    // Return the public URL with SEO optimization info
+    const imageUrl = `/uploads/${seoFilename}`
     
     return NextResponse.json({ 
       success: true, 
       imageUrl,
-      filename,
+      filename: seoFilename,
+      originalName: file.name,
       size: file.size,
-      type: file.type
+      type: file.type,
+      seoOptimized: true,
+      altTextSuggestion: `AI tools and technology - ${originalName.replace(/\.[^/.]+$/, '').replace(/_/g, ' ')}`,
+      titleSuggestion: `Professional AI Tools Image - ${originalName.replace(/\.[^/.]+$/, '').replace(/_/g, ' ')}`
     })
 
   } catch (error) {
