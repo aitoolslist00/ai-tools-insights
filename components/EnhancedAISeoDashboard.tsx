@@ -57,6 +57,7 @@ interface EnhancedAISeoDashboardProps {
 interface ImageUploadResult {
   success: boolean
   imageUrl?: string
+  apiUrl?: string
   filename?: string
   size?: number
   type?: string
@@ -257,24 +258,79 @@ export default function EnhancedAISeoDashboard({ onSave, saving = false, editing
       const formData = new FormData()
       formData.append('file', file)
 
+      console.log('Uploading file:', file.name, file.size, file.type)
+      
       const response = await fetch('/api/upload', {
         method: 'POST',
         body: formData,
       })
 
+      console.log('Upload response status:', response.status)
+      console.log('Upload response ok:', response.ok)
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        console.error('Upload failed with status:', response.status, errorText)
+        alert(`Upload failed: ${response.status} - ${errorText}`)
+        return
+      }
+
       const result: ImageUploadResult = await response.json()
+      console.log('Upload result:', result)
 
       if (result.success && result.imageUrl) {
-        setImage(result.imageUrl)
-        setImagePreview(result.imageUrl)
-        setImageFile(file)
+        console.log('Setting image URL:', result.imageUrl)
+        console.log('API URL fallback:', result.apiUrl)
         
-        // Generate SEO optimization for the image
-        const seoOptimization = generateImageSEOOptimization(file.name, focusKeyword, title)
-        setImageOptimization(seoOptimization)
+        // Test if the image URL is accessible
+        const testImg = document.createElement('img')
+        testImg.onload = () => {
+          console.log('Image loaded successfully in dashboard:', result.imageUrl)
+          if (result.imageUrl) {
+            setImage(result.imageUrl)
+            setImagePreview(result.imageUrl)
+            setImageFile(file)
+          }
+          
+          // Generate SEO optimization for the image
+          const seoOptimization = generateImageSEOOptimization(file.name, focusKeyword, title)
+          setImageOptimization(seoOptimization)
+          
+          alert('Image uploaded successfully!')
+        }
+        testImg.onerror = (error) => {
+          console.error('Failed to load static image, trying API URL:', result.imageUrl, error)
+          
+          // Try API URL as fallback
+          if (result.apiUrl) {
+            const fallbackImg = document.createElement('img')
+            fallbackImg.onload = () => {
+              console.log('Image loaded successfully via API:', result.apiUrl)
+              if (result.apiUrl) {
+                setImage(result.apiUrl)
+                setImagePreview(result.apiUrl)
+                setImageFile(file)
+              }
+              
+              // Generate SEO optimization for the image
+              const seoOptimization = generateImageSEOOptimization(file.name, focusKeyword, title)
+              setImageOptimization(seoOptimization)
+              
+              alert('Image uploaded successfully!')
+            }
+            fallbackImg.onerror = (fallbackError) => {
+              console.error('Failed to load image via API as well:', result.apiUrl, fallbackError)
+              alert('Image uploaded but failed to display. Please refresh the page.')
+            }
+            fallbackImg.src = result.apiUrl
+          } else {
+            alert('Image uploaded but failed to display. Please refresh the page.')
+          }
+        }
+        testImg.src = result.imageUrl
         
-        alert('Image uploaded successfully!')
       } else {
+        console.error('Upload result error:', result.error)
         alert(result.error || 'Failed to upload image')
       }
     } catch (error) {

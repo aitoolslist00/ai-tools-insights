@@ -164,6 +164,19 @@ const nextConfig = {
         ]
       },
       {
+        source: '/uploads/(.*)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=3600'
+          },
+          {
+            key: 'Access-Control-Allow-Origin',
+            value: '*'
+          }
+        ]
+      },
+      {
         source: '/(.*)\\.(jpg|jpeg|png|webp|avif|gif|svg)',
         headers: [
           {
