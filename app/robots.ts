@@ -9,7 +9,11 @@ export default function robots(): MetadataRoute.Robots {
   
   return {
     rules: [
+<<<<<<< HEAD
       // Googlebot - Highest priority with MAXIMUM crawling permissions
+=======
+      // Googlebot - Highest priority with aggressive crawling permissions
+>>>>>>> 6e3c964e7c99441b87c1b6d576569e02cf5db032
       {
         userAgent: 'Googlebot',
         allow: '/',
@@ -23,7 +27,11 @@ export default function robots(): MetadataRoute.Robots {
           '/test-*',
           '/*.json$',
         ],
+<<<<<<< HEAD
         crawlDelay: 0, // ZERO delay - Maximum crawl speed for Google
+=======
+        crawlDelay: 0.1, // Very fast crawling for Google
+>>>>>>> 6e3c964e7c99441b87c1b6d576569e02cf5db032
       },
       // Google Image Bot - for AI tool images
       {

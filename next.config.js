@@ -43,13 +43,21 @@ const nextConfig = {
     optimizePackageImports: ['lucide-react', '@headlessui/react'],
     // Temporarily disable optimizeCss to fix build issue
     // optimizeCss: true,
+<<<<<<< HEAD
     webVitalsAttribution: ['CLS', 'LCP', 'FID', 'FCP', 'TTFB'],
+=======
+    webVitalsAttribution: ['CLS', 'LCP'],
+>>>>>>> 6e3c964e7c99441b87c1b6d576569e02cf5db032
     // SSG optimizations
     optimisticClientCache: true,
   },
   
   // Server external packages (moved from experimental)
+<<<<<<< HEAD
   serverExternalPackages: ['sharp'],
+=======
+  serverExternalPackages: [],
+>>>>>>> 6e3c964e7c99441b87c1b6d576569e02cf5db032
   
   // Turbopack configuration (moved from experimental.turbo)
   turbopack: {
