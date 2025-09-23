@@ -1,0 +1,23 @@
+import { NextResponse } from 'next/server'
+
+export async function GET() {
+  const securityTxt = `Contact: security@aitoolsinsights.com
+Expires: 2025-12-31T23:59:59.000Z
+Encryption: https://www.aitoolsinsights.com/pgp-key.txt
+Preferred-Languages: en
+Canonical: https://www.aitoolsinsights.com/.well-known/security.txt
+Policy: https://www.aitoolsinsights.com/security-policy
+Hiring: https://www.aitoolsinsights.com/careers
+
+# Security Policy
+# We take security seriously. Please report vulnerabilities responsibly.
+# Do not test on production systems without permission.
+# Allow reasonable time for fixes before public disclosure.`
+
+  return new NextResponse(securityTxt, {
+    headers: {
+      'Content-Type': 'text/plain',
+      'Cache-Control': 'public, max-age=86400',
+    },
+  })
+}

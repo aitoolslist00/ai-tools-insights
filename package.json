@@ -1,0 +1,63 @@
+{
+  "name": "ai-tools-insights",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "dev:turbo": "next dev --turbo",
+    "build": "next build",
+    "build:ssg": "node scripts/build-ssg.js",
+    "build:analyze": "ANALYZE=true next build",
+    "build:profile": "next build --profile",
+    "start": "next start",
+    "start:prod": "NODE_ENV=production next start",
+    "lint": "next lint",
+    "lint:fix": "next lint --fix",
+    "clean": "if exist .next rmdir /s /q .next && if exist node_modules\\.cache rmdir /s /q node_modules\\.cache",
+    "clean:all": "if exist .next rmdir /s /q .next && if exist node_modules\\.cache rmdir /s /q node_modules\\.cache && if exist out rmdir /s /q out && if exist dist rmdir /s /q dist",
+    "optimize": "node scripts/optimize.js",
+    "lighthouse": "lighthouse http://localhost:3000 --output=html --output-path=./lighthouse-report.html --chrome-flags=\"--headless\"",
+    "bundle-analyzer": "npx @next/bundle-analyzer",
+    "precommit": "npm run lint && npm run build",
+    "setup-auth": "node scripts/setup-auth.js",
+    "test-auth": "node scripts/setup-auth.js test",
+    "test-api": "node scripts/test-blog-api.js",
+    "blog:setup": "npm run setup-auth",
+    "blog:test": "npm run test-api",
+    "ssg:check": "node scripts/ssg-optimization-check.js",
+    "auth:verify": "node scripts/verify-auth.js"
+  },
+  "dependencies": {
+    "@headlessui/react": "^2.1.9",
+    "@types/nodemailer": "^7.0.1",
+    "bcryptjs": "^3.0.2",
+    "clsx": "^2.1.1",
+    "dotenv": "^17.2.2",
+    "framer-motion": "^12.23.12",
+    "jose": "^6.0.12",
+    "lucide-react": "^0.451.0",
+    "next": "^15.0.3",
+    "node-fetch": "^3.3.2",
+    "nodemailer": "^7.0.6",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tailwind-merge": "^2.5.4",
+    "zod": "^4.0.17"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^22.8.4",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^8.57.1",
+    "eslint-config-next": "^15.0.3",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.14",
+    "typescript": "^5.6.3"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  }
+}

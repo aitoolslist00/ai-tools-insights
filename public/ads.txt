@@ -1,0 +1,9 @@
+# ads.txt file for aitoolsinsights.com
+# This file is used to authorize digital advertising sellers
+# Currently no advertising partners - placeholder for future monetization
+
+# Format: domain, publisher_id, relationship, certification_authority_id
+# Example: google.com, pub-0000000000000000, DIRECT, f08c47fec0942fa0
+
+# Placeholder - update when implementing advertising
+# google.com, pub-placeholder, DIRECT, f08c47fec0942fa0

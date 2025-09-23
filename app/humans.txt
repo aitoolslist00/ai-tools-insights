@@ -1,0 +1,43 @@
+import { NextResponse } from 'next/server'
+
+export async function GET() {
+  const humansTxt = `/* TEAM */
+Developer: AI Tools Insights Team
+Contact: hello@aitoolsinsights.com
+Location: Global
+
+/* SITE */
+Last update: ${new Date().toISOString().split('T')[0]}
+Language: English
+Doctype: HTML5
+IDE: Visual Studio Code
+Framework: Next.js 15
+Styling: Tailwind CSS
+Fonts: Inter (Google Fonts)
+Hosting: Vercel
+
+/* THANKS */
+Next.js Team - Amazing React framework
+Vercel Team - Excellent hosting platform
+Tailwind CSS Team - Beautiful utility-first CSS
+Lucide Icons - Clean and consistent icons
+Open Source Community - For making this possible
+
+/* MISSION */
+Helping businesses discover and implement the best AI tools
+Making AI technology accessible to everyone
+Building a comprehensive, trustworthy AI tools directory
+
+/* VALUES */
+Transparency in reviews and recommendations
+User privacy and data protection
+Continuous improvement and innovation
+Community-driven content and feedback`
+
+  return new NextResponse(humansTxt, {
+    headers: {
+      'Content-Type': 'text/plain',
+      'Cache-Control': 'public, max-age=86400',
+    },
+  })
+}
