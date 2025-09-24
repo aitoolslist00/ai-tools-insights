@@ -46,21 +46,12 @@ export const metadata: Metadata = {
     site: '@aitoolslist',
   },
   alternates: {
-<<<<<<< HEAD
-    canonical: 'https://www.aitoolsinsights.com',
-  },
-  other: {
-    'google-site-verification': 'verified-via-dns',
-    'msvalidate.01': 'pending-setup',
-    'yandex-verification': 'pending-setup',
-=======
     canonical: 'https://www.aitoolslist.com',
   },
   other: {
     'google-site-verification': 'your-verification-code',
     'msvalidate.01': 'your-bing-verification-code',
     'yandex-verification': 'your-yandex-verification-code',
->>>>>>> 6e3c964e7c99441b87c1b6d576569e02cf5db032
   },
 }
 
@@ -78,20 +69,12 @@ export default function Home() {
     title: 'AI Tools List - Discover the Best AI Tools for Your Business | 2025',
     description: 'Find the perfect AI tools for your business. Comprehensive directory featuring 100+ AI tools with expert reviews, pricing comparisons, and detailed features analysis.',
     image: '/og-home.jpg',
-<<<<<<< HEAD
-    url: 'https://www.aitoolsinsights.com',
-=======
     url: 'https://www.aitoolslist.com',
->>>>>>> 6e3c964e7c99441b87c1b6d576569e02cf5db032
     keywords: ['AI tools', 'artificial intelligence', 'business AI', 'AI directory', 'machine learning tools']
   }
   
   const breadcrumbs = [
-<<<<<<< HEAD
-    { name: 'Home', url: 'https://www.aitoolsinsights.com' }
-=======
     { name: 'Home', url: 'https://www.aitoolslist.com' }
->>>>>>> 6e3c964e7c99441b87c1b6d576569e02cf5db032
   ]
 
   // Generate comprehensive homepage schema with all critical types
