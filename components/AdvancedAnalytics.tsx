@@ -3,15 +3,7 @@
 import { useEffect } from 'react'
 import { usePathname, useSearchParams } from 'next/navigation'
 
-declare global {
-  interface Window {
-    gtag: (...args: any[]) => void
-    dataLayer: any[]
-    fbq: (...args: any[]) => void
-    _linkedin_partner_id: string
-    lintrk: (...args: any[]) => void
-  }
-}
+
 
 interface AnalyticsProps {
   googleAnalyticsId?: string
@@ -69,7 +61,7 @@ export default function AdvancedAnalytics({
       script.onload = () => {
         window.dataLayer = window.dataLayer || []
         window.gtag = function gtag() {
-          window.dataLayer.push(arguments)
+          window.dataLayer!.push(arguments)
         }
         window.gtag('js', new Date())
         window.gtag('config', googleAnalyticsId, {
