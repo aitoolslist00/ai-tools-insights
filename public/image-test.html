@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Image Upload Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .test-section { margin: 20px 0; padding: 20px; border: 1px solid #ddd; }
+        img { max-width: 300px; border: 1px solid #ccc; }
+        .error { color: red; }
+        .success { color: green; }
+    </style>
+</head>
+<body>
+    <h1>Image Upload Test Page</h1>
+    
+    <div class="test-section">
+        <h2>Test Image Direct Access</h2>
+        <p>Testing direct access to uploaded image:</p>
+        <img src="/uploads/test-blog-image.png" alt="Test Image" onload="this.nextSibling.innerHTML='✅ Image loaded successfully'" onerror="this.nextSibling.innerHTML='❌ Image failed to load'">
+        <div class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test Image via Full URL</h2>
+        <p>Testing image access via full URL:</p>
+        <img src="https://www.aitoolsinsights.com/uploads/test-blog-image.png" alt="Test Image Full URL" onload="this.nextSibling.innerHTML='✅ Image loaded successfully'" onerror="this.nextSibling.innerHTML='❌ Image failed to load'">
+        <div class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Blog Post Data</h2>
+        <pre>{
+  "id": "image-test-1758700574760",
+  "title": "Image Upload Test Post",
+  "content": "# Image Upload Test\n\nThis post is testing the image upload functionality.\n\n![Test Image](/uploads/test-blog-image.png)\n\nThe image should appear both as a featured image and in the content.",
+  "excerpt": "Testing image upload functionality in the blog system",
+  "author": "Test Author",
+  "category": "ai-tools",
+  "tags": [
+    "test",
+    "image-upload",
+    "debugging"
+  ],
+  "image": "/uploads/test-blog-image.png",
+  "featured": false,
+  "published": true,
+  "readTime": "2 min read",
+  "date": "2025-09-24",
+  "publishedAt": "2025-09-24T07:56:14.762Z",
+  "createdAt": "2025-09-24T07:56:14.762Z",
+  "updatedAt": "2025-09-24T07:56:14.762Z",
+  "seo": {
+    "metaTitle": "Image Upload Test Post - AI Tools List",
+    "metaDescription": "Testing image upload functionality in the blog system",
+    "keywords": [
+      "test",
+      "image-upload",
+      "debugging"
+    ],
+    "focusKeyword": "image-upload",
+    "canonicalUrl": "https://www.aitoolsinsights.com/blog/image-test-1758700574760",
+    "ogTitle": "Image Upload Test Post",
+    "ogDescription": "Testing image upload functionality in the blog system",
+    "ogImage": "/uploads/test-blog-image.png",
+    "twitterTitle": "Image Upload Test Post",
+    "twitterDescription": "Testing image upload functionality in the blog system",
+    "twitterImage": "/uploads/test-blog-image.png"
+  }
+}</pre>
+    </div>
+    
+    <script>
+        console.log('🧪 Image test page loaded');
+        console.log('📸 Test image URL:', '/uploads/test-blog-image.png');
+        console.log('📝 Test post ID:', 'image-test-1758700574760');
+    </script>
+</body>
+</html>

@@ -231,6 +231,15 @@ export default function BlogDashboardNew() {
   const handleSavePost = async (post: Partial<BlogPost>) => {
     setSaving(true)
     try {
+      console.log('🔍 BlogDashboardNew - handleSavePost called');
+      console.log('📸 Post image in save handler:', post.image);
+      console.log('📝 Full post data:', {
+        id: post.id,
+        title: post.title,
+        image: post.image,
+        published: post.published
+      });
+      
       const token = getAuthToken()
       if (!token) {
         showMessage('Authentication required. Please log in again.', 'error')
@@ -247,8 +256,10 @@ export default function BlogDashboardNew() {
       })
 
       const result = await response.json()
+      console.log('💾 Save API response:', result);
 
       if (result.success) {
+        console.log('✅ Post saved successfully, reloading posts...');
         await loadPosts()
         setShowEditor(false)
         setShowAIEditor(false)
@@ -258,9 +269,11 @@ export default function BlogDashboardNew() {
         // Automatically refresh blog pages after saving
         await handleRefreshBlog()
       } else {
+        console.error('❌ Save failed:', result.error);
         showMessage(result.error || 'Failed to save post', 'error')
       }
     } catch (err) {
+      console.error('❌ Network error while saving post:', err);
       showMessage('Network error while saving post', 'error')
       console.error('Error saving post:', err)
     } finally {

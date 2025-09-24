@@ -89,6 +89,43 @@ export default function ModernArticleEditor({
 
   const contentRef = useRef<HTMLTextAreaElement>(null)
 
+  // Update state when post prop changes (for editing existing posts)
+  useEffect(() => {
+    if (post) {
+      console.log('🔄 ModernArticleEditor - Post prop changed, updating state');
+      console.log('📸 Post image from props:', post.image);
+      
+      setTitle(post.title || '')
+      setContent(post.content || '')
+      setExcerpt(post.excerpt || '')
+      setAuthor(post.author || 'AI Tools Expert')
+      setCategory(post.category || 'ai-tools')
+      setTags(post.tags || [])
+      setImage(post.image || '')
+      setFeatured(post.featured || false)
+      setPublished(post.published || false)
+      
+      // SEO state
+      setSeoTitle(post.seo?.metaTitle || '')
+      setSeoDescription(post.seo?.metaDescription || '')
+      setSeoKeywords(post.seo?.keywords || '')
+      setFocusKeyword(post.seo?.focusKeyword || '')
+      
+      // Reset upload state when switching posts
+      setUploadProgress(0)
+      setUploadError('')
+      if (previewBlob) {
+        URL.revokeObjectURL(previewBlob)
+        setPreviewBlob(null)
+      }
+      
+      // Set image input type based on existing image
+      if (post.image) {
+        setImageInputType(post.image.startsWith('/uploads/') ? 'upload' : 'url')
+      }
+    }
+  }, [post])
+
   // Calculate word count and reading time
   useEffect(() => {
     const words = content.trim().split(/\s+/).filter(word => word.length > 0).length
@@ -280,13 +317,22 @@ export default function ModernArticleEditor({
         
         // Set the image URL - use relative path for local development
         // The API returns something like "/uploads/filename.jpg"
-        console.log('Setting image URL to:', result.imageUrl)
+        console.log('✅ Upload successful! Setting image URL to:', result.imageUrl)
+        console.log('📋 Full upload result:', result)
         setImage(result.imageUrl)
+        
+        // Clean up blob URL if it exists
+        if (previewBlob) {
+          URL.revokeObjectURL(previewBlob)
+          setPreviewBlob(null)
+        }
         
         // Reset progress after a short delay
         setTimeout(() => {
           setUploadProgress(0)
         }, 1000)
+        
+        console.log('🎯 Image state after upload:', result.imageUrl)
       } else {
         throw new Error(result.error || 'Upload failed')
       }
@@ -328,6 +374,11 @@ export default function ModernArticleEditor({
   }
 
   const handleSave = async () => {
+    // Debug logging for image state
+    console.log('🔍 ModernArticleEditor - handleSave called');
+    console.log('📸 Current image state:', image);
+    console.log('🖼️ Preview blob state:', previewBlob);
+    
     const postData: Partial<BlogPost> = {
       id: post?.id || title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
       title,
@@ -354,6 +405,13 @@ export default function ModernArticleEditor({
         twitterImage: image
       }
     }
+
+    console.log('📝 Post data being saved:', {
+      id: postData.id,
+      title: postData.title,
+      image: postData.image,
+      seoOgImage: postData.seo?.ogImage
+    });
 
     await onSave(postData)
   }
