@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { revalidatePath, revalidateTag } from 'next/cache'
-import { validateApiAuth } from '@/lib/auth-middleware'
+import { validateApiAuth } from '@/lib/auth-enhanced'
 
 export async function POST(request: NextRequest) {
   // Check authentication for revalidation operations
-  if (!validateApiAuth(request)) {
+  const isAuthenticated = await validateApiAuth(request)
+  if (!isAuthenticated) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 

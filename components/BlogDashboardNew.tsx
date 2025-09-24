@@ -31,13 +31,15 @@ import {
   BarChart3,
   TrendingUp,
   Activity,
-  Zap
+  Zap,
+  AlertTriangle
 } from 'lucide-react'
 import { BlogPost, BlogCategory, blogCategories } from '@/lib/blog-data'
 import { optimizeImageUrl } from '@/lib/utils'
 import { getAuthToken } from '@/lib/auth-enhanced'
 import ModernArticleEditor from './ModernArticleEditor'
 import RealAISeoDashboard from './RealAISeoDashboard'
+import BlogSystemDiagnostics from './BlogSystemDiagnostics'
 import EnhancedAISeoDashboard from './EnhancedAISeoDashboard'
 
 interface DashboardStats {
@@ -80,6 +82,7 @@ export default function BlogDashboardNew() {
   const [showEditor, setShowEditor] = useState(false)
   const [showAIEditor, setShowAIEditor] = useState(false)
   const [editingPost, setEditingPost] = useState<BlogPost | null>(null)
+  const [showDiagnostics, setShowDiagnostics] = useState(false)
 
   // Stats and connection state
   const [stats, setStats] = useState<DashboardStats>({
@@ -104,19 +107,41 @@ export default function BlogDashboardNew() {
       setLoading(true)
       setError(null)
       
-      const response = await fetch('/api/blog/unified')
+      console.log('🔄 Loading posts from unified API...')
+      const token = await getAuthToken()
+      
+      const response = await fetch('/api/blog/unified', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        cache: 'no-store'
+      })
+      
+      console.log('📡 Response status:', response.status)
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+      }
+      
       const result = await response.json()
+      console.log('📊 API Result:', { success: result.success, dataLength: result.data?.length })
       
       if (result.success) {
         setPosts(result.data || [])
+        setMessage({ text: `Loaded ${result.data?.length || 0} posts successfully`, type: 'success' })
         await loadStats()
         await loadConnectionStatus()
       } else {
-        setError(result.error || 'Failed to load posts')
+        const errorMsg = result.error || 'Failed to load posts'
+        setError(errorMsg)
+        setMessage({ text: errorMsg, type: 'error' })
       }
     } catch (err) {
-      setError('Network error while loading posts')
-      console.error('Error loading posts:', err)
+      const errorMsg = err instanceof Error ? err.message : 'Network error while loading posts'
+      setError(errorMsg)
+      setMessage({ text: errorMsg, type: 'error' })
+      console.error('❌ Error loading posts:', err)
     } finally {
       setLoading(false)
     }
@@ -230,6 +255,8 @@ export default function BlogDashboardNew() {
   // Save post handler
   const handleSavePost = async (post: Partial<BlogPost>) => {
     setSaving(true)
+    setError(null)
+    
     try {
       console.log('🔍 BlogDashboardNew - handleSavePost called');
       console.log('📸 Post image in save handler:', post.image);
@@ -237,14 +264,19 @@ export default function BlogDashboardNew() {
         id: post.id,
         title: post.title,
         image: post.image,
-        published: post.published
+        published: post.published,
+        href: post.href
       });
       
-      const token = getAuthToken()
+      const token = await getAuthToken()
       if (!token) {
-        showMessage('Authentication required. Please log in again.', 'error')
+        const errorMsg = 'Authentication required. Please log in again.'
+        setError(errorMsg)
+        showMessage(errorMsg, 'error')
         return
       }
+
+      console.log('🔐 Using auth token:', token.substring(0, 20) + '...')
 
       const response = await fetch('/api/blog/manage', {
         method: 'POST',
@@ -253,18 +285,33 @@ export default function BlogDashboardNew() {
           'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify(post),
+        cache: 'no-store'
       })
+
+      console.log('📡 Save response status:', response.status, response.statusText)
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        console.error('❌ Save API error response:', errorText)
+        throw new Error(`HTTP ${response.status}: ${errorText}`)
+      }
 
       const result = await response.json()
       console.log('💾 Save API response:', result);
 
       if (result.success) {
         console.log('✅ Post saved successfully, reloading posts...');
-        await loadPosts()
+        
+        // Close modals first
         setShowEditor(false)
         setShowAIEditor(false)
         setEditingPost(null)
+        
+        // Show success message
         showMessage(result.message || 'Post saved successfully!')
+        
+        // Reload posts to reflect changes
+        await loadPosts()
         
         // Automatically refresh blog pages after saving
         await handleRefreshBlog()
@@ -359,22 +406,41 @@ export default function BlogDashboardNew() {
   // Refresh blog pages
   const handleRefreshBlog = async () => {
     try {
-      const token = getAuthToken()
+      console.log('🔄 Refreshing blog pages...')
+      const token = await getAuthToken()
+      
+      if (!token) {
+        console.warn('⚠️ No auth token for revalidation')
+        showMessage('Authentication required for cache refresh', 'error')
+        return
+      }
+
       const response = await fetch('/api/revalidate', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ path: '/blog' }),
+        body: JSON.stringify({ 
+          path: '/blog',
+          timestamp: Date.now()
+        }),
+        cache: 'no-store'
       })
 
+      console.log('🔄 Revalidate response:', response.status, response.statusText)
+
       if (response.ok) {
+        const result = await response.json()
+        console.log('✅ Revalidation successful:', result)
         showMessage('Blog pages refreshed successfully!')
       } else {
-        showMessage('Failed to refresh blog pages', 'error')
+        const errorText = await response.text()
+        console.error('❌ Revalidation failed:', errorText)
+        showMessage(`Failed to refresh blog pages: ${response.status}`, 'error')
       }
     } catch (err) {
+      console.error('❌ Error refreshing blog pages:', err)
       showMessage('Error refreshing blog pages', 'error')
     }
   }
@@ -662,6 +728,14 @@ export default function BlogDashboardNew() {
                 className="hidden"
               />
             </label>
+
+            <button
+              onClick={() => setShowDiagnostics(true)}
+              className="inline-flex items-center px-3 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
+            >
+              <AlertTriangle className="h-4 w-4 mr-2" />
+              Diagnostics
+            </button>
           </div>
         </div>
       </div>
@@ -1012,6 +1086,26 @@ export default function BlogDashboardNew() {
               saving={saving}
               editingPost={editingPost}
             />
+          </div>
+        </div>
+      )}
+
+      {/* Blog System Diagnostics Modal */}
+      {showDiagnostics && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-6xl max-h-[95vh] overflow-auto">
+            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-gray-900">System Diagnostics</h2>
+              <button
+                onClick={() => setShowDiagnostics(false)}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            <div className="p-6">
+              <BlogSystemDiagnostics />
+            </div>
           </div>
         </div>
       )}

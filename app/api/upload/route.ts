@@ -2,24 +2,33 @@ import { NextRequest, NextResponse } from 'next/server'
 import { writeFile, mkdir } from 'fs/promises'
 import { join, resolve } from 'path'
 import { existsSync } from 'fs'
+import { validateApiAuth } from '@/lib/auth-enhanced'
 
 export async function POST(request: NextRequest) {
   let uploadsDir = ''
   let filepath = ''
   
   try {
-    console.log('Upload API called')
+    console.log('🚀 Upload API called')
+    
+    // Check authentication first
+    const isAuthenticated = await validateApiAuth(request)
+    if (!isAuthenticated) {
+      console.log('❌ Upload request not authenticated')
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    
     const formData = await request.formData()
     const file = formData.get('file') as File
     
-    console.log('File received:', {
+    console.log('📁 File received:', {
       name: file?.name,
       size: file?.size,
       type: file?.type
     })
     
     if (!file) {
-      console.log('No file provided in request')
+      console.log('❌ No file provided in request')
       return NextResponse.json({ error: 'No file provided' }, { status: 400 })
     }
 

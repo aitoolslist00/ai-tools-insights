@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import BlogDashboardNew from '@/components/BlogDashboardNew'
+import BlogSystemDiagnostics from '@/components/BlogSystemDiagnostics'
 import LoginForm from '@/components/LoginForm'
 import { isAuthenticated, logout } from '@/lib/auth-enhanced'
 import { LogOut } from 'lucide-react'
@@ -56,6 +57,11 @@ export default function BlogDashboardPage() {
             </button>
           </div>
         </div>
+      </div>
+
+      {/* System Diagnostics */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <BlogSystemDiagnostics />
       </div>
 
       {/* Dashboard */}
