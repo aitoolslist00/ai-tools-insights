@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { BlogPost, blogCategories } from '@/lib/blog-data'
 import { EnhancedSEOEngine, EnhancedSEOAnalysis } from '@/lib/enhanced-seo-engine'
 import { EnhancedSEOAutoOptimizer, EnhancedSEOOptimizationResult } from '@/lib/enhanced-seo-auto-optimizer'
+import { getAuthToken } from '@/lib/auth-enhanced'
 import { 
   Wand2, 
   Target, 
@@ -258,10 +259,21 @@ export default function EnhancedAISeoDashboard({ onSave, saving = false, editing
       const formData = new FormData()
       formData.append('file', file)
 
+      // Get auth token
+      const token = getAuthToken()
+      if (!token) {
+        alert('Authentication required. Please log in again.')
+        setIsUploadingImage(false)
+        return
+      }
+
       console.log('Uploading file:', file.name, file.size, file.type)
       
       const response = await fetch('/api/upload', {
         method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
         body: formData,
       })
 

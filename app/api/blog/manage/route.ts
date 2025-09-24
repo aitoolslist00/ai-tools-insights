@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { BlogPost } from '@/lib/blog-data'
-import { loadBlogPostsFromFile, saveBlogPostsToFile } from '@/lib/blog-file-manager'
+import { getBlogStorageAdapter } from '@/lib/blog-storage-adapter'
 import { validateApiAuth } from '@/lib/auth-enhanced'
 
 export async function GET(request: NextRequest) {
@@ -11,7 +11,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const posts = await loadBlogPostsFromFile()
+    const storage = getBlogStorageAdapter()
+    const posts = await storage.loadPosts()
     return NextResponse.json(posts)
   } catch (error) {
     console.error('Error fetching blog posts:', error)
@@ -36,35 +37,20 @@ export async function POST(request: NextRequest) {
       }, { status: 400 })
     }
 
-    // Load existing posts
-    const existingPosts = await loadBlogPostsFromFile()
+    // Use storage adapter
+    const storage = getBlogStorageAdapter()
     
-    // Check if post with same ID exists
-    const existingPostIndex = existingPosts.findIndex(post => post.id === newPost.id)
+    // Add or update post using storage adapter
+    const success = await storage.addPost(newPost)
     
-    if (existingPostIndex >= 0) {
-      // Update existing post
-      existingPosts[existingPostIndex] = {
-        ...newPost,
-        updatedAt: new Date().toISOString()
-      }
-    } else {
-      // Add new post
-      const postWithTimestamp = {
-        ...newPost,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      }
-      existingPosts.unshift(postWithTimestamp)
+    if (!success) {
+      throw new Error('Failed to save post to storage')
     }
-
-    // Save updated posts
-    await saveBlogPostsToFile(existingPosts)
     
     return NextResponse.json({ 
       success: true, 
-      message: existingPostIndex >= 0 ? 'Post updated successfully' : 'Post created successfully',
-      post: existingPosts[existingPostIndex >= 0 ? existingPostIndex : 0]
+      message: 'Post saved successfully',
+      post: newPost
     })
     
   } catch (error) {
@@ -90,25 +76,17 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Post ID is required' }, { status: 400 })
     }
 
-    const existingPosts = await loadBlogPostsFromFile()
-    const postIndex = existingPosts.findIndex(post => post.id === updatedPost.id)
+    const storage = getBlogStorageAdapter()
+    const success = await storage.updatePost(updatedPost)
     
-    if (postIndex === -1) {
-      return NextResponse.json({ error: 'Post not found' }, { status: 404 })
+    if (!success) {
+      return NextResponse.json({ error: 'Post not found or failed to update' }, { status: 404 })
     }
-
-    // Update the post
-    existingPosts[postIndex] = {
-      ...updatedPost,
-      updatedAt: new Date().toISOString()
-    }
-
-    await saveBlogPostsToFile(existingPosts)
     
     return NextResponse.json({ 
       success: true, 
       message: 'Post updated successfully',
-      post: existingPosts[postIndex]
+      post: updatedPost
     })
     
   } catch (error) {
@@ -135,21 +113,17 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Post ID is required' }, { status: 400 })
     }
 
-    const existingPosts = await loadBlogPostsFromFile()
-    const postIndex = existingPosts.findIndex(post => post.id === postId)
+    const storage = getBlogStorageAdapter()
+    const success = await storage.deletePost(postId)
     
-    if (postIndex === -1) {
+    if (!success) {
       return NextResponse.json({ error: 'Post not found' }, { status: 404 })
     }
-
-    // Remove the post
-    const deletedPost = existingPosts.splice(postIndex, 1)[0]
-    await saveBlogPostsToFile(existingPosts)
     
     return NextResponse.json({ 
       success: true, 
       message: 'Post deleted successfully',
-      deletedPost
+      postId
     })
     
   } catch (error) {

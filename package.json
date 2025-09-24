@@ -31,6 +31,8 @@
     "@headlessui/react": "^2.1.9",
     "@heroicons/react": "^2.2.0",
     "@types/nodemailer": "^7.0.1",
+    "@vercel/blob": "^0.15.1",
+    "@vercel/kv": "^1.0.1",
     "bcryptjs": "^3.0.2",
     "clsx": "^2.1.1",
     "dotenv": "^17.2.2",

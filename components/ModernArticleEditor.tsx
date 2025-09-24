@@ -31,6 +31,7 @@ import {
 } from 'lucide-react'
 import { BlogPost, BlogCategory, blogCategories } from '@/lib/blog-data'
 import { getImageUrlError, optimizeImageUrl } from '@/lib/utils'
+import { getAuthToken } from '@/lib/auth-enhanced'
 import EnhancedArticleContent from './EnhancedArticleContent'
 
 interface ModernArticleEditorProps {
@@ -293,11 +294,20 @@ export default function ModernArticleEditor({
       const formData = new FormData()
       formData.append('file', file)
 
+      // Get auth token
+      const token = getAuthToken()
+      if (!token) {
+        throw new Error('Authentication required. Please log in again.')
+      }
+
       // Start upload with progress tracking
       setUploadProgress(10)
 
       const response = await fetch('/api/upload', {
         method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
         body: formData,
       })
 

@@ -1,16 +1,21 @@
 import { NextResponse } from 'next/server'
-import { loadBlogPostsFromFile } from '@/lib/blog-file-manager'
+import { getBlogStorageAdapter } from '@/lib/blog-storage-adapter'
 
-// Force static generation for API route
-export const dynamic = 'force-static'
-export const revalidate = false
+// Force dynamic for production compatibility
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 export async function GET() {
   try {
-    const posts = await loadBlogPostsFromFile()
+    const storage = getBlogStorageAdapter()
+    const posts = await storage.loadPosts()
     const publishedPosts = posts.filter(post => post.published)
     
-    return NextResponse.json(publishedPosts)
+    return NextResponse.json(publishedPosts, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300'
+      }
+    })
   } catch (error) {
     console.error('Error fetching blog posts:', error)
     return NextResponse.json([], { status: 500 })
