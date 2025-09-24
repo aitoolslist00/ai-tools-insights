@@ -287,28 +287,55 @@ export default function BlogDashboardNew() {
       return
     }
 
+    console.log('🗑️ Starting delete process for post:', postId);
+
     try {
       const token = getAuthToken()
+      console.log('🔑 Auth token available:', !!token);
+      
+      if (!token) {
+        showMessage('Authentication required. Please log in again.', 'error')
+        return
+      }
+
+      console.log('📡 Sending DELETE request to:', `/api/blog/unified?id=${postId}`);
+      
       const response = await fetch(`/api/blog/unified?id=${postId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
       })
 
+      console.log('📥 Response status:', response.status);
+      console.log('📥 Response ok:', response.ok);
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        console.error('❌ HTTP error response:', errorText);
+        showMessage(`HTTP Error ${response.status}: ${errorText}`, 'error')
+        return
+      }
+
       const result = await response.json()
+      console.log('📋 Delete result:', result);
 
       if (result.success) {
+        console.log('✅ Delete successful, reloading posts...');
         await loadPosts()
         showMessage('Post deleted successfully!')
         
         // Automatically refresh blog pages after deleting
+        console.log('🔄 Refreshing blog pages...');
         await handleRefreshBlog()
       } else {
+        console.error('❌ Delete failed:', result.error);
         showMessage(result.error || 'Failed to delete post', 'error')
       }
     } catch (err) {
-      showMessage('Error deleting post', 'error')
+      console.error('❌ Delete error:', err);
+      showMessage(`Error deleting post: ${err instanceof Error ? err.message : 'Unknown error'}`, 'error')
     }
   }
 

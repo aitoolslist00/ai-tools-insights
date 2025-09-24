@@ -113,9 +113,17 @@ export async function POST(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
+    console.log('🗑️ DELETE request received');
+    
     // Check authentication
+    const authHeader = request.headers.get('authorization')
+    console.log('🔑 Auth header present:', !!authHeader);
+    
     const isAuthenticated = await validateApiAuth(request)
+    console.log('🔐 Authentication result:', isAuthenticated);
+    
     if (!isAuthenticated) {
+      console.log('❌ Authentication failed');
       return NextResponse.json({
         success: false,
         error: 'Unauthorized access'
@@ -124,23 +132,29 @@ export async function DELETE(request: NextRequest) {
 
     const { searchParams } = new URL(request.url)
     const postId = searchParams.get('id')
+    console.log('🆔 Post ID to delete:', postId);
 
     if (!postId) {
+      console.log('❌ No post ID provided');
       return NextResponse.json({
         success: false,
         error: 'Post ID is required'
       }, { status: 400 })
     }
 
+    console.log('🔄 Calling unifiedBlogSystem.deleteBlogPost...');
     const result = await unifiedBlogSystem.deleteBlogPost(postId)
+    console.log('📋 Delete operation result:', result);
 
     if (result.success) {
+      console.log('✅ Delete successful');
       return NextResponse.json({
         success: true,
         message: result.message,
         timestamp: result.timestamp
       })
     } else {
+      console.log('❌ Delete failed:', result.error);
       return NextResponse.json({
         success: false,
         error: result.error,
@@ -149,7 +163,7 @@ export async function DELETE(request: NextRequest) {
       }, { status: 500 })
     }
   } catch (error) {
-    console.error('Error deleting blog post:', error)
+    console.error('❌ Error deleting blog post:', error)
     return NextResponse.json({
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',
