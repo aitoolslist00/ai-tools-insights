@@ -125,8 +125,8 @@ export class VercelBlogStorage {
             }
           }
         } else {
-          // KV not configured, use file system as fallback
-          console.log('⚠️ KV not configured, using file system fallback...')
+          // KV not configured in production - this is a warning, but we can still try file system for read operations
+          console.warn('⚠️ KV not configured in production. Write operations will fail.')
           try {
             const fileData = await fs.readFile(BLOG_POSTS_FILE, 'utf-8')
             posts = JSON.parse(fileData)
@@ -197,16 +197,13 @@ export class VercelBlogStorage {
             await kv.set(KV_BLOG_POSTS_KEY, posts)
             console.log('✅ Posts saved to KV')
           } catch (kvError) {
-            console.error('❌ KV save failed, falling back to file:', kvError)
-            // Fallback to file system
-            await fs.writeFile(BLOG_POSTS_FILE, JSON.stringify(posts, null, 2))
-            console.log('✅ Posts saved to file (fallback)')
+            console.error('❌ KV save failed in production:', kvError)
+            // In production, don't fallback to file system as it's read-only
+            throw new Error(`KV storage failed in production: ${kvError instanceof Error ? kvError.message : 'Unknown KV error'}. File system is read-only in production environment.`)
           }
         } else {
-          // KV not configured, use file system
-          console.log('⚠️ KV not configured, saving to file...')
-          await fs.writeFile(BLOG_POSTS_FILE, JSON.stringify(posts, null, 2))
-          console.log('✅ Posts saved to file (no KV config)')
+          // KV not configured in production - this is an error
+          throw new Error('KV storage is required in production environment. Please configure KV_REST_API_URL and KV_REST_API_TOKEN environment variables.')
         }
       } else {
         // Save to file system in development
