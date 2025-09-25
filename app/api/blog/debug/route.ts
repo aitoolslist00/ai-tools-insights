@@ -51,24 +51,57 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Test file write permissions for uploads directory
+    // Test upload capabilities based on configured provider
     try {
-      const uploadsDir = resolve(process.cwd(), 'public', 'uploads')
-      const { writeFileSync, unlinkSync, mkdirSync } = await import('fs')
+      const uploadProvider = process.env.UPLOAD_PROVIDER || 'local'
+      debugInfo.files.uploadsDir.provider = uploadProvider
       
-      // Ensure uploads directory exists
-      if (!existsSync(uploadsDir)) {
-        mkdirSync(uploadsDir, { recursive: true })
+      if (uploadProvider === 'vercel-blob') {
+        // Test Vercel Blob configuration
+        if (process.env.BLOB_READ_WRITE_TOKEN) {
+          try {
+            // Check if @vercel/blob package is available
+            await import('@vercel/blob')
+            debugInfo.files.uploadsDir.writable = true
+            debugInfo.files.uploadsDir.status = 'Vercel Blob configured and ready'
+          } catch (importError) {
+            debugInfo.files.uploadsDir.writable = false
+            debugInfo.files.uploadsDir.status = 'Vercel Blob package not installed'
+          }
+        } else {
+          debugInfo.files.uploadsDir.writable = false
+          debugInfo.files.uploadsDir.status = 'BLOB_READ_WRITE_TOKEN not configured'
+        }
+      } else if (uploadProvider === 'cloudinary') {
+        // Test Cloudinary configuration
+        if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_UPLOAD_PRESET) {
+          debugInfo.files.uploadsDir.writable = true
+          debugInfo.files.uploadsDir.status = 'Cloudinary configured and ready'
+        } else {
+          debugInfo.files.uploadsDir.writable = false
+          debugInfo.files.uploadsDir.status = 'Cloudinary environment variables not configured'
+        }
+      } else {
+        // Test local file system (development)
+        const uploadsDir = resolve(process.cwd(), 'public', 'uploads')
+        const { writeFileSync, unlinkSync, mkdirSync } = await import('fs')
+        
+        // Ensure uploads directory exists
+        if (!existsSync(uploadsDir)) {
+          mkdirSync(uploadsDir, { recursive: true })
+        }
+        
+        // Test write permissions in uploads directory
+        const testFile = resolve(uploadsDir, 'test-write.txt')
+        writeFileSync(testFile, 'test')
+        unlinkSync(testFile)
+        debugInfo.files.uploadsDir.writable = true
+        debugInfo.files.uploadsDir.status = 'Local file system write permissions OK'
       }
-      
-      // Test write permissions in uploads directory
-      const testFile = resolve(uploadsDir, 'test-write.txt')
-      writeFileSync(testFile, 'test')
-      unlinkSync(testFile)
-      debugInfo.files.uploadsDir.writable = true
     } catch (error) {
-      console.error('Write permission test failed:', error)
+      console.error('Upload capability test failed:', error)
       debugInfo.files.uploadsDir.writable = false
+      debugInfo.files.uploadsDir.status = `Error: ${error instanceof Error ? error.message : 'Unknown error'}`
     }
 
     // Load and analyze posts
