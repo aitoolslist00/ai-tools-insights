@@ -51,14 +51,23 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Test file write permissions
+    // Test file write permissions for uploads directory
     try {
-      const testFile = resolve(process.cwd(), 'test-write.txt')
-      const { writeFileSync, unlinkSync } = await import('fs')
+      const uploadsDir = resolve(process.cwd(), 'public', 'uploads')
+      const { writeFileSync, unlinkSync, mkdirSync } = await import('fs')
+      
+      // Ensure uploads directory exists
+      if (!existsSync(uploadsDir)) {
+        mkdirSync(uploadsDir, { recursive: true })
+      }
+      
+      // Test write permissions in uploads directory
+      const testFile = resolve(uploadsDir, 'test-write.txt')
       writeFileSync(testFile, 'test')
       unlinkSync(testFile)
       debugInfo.files.uploadsDir.writable = true
     } catch (error) {
+      console.error('Write permission test failed:', error)
       debugInfo.files.uploadsDir.writable = false
     }
 
