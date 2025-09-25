@@ -204,15 +204,66 @@ class CloudinaryAdapter implements ImageUploadAdapter {
   }
 }
 
+// Vercel-compatible adapter (works without external services)
+class VercelCompatibleAdapter implements ImageUploadAdapter {
+  async uploadImage(file: File): Promise<ImageUploadResult> {
+    try {
+      // For Vercel, we'll use a base64 data URL approach
+      // This stores the image as a data URL that can be used directly
+      const bytes = await file.arrayBuffer()
+      const buffer = Buffer.from(bytes)
+      const base64 = buffer.toString('base64')
+      const mimeType = file.type
+      const dataUrl = `data:${mimeType};base64,${base64}`
+      
+      // Generate a unique filename for reference
+      const timestamp = Date.now()
+      const originalName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_').toLowerCase()
+      const filename = `ai-tools-${timestamp}-${originalName}`
+      
+      return {
+        success: true,
+        imageUrl: dataUrl,
+        filename: filename,
+        size: file.size,
+        type: file.type
+      }
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Vercel-compatible upload failed'
+      }
+    }
+  }
+
+  async deleteImage(filename: string): Promise<boolean> {
+    // For data URLs, deletion is not needed as they're not stored on disk
+    return true
+  }
+}
+
 // Factory function to get the appropriate upload adapter
 export function getImageUploadAdapter(): ImageUploadAdapter {
-  const provider = process.env.UPLOAD_PROVIDER || 'local'
+  const isProduction = process.env.NODE_ENV === 'production'
+  const isVercel = process.env.VERCEL === '1'
+  let provider = process.env.UPLOAD_PROVIDER || 'local'
+  
+  // Auto-detect best provider for environment
+  if (isVercel && isProduction) {
+    if (process.env.BLOB_READ_WRITE_TOKEN) {
+      provider = 'vercel-blob'
+    } else {
+      provider = 'vercel-compatible'
+    }
+  }
   
   console.log('📸 Image upload provider:', provider)
   
   switch (provider) {
     case 'vercel-blob':
       return new VercelBlobAdapter()
+    case 'vercel-compatible':
+      return new VercelCompatibleAdapter()
     case 'cloudinary':
       return new CloudinaryAdapter()
     case 'local':
