@@ -1,4 +1,3 @@
-import { kv } from '@vercel/kv'
 import fs from 'fs/promises'
 import path from 'path'
 import { BlogPost } from './blog-data'
@@ -6,6 +5,24 @@ import { BlogPost } from './blog-data'
 const BLOG_POSTS_FILE = path.join(process.cwd(), 'blog-posts.json')
 const KV_BLOG_POSTS_KEY = 'blog:posts'
 const KV_BLOG_STATS_KEY = 'blog:stats'
+
+// Lazy load KV to handle missing configuration gracefully
+let kvInstance: any = null
+let kvError: string | null = null
+
+async function getKV() {
+  if (kvInstance) return kvInstance
+  if (kvError) throw new Error(kvError)
+  
+  try {
+    const { kv } = await import('@vercel/kv')
+    kvInstance = kv
+    return kvInstance
+  } catch (error) {
+    kvError = `KV import failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+    throw new Error(kvError)
+  }
+}
 
 export interface BlogStorageResult {
   success: boolean
@@ -65,27 +82,58 @@ export class VercelBlogStorage {
       let posts: BlogPost[] = []
 
       if (this.isProduction) {
-        // Use Vercel KV in production
-        console.log('🔄 Loading posts from Vercel KV...')
-        const kvData = await kv.get<BlogPost[]>(KV_BLOG_POSTS_KEY)
+        // Check if KV is properly configured
+        const kvConfigured = !!(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN)
         
-        if (kvData) {
-          posts = kvData
-          console.log(`✅ Loaded ${posts.length} posts from KV`)
+        if (kvConfigured) {
+          try {
+            // Use Vercel KV in production
+            console.log('🔄 Loading posts from Vercel KV...')
+            const kv = await getKV()
+            const kvData = await kv.get(KV_BLOG_POSTS_KEY) as BlogPost[] | null
+            
+            if (kvData) {
+              posts = kvData
+              console.log(`✅ Loaded ${posts.length} posts from KV`)
+            } else {
+              // If no data in KV, try to migrate from file (first time setup)
+              console.log('📦 No data in KV, attempting migration from file...')
+              try {
+                const fileData = await fs.readFile(BLOG_POSTS_FILE, 'utf-8')
+                posts = JSON.parse(fileData)
+                
+                // Save to KV for future use
+                await kv.set(KV_BLOG_POSTS_KEY, posts)
+                console.log(`🔄 Migrated ${posts.length} posts to KV`)
+              } catch (fileError) {
+                console.log('📝 No existing file data, starting with empty posts')
+                posts = []
+                await kv.set(KV_BLOG_POSTS_KEY, posts)
+              }
+            }
+          } catch (kvError) {
+            console.error('❌ KV operation failed:', kvError)
+            // Fallback to file system even in production
+            console.log('🔄 Falling back to file system...')
+            try {
+              const fileData = await fs.readFile(BLOG_POSTS_FILE, 'utf-8')
+              posts = JSON.parse(fileData)
+              console.log(`✅ Loaded ${posts.length} posts from file (fallback)`)
+            } catch (fileError) {
+              console.log('📝 No existing file, starting with empty posts')
+              posts = []
+            }
+          }
         } else {
-          // If no data in KV, try to migrate from file (first time setup)
-          console.log('📦 No data in KV, attempting migration from file...')
+          // KV not configured, use file system as fallback
+          console.log('⚠️ KV not configured, using file system fallback...')
           try {
             const fileData = await fs.readFile(BLOG_POSTS_FILE, 'utf-8')
             posts = JSON.parse(fileData)
-            
-            // Save to KV for future use
-            await kv.set(KV_BLOG_POSTS_KEY, posts)
-            console.log(`🔄 Migrated ${posts.length} posts to KV`)
+            console.log(`✅ Loaded ${posts.length} posts from file (no KV config)`)
           } catch (fileError) {
-            console.log('📝 No existing file data, starting with empty posts')
+            console.log('📝 No existing file, starting with empty posts')
             posts = []
-            await kv.set(KV_BLOG_POSTS_KEY, posts)
           }
         }
       } else {
@@ -139,9 +187,27 @@ export class VercelBlogStorage {
       console.log(`💾 Saving ${posts.length} posts to ${this.isProduction ? 'KV' : 'file'}...`)
 
       if (this.isProduction) {
-        // Save to Vercel KV in production
-        await kv.set(KV_BLOG_POSTS_KEY, posts)
-        console.log('✅ Posts saved to KV')
+        // Check if KV is properly configured
+        const kvConfigured = !!(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN)
+        
+        if (kvConfigured) {
+          try {
+            // Save to Vercel KV in production
+            const kv = await getKV()
+            await kv.set(KV_BLOG_POSTS_KEY, posts)
+            console.log('✅ Posts saved to KV')
+          } catch (kvError) {
+            console.error('❌ KV save failed, falling back to file:', kvError)
+            // Fallback to file system
+            await fs.writeFile(BLOG_POSTS_FILE, JSON.stringify(posts, null, 2))
+            console.log('✅ Posts saved to file (fallback)')
+          }
+        } else {
+          // KV not configured, use file system
+          console.log('⚠️ KV not configured, saving to file...')
+          await fs.writeFile(BLOG_POSTS_FILE, JSON.stringify(posts, null, 2))
+          console.log('✅ Posts saved to file (no KV config)')
+        }
       } else {
         // Save to file system in development
         await fs.writeFile(BLOG_POSTS_FILE, JSON.stringify(posts, null, 2))
@@ -324,13 +390,21 @@ export class VercelBlogStorage {
       const warnings: string[] = []
 
       if (this.isProduction) {
-        // Test KV connection
-        try {
-          await kv.ping()
-          console.log('✅ KV connection successful')
-        } catch (kvError) {
-          errors.push('Cannot connect to Vercel KV')
-          console.error('❌ KV connection failed:', kvError)
+        // Check if KV is properly configured
+        const kvConfigured = !!(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN)
+        
+        if (kvConfigured) {
+          // Test KV connection
+          try {
+            const kv = await getKV()
+            await kv.ping()
+            console.log('✅ KV connection successful')
+          } catch (kvError) {
+            errors.push('Cannot connect to Vercel KV')
+            console.error('❌ KV connection failed:', kvError)
+          }
+        } else {
+          warnings.push('Vercel KV not configured - using file system fallback')
         }
       } else {
         // Test file access in development
