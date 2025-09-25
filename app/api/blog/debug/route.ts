@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { validateApiAuth } from '@/lib/auth-enhanced'
-import { loadBlogPostsFromFile } from '@/lib/blog-file-manager'
+import { unifiedBlogSystem } from '@/lib/blog-system-unified'
+import { BlogPost } from '@/lib/blog-data'
 import { existsSync, statSync } from 'fs'
 import { resolve } from 'path'
 
@@ -20,8 +21,11 @@ export async function GET(request: NextRequest) {
         nodeVersion: process.version,
         cwd: process.cwd()
       },
-      files: {
-        blogPostsFile: {
+      storage: {
+        type: process.env.NODE_ENV === 'production' ? 'vercel-kv' : 'file-system',
+        environment: process.env.NODE_ENV,
+        kvConfigured: !!(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN),
+        fallbackFile: {
           path: resolve(process.cwd(), 'blog-posts.json'),
           exists: existsSync(resolve(process.cwd(), 'blog-posts.json')),
           size: existsSync(resolve(process.cwd(), 'blog-posts.json')) 
@@ -30,7 +34,9 @@ export async function GET(request: NextRequest) {
           lastModified: existsSync(resolve(process.cwd(), 'blog-posts.json'))
             ? statSync(resolve(process.cwd(), 'blog-posts.json')).mtime.toISOString()
             : null
-        },
+        }
+      },
+      files: {
         uploadsDir: {
           path: resolve(process.cwd(), 'public', 'uploads'),
           exists: existsSync(resolve(process.cwd(), 'public', 'uploads')),
@@ -169,11 +175,14 @@ export async function GET(request: NextRequest) {
 
     // Load and analyze posts
     try {
-      const posts = await loadBlogPostsFromFile()
-      debugInfo.posts.total = posts.length
-      debugInfo.posts.published = posts.filter(p => p.published).length
-      debugInfo.posts.drafts = posts.filter(p => !p.published).length
-      debugInfo.posts.withImages = posts.filter(p => p.image).length
+      const loadResult = await unifiedBlogSystem.loadBlogPosts()
+      if (loadResult.success && loadResult.data) {
+        const posts: BlogPost[] = loadResult.data
+        debugInfo.posts.total = posts.length
+        debugInfo.posts.published = posts.filter((p: BlogPost) => p.published).length
+        debugInfo.posts.drafts = posts.filter((p: BlogPost) => !p.published).length
+        debugInfo.posts.withImages = posts.filter((p: BlogPost) => p.image).length
+      }
     } catch (error) {
       console.error('Error loading posts for debug:', error)
     }

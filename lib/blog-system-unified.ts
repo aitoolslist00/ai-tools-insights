@@ -2,6 +2,7 @@ import fs from 'fs/promises'
 import path from 'path'
 import { BlogPost } from './blog-data'
 import { revalidatePath, revalidateTag } from 'next/cache'
+import { vercelBlogStorage } from './blog-storage-vercel'
 
 const BLOG_POSTS_FILE = path.join(process.cwd(), 'blog-posts.json')
 const BACKUP_DIR = path.join(process.cwd(), 'backups')
@@ -19,6 +20,7 @@ export class UnifiedBlogSystem {
   private lockFile = path.join(process.cwd(), '.blog-lock')
   private cache = new Map<string, { data: any; timestamp: number }>()
   private readonly CACHE_TTL = 5000 // 5 seconds in development
+  private storage = vercelBlogStorage
 
   static getInstance(): UnifiedBlogSystem {
     if (!UnifiedBlogSystem.instance) {
@@ -106,43 +108,19 @@ export class UnifiedBlogSystem {
 
   async loadBlogPosts(): Promise<BlogOperationResult> {
     try {
-      const cacheKey = this.getCacheKey('loadPosts')
-      const cached = this.getFromCache<BlogPost[]>(cacheKey)
+      console.log('🔄 UnifiedBlogSystem: Loading posts via Vercel storage...')
+      const result = await vercelBlogStorage.loadPosts()
       
-      if (cached && process.env.NODE_ENV === 'production') {
-        return {
-          success: true,
-          message: 'Posts loaded from cache',
-          data: cached,
-          timestamp: new Date().toISOString()
-        }
+      if (result.success) {
+        // Cache the result in our local cache too
+        const cacheKey = this.getCacheKey('loadPosts')
+        this.setCache(cacheKey, result.data)
+        console.log(`✅ UnifiedBlogSystem: Loaded ${result.data?.length || 0} posts`)
       }
-
-      const data = await fs.readFile(BLOG_POSTS_FILE, 'utf-8')
-      const posts: BlogPost[] = JSON.parse(data)
       
-      // Validate and clean posts
-      const validPosts = posts.filter(post => {
-        return post.id && post.title && post.content && post.href
-      })
-
-      // Sort by date (newest first)
-      validPosts.sort((a, b) => {
-        const dateA = new Date(b.publishedAt || b.date || b.updatedAt || '1970-01-01').getTime()
-        const dateB = new Date(a.publishedAt || a.date || a.updatedAt || '1970-01-01').getTime()
-        return dateA - dateB
-      })
-
-      this.setCache(cacheKey, validPosts)
-
-      return {
-        success: true,
-        message: `Loaded ${validPosts.length} blog posts`,
-        data: validPosts,
-        timestamp: new Date().toISOString()
-      }
+      return result
     } catch (error) {
-      console.error('Error loading blog posts:', error)
+      console.error('❌ UnifiedBlogSystem: Error loading blog posts:', error)
       return {
         success: false,
         message: 'Failed to load blog posts',
@@ -153,115 +131,68 @@ export class UnifiedBlogSystem {
   }
 
   async saveBlogPost(post: BlogPost): Promise<BlogOperationResult> {
-    await this.acquireLock()
-    
     try {
-      // Create backup before making changes
-      await this.createBackup()
-
-      // Load current posts
-      const loadResult = await this.loadBlogPosts()
-      if (!loadResult.success) {
-        throw new Error(loadResult.error || 'Failed to load existing posts')
-      }
-
-      let posts: BlogPost[] = loadResult.data || []
+      console.log('💾 UnifiedBlogSystem: Saving post via Vercel storage...')
       
-      // Validate required fields
-      if (!post.id || !post.title || !post.content) {
-        throw new Error('Missing required fields: id, title, or content')
+      // Create backup in development only
+      if (process.env.NODE_ENV === 'development') {
+        await this.createBackup()
       }
 
-      // Generate proper slug and href if missing
-      if (!post.href || post.href === `/blog/${post.id}`) {
-        const slug = this.generateSlug(post.title)
-        post.id = slug
-        post.href = `/blog/${slug}`
-      }
-
-      // Set timestamps
-      const now = new Date().toISOString()
-      post.updatedAt = now
+      const result = await vercelBlogStorage.savePost(post)
       
-      if (post.published && !post.publishedAt) {
-        post.publishedAt = now
+      if (result.success) {
+        // Clear local cache
+        this.clearCache()
+        
+        // Trigger revalidation
+        await this.revalidateBlogPages(result.data)
+        
+        console.log(`✅ UnifiedBlogSystem: Post saved successfully: ${post.title}`)
       }
-
-      // Find existing post or add new one
-      const existingIndex = posts.findIndex(p => p.id === post.id)
       
-      if (existingIndex >= 0) {
-        posts[existingIndex] = post
-      } else {
-        posts.unshift(post) // Add to beginning
-      }
-
-      // Save to file
-      await fs.writeFile(BLOG_POSTS_FILE, JSON.stringify(posts, null, 2))
-
-      // Clear cache and trigger revalidation
-      this.clearCache()
-      await this.revalidateBlogPages(post)
-
-      return {
-        success: true,
-        message: `Blog post ${existingIndex >= 0 ? 'updated' : 'created'} successfully`,
-        data: post,
-        timestamp: now
-      }
+      return result
     } catch (error) {
-      console.error('Error saving blog post:', error)
+      console.error('❌ UnifiedBlogSystem: Error saving blog post:', error)
       return {
         success: false,
         message: 'Failed to save blog post',
         error: error instanceof Error ? error.message : 'Unknown error',
         timestamp: new Date().toISOString()
       }
-    } finally {
-      await this.releaseLock()
     }
   }
 
   async deleteBlogPost(postId: string): Promise<BlogOperationResult> {
-    await this.acquireLock()
-    
     try {
-      await this.createBackup()
-
-      const loadResult = await this.loadBlogPosts()
-      if (!loadResult.success) {
-        throw new Error(loadResult.error || 'Failed to load existing posts')
-      }
-
-      let posts: BlogPost[] = loadResult.data || []
-      const initialLength = posts.length
+      console.log(`🗑️ UnifiedBlogSystem: Deleting post via Vercel storage: ${postId}`)
       
-      posts = posts.filter(p => p.id !== postId)
+      // Create backup in development only
+      if (process.env.NODE_ENV === 'development') {
+        await this.createBackup()
+      }
+
+      const result = await vercelBlogStorage.deletePost(postId)
       
-      if (posts.length === initialLength) {
-        throw new Error('Post not found')
+      if (result.success) {
+        // Clear local cache
+        this.clearCache()
+        
+        // Trigger revalidation
+        await this.revalidateBlogPages()
+        
+        console.log(`✅ UnifiedBlogSystem: Post deleted successfully: ${postId}`)
       }
-
-      await fs.writeFile(BLOG_POSTS_FILE, JSON.stringify(posts, null, 2))
-
-      this.clearCache()
-      await this.revalidateBlogPages()
-
-      return {
-        success: true,
-        message: 'Blog post deleted successfully',
-        timestamp: new Date().toISOString()
-      }
+      
+      return result
     } catch (error) {
-      console.error('Error deleting blog post:', error)
+      console.error('❌ UnifiedBlogSystem: Error deleting blog post:', error)
       return {
         success: false,
         message: 'Failed to delete blog post',
         error: error instanceof Error ? error.message : 'Unknown error',
         timestamp: new Date().toISOString()
       }
-    } finally {
-      await this.releaseLock()
     }
   }
 
@@ -397,11 +328,14 @@ export class UnifiedBlogSystem {
       const errors: string[] = []
       const warnings: string[] = []
 
-      // Test file access
+      // Test storage connection
       try {
-        await fs.access(BLOG_POSTS_FILE)
-      } catch {
-        errors.push('Blog posts file is not accessible')
+        const connectionTest = await this.storage.validateConnection()
+        if (!connectionTest.success) {
+          errors.push(`Storage connection failed: ${connectionTest.error}`)
+        }
+      } catch (error) {
+        errors.push(`Storage connection error: ${error instanceof Error ? error.message : 'Unknown error'}`)
       }
 
       // Test data integrity

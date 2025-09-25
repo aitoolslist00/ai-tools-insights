@@ -12,13 +12,18 @@ interface DiagnosticInfo {
     nodeVersion: string
     cwd: string
   }
-  files: {
-    blogPostsFile: {
+  storage: {
+    type: string
+    environment: string
+    kvConfigured: boolean
+    fallbackFile: {
       path: string
       exists: boolean
       size: number
       lastModified: string | null
     }
+  }
+  files: {
     uploadsDir: {
       path: string
       exists: boolean
@@ -163,23 +168,29 @@ export default function BlogSystemDiagnostics() {
           </div>
         </div>
 
-        {/* File System */}
+        {/* Storage System */}
         <div className="space-y-4">
           <h4 className="font-medium text-gray-900 flex items-center">
-            <Upload className="h-4 w-4 mr-2" />
-            File System
+            <Database className="h-4 w-4 mr-2" />
+            Storage System
           </h4>
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Blog Posts File</span>
-              <StatusIcon status={diagnostics.files.blogPostsFile.exists} />
+              <span className="text-sm text-gray-600">Storage Type</span>
+              <span className="text-sm font-mono bg-gray-100 px-2 py-1 rounded">
+                {diagnostics.storage.type}
+              </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Uploads Directory</span>
-              <StatusIcon status={diagnostics.files.uploadsDir.exists} />
+              <span className="text-sm text-gray-600">Vercel KV Configured</span>
+              <StatusIcon status={diagnostics.storage.kvConfigured} />
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Write Permissions</span>
+              <span className="text-sm text-gray-600">Fallback File Available</span>
+              <StatusIcon status={diagnostics.storage.fallbackFile.exists} />
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600">Upload System</span>
               <StatusIcon status={diagnostics.files.uploadsDir.writable} />
             </div>
           </div>
@@ -211,20 +222,35 @@ export default function BlogSystemDiagnostics() {
           </div>
         </div>
 
-        {/* File Details */}
+        {/* Storage Details */}
         <div className="space-y-4">
-          <h4 className="font-medium text-gray-900">File Details</h4>
+          <h4 className="font-medium text-gray-900">Storage Details</h4>
           <div className="space-y-2 text-sm">
             <div>
-              <span className="text-gray-600">Blog Posts File Size:</span>
-              <span className="ml-2 font-mono">{diagnostics.files.blogPostsFile.size} bytes</span>
+              <span className="text-gray-600">Environment:</span>
+              <span className="ml-2 font-mono">{diagnostics.storage.environment}</span>
             </div>
-            {diagnostics.files.blogPostsFile.lastModified && (
-              <div>
-                <span className="text-gray-600">Last Modified:</span>
-                <span className="ml-2 font-mono">
-                  {new Date(diagnostics.files.blogPostsFile.lastModified).toLocaleString()}
-                </span>
+            {diagnostics.storage.fallbackFile.exists && (
+              <>
+                <div>
+                  <span className="text-gray-600">Fallback File Size:</span>
+                  <span className="ml-2 font-mono">{diagnostics.storage.fallbackFile.size} bytes</span>
+                </div>
+                {diagnostics.storage.fallbackFile.lastModified && (
+                  <div>
+                    <span className="text-gray-600">Last Modified:</span>
+                    <span className="ml-2 font-mono">
+                      {new Date(diagnostics.storage.fallbackFile.lastModified).toLocaleString()}
+                    </span>
+                  </div>
+                )}
+              </>
+            )}
+            {!diagnostics.storage.kvConfigured && diagnostics.storage.type === 'vercel-kv' && (
+              <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <p className="text-sm text-yellow-800">
+                  <strong>⚠️ Configuration Required:</strong> Vercel KV environment variables need to be set in your Vercel dashboard.
+                </p>
               </div>
             )}
           </div>

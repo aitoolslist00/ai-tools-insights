@@ -101,13 +101,14 @@ export default function BlogDashboardPage() {
             <p><strong>Features:</strong></p>
             <ul className="list-disc list-inside ml-4 space-y-1">
               <li>✅ Authentication and authorization</li>
-              <li>✅ File-based storage with JSON</li>
+              <li>✅ Vercel KV storage for production</li>
+              <li>✅ File-based storage for development</li>
               <li>✅ Automatic blog page updates</li>
               <li>✅ Manual refresh capability</li>
               <li>✅ SEO optimization</li>
               <li>✅ Rich content management</li>
             </ul>
-            <p><strong>Production Enhancements:</strong> For enterprise use, consider adding database storage, image uploads, and version control.</p>
+            <p><strong>Storage System:</strong> Uses Vercel KV (Redis) for production and local files for development, ensuring optimal performance in both environments.</p>
           </div>
         </div>
       </div>
