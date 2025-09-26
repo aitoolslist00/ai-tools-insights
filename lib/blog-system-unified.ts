@@ -2,7 +2,6 @@ import fs from 'fs/promises'
 import path from 'path'
 import { BlogPost } from './blog-data'
 import { revalidatePath, revalidateTag } from 'next/cache'
-import { getBlogStorageAdapter } from './blog-storage-adapter'
 
 const BLOG_POSTS_FILE = path.join(process.cwd(), 'blog-posts.json')
 const BACKUP_DIR = path.join(process.cwd(), 'backups')
@@ -20,7 +19,6 @@ export class UnifiedBlogSystem {
   private lockFile = path.join(process.cwd(), '.blog-lock')
   private cache = new Map<string, { data: any; timestamp: number }>()
   private readonly CACHE_TTL = 2000 // 2 seconds for immediate updates
-  private storage = getBlogStorageAdapter()
 
   static getInstance(): UnifiedBlogSystem {
     if (!UnifiedBlogSystem.instance) {
@@ -66,11 +64,14 @@ export class UnifiedBlogSystem {
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
       const backupFile = path.join(BACKUP_DIR, `blog-posts-${timestamp}.json`)
 
-      // Load current posts from storage (works for any storage type)
-      const currentPosts = await this.storage.loadPosts()
-      if (currentPosts.success && currentPosts.data) {
-        const currentData = JSON.stringify(currentPosts.data, null, 2)
+      // Load current posts from file
+      try {
+        const fileContent = await fs.readFile(BLOG_POSTS_FILE, 'utf-8')
+        const currentPosts = JSON.parse(fileContent)
+        const currentData = JSON.stringify(currentPosts, null, 2)
         await fs.writeFile(backupFile, currentData)
+      } catch (error) {
+        // File doesn't exist or is empty, no backup needed
       }
 
       // Keep only last 10 backups
@@ -112,17 +113,21 @@ export class UnifiedBlogSystem {
 
   async loadBlogPosts(): Promise<BlogOperationResult> {
     try {
-      console.log('🔄 UnifiedBlogSystem: Loading posts via file storage...')
-      const result = await this.storage.loadPosts()
-      
-      if (result.success) {
-        // Cache the result in our local cache too
-        const cacheKey = this.getCacheKey('loadPosts')
-        this.setCache(cacheKey, result.data)
-        console.log(`✅ UnifiedBlogSystem: Loaded ${result.data?.length || 0} posts`)
+      console.log('🔄 UnifiedBlogSystem: Loading posts from file...')
+      const fileContent = await fs.readFile(BLOG_POSTS_FILE, 'utf-8')
+      const posts: BlogPost[] = JSON.parse(fileContent)
+
+      // Cache the result
+      const cacheKey = this.getCacheKey('loadPosts')
+      this.setCache(cacheKey, posts)
+      console.log(`✅ UnifiedBlogSystem: Loaded ${posts.length} posts`)
+
+      return {
+        success: true,
+        message: `Loaded ${posts.length} posts`,
+        data: posts,
+        timestamp: new Date().toISOString()
       }
-      
-      return result
     } catch (error) {
       console.error('❌ UnifiedBlogSystem: Error loading blog posts:', error)
       return {
@@ -136,24 +141,54 @@ export class UnifiedBlogSystem {
 
   async saveBlogPost(post: BlogPost): Promise<BlogOperationResult> {
     try {
-      console.log('💾 UnifiedBlogSystem: Saving post via file storage...')
-      
-      // Create backup before making changes
-      await this.createBackup()
+      console.log('💾 UnifiedBlogSystem: Saving post to file...')
 
-      const result = await this.storage.savePost(post)
-      
-      if (result.success) {
+      // Acquire lock
+      await this.acquireLock()
+
+      try {
+        // Create backup before making changes
+        await this.createBackup()
+
+        // Load existing posts
+        let posts: BlogPost[] = []
+        try {
+          const fileContent = await fs.readFile(BLOG_POSTS_FILE, 'utf-8')
+          posts = JSON.parse(fileContent)
+        } catch (error) {
+          // File doesn't exist, start with empty array
+        }
+
+        // Find existing post or add new one
+        const existingIndex = posts.findIndex(p => p.id === post.id)
+        if (existingIndex >= 0) {
+          posts[existingIndex] = post
+        } else {
+          posts.push(post)
+        }
+
+        // Write back to file
+        const updatedData = JSON.stringify(posts, null, 2)
+        await fs.writeFile(BLOG_POSTS_FILE, updatedData)
+
         // Clear local cache
         this.clearCache()
-        
+
         // Trigger revalidation
-        await this.revalidateBlogPages(result.data)
-        
+        await this.revalidateBlogPages(post)
+
         console.log(`✅ UnifiedBlogSystem: Post saved successfully: ${post.title}`)
+
+        return {
+          success: true,
+          message: 'Blog post saved successfully',
+          data: post,
+          timestamp: new Date().toISOString()
+        }
+      } finally {
+        // Always release lock
+        await this.releaseLock()
       }
-      
-      return result
     } catch (error) {
       console.error('❌ UnifiedBlogSystem: Error saving blog post:', error)
       return {
@@ -167,24 +202,63 @@ export class UnifiedBlogSystem {
 
   async deleteBlogPost(postId: string): Promise<BlogOperationResult> {
     try {
-      console.log(`🗑️ UnifiedBlogSystem: Deleting post via file storage: ${postId}`)
-      
-      // Create backup before making changes
-      await this.createBackup()
+      console.log(`🗑️ UnifiedBlogSystem: Deleting post from file: ${postId}`)
 
-      const result = await this.storage.deletePost(postId)
-      
-      if (result.success) {
+      // Acquire lock
+      await this.acquireLock()
+
+      try {
+        // Create backup before making changes
+        await this.createBackup()
+
+        // Load existing posts
+        let posts: BlogPost[] = []
+        try {
+          const fileContent = await fs.readFile(BLOG_POSTS_FILE, 'utf-8')
+          posts = JSON.parse(fileContent)
+        } catch (error) {
+          return {
+            success: false,
+            message: 'Blog posts file not found',
+            error: 'File does not exist',
+            timestamp: new Date().toISOString()
+          }
+        }
+
+        // Find and remove the post
+        const initialLength = posts.length
+        posts = posts.filter(p => p.id !== postId)
+
+        if (posts.length === initialLength) {
+          return {
+            success: false,
+            message: `Post with ID ${postId} not found`,
+            timestamp: new Date().toISOString()
+          }
+        }
+
+        // Write back to file
+        const updatedData = JSON.stringify(posts, null, 2)
+        await fs.writeFile(BLOG_POSTS_FILE, updatedData)
+
         // Clear local cache
         this.clearCache()
-        
+
         // Trigger revalidation
         await this.revalidateBlogPages()
-        
+
         console.log(`✅ UnifiedBlogSystem: Post deleted successfully: ${postId}`)
+
+        return {
+          success: true,
+          message: 'Blog post deleted successfully',
+          data: postId,
+          timestamp: new Date().toISOString()
+        }
+      } finally {
+        // Always release lock
+        await this.releaseLock()
       }
-      
-      return result
     } catch (error) {
       console.error('❌ UnifiedBlogSystem: Error deleting blog post:', error)
       return {
@@ -328,14 +402,11 @@ export class UnifiedBlogSystem {
       const errors: string[] = []
       const warnings: string[] = []
 
-      // Test storage connection
+      // Test file access
       try {
-        const connectionTest = await this.storage.validateConnection()
-        if (!connectionTest.success) {
-          errors.push(`Storage connection failed: ${connectionTest.error}`)
-        }
+        await fs.access(BLOG_POSTS_FILE)
       } catch (error) {
-        errors.push(`Storage connection error: ${error instanceof Error ? error.message : 'Unknown error'}`)
+        errors.push(`Blog posts file not accessible: ${error instanceof Error ? error.message : 'Unknown error'}`)
       }
 
       // Test data integrity
