@@ -105,7 +105,26 @@ class VercelKVStorageAdapter implements BlogStorageAdapter {
   async loadPosts(): Promise<BlogPost[]> {
     try {
       const kv = await this.getKV()
-      const posts = await kv.get('blog-posts')
+      let posts = await kv.get('blog-posts')
+
+      // If no posts in KV, migrate from file storage
+      if (!posts || posts.length === 0) {
+        console.log('🔄 Migrating blog posts from file to KV...')
+        try {
+          const filePosts = await import('./blog-storage-file-only').then(m => m.fileOnlyBlogStorage.loadPosts())
+          if (filePosts.success && filePosts.data) {
+            posts = filePosts.data
+            await kv.set('blog-posts', posts)
+            console.log(`✅ Migrated ${posts.length} posts to KV`)
+          } else {
+            posts = []
+          }
+        } catch (error) {
+          console.warn('Failed to migrate from file:', error)
+          posts = []
+        }
+      }
+
       return posts || []
     } catch (error) {
       console.error('Error loading posts from KV:', error)

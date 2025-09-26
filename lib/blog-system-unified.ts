@@ -2,7 +2,7 @@ import fs from 'fs/promises'
 import path from 'path'
 import { BlogPost } from './blog-data'
 import { revalidatePath, revalidateTag } from 'next/cache'
-import { fileOnlyBlogStorage } from './blog-storage-file-only'
+import { getBlogStorageAdapter } from './blog-storage-adapter'
 
 const BLOG_POSTS_FILE = path.join(process.cwd(), 'blog-posts.json')
 const BACKUP_DIR = path.join(process.cwd(), 'backups')
@@ -20,7 +20,7 @@ export class UnifiedBlogSystem {
   private lockFile = path.join(process.cwd(), '.blog-lock')
   private cache = new Map<string, { data: any; timestamp: number }>()
   private readonly CACHE_TTL = 2000 // 2 seconds for immediate updates
-  private storage = fileOnlyBlogStorage
+  private storage = getBlogStorageAdapter()
 
   static getInstance(): UnifiedBlogSystem {
     if (!UnifiedBlogSystem.instance) {
@@ -65,17 +65,21 @@ export class UnifiedBlogSystem {
       await this.ensureBackupDir()
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
       const backupFile = path.join(BACKUP_DIR, `blog-posts-${timestamp}.json`)
-      
-      const currentData = await fs.readFile(BLOG_POSTS_FILE, 'utf-8')
-      await fs.writeFile(backupFile, currentData)
-      
+
+      // Load current posts from storage (works for any storage type)
+      const currentPosts = await this.storage.loadPosts()
+      if (currentPosts.success && currentPosts.data) {
+        const currentData = JSON.stringify(currentPosts.data, null, 2)
+        await fs.writeFile(backupFile, currentData)
+      }
+
       // Keep only last 10 backups
       const backupFiles = await fs.readdir(BACKUP_DIR)
       const blogBackups = backupFiles
         .filter(file => file.startsWith('blog-posts-'))
         .sort()
         .reverse()
-      
+
       if (blogBackups.length > 10) {
         for (const oldBackup of blogBackups.slice(10)) {
           await fs.unlink(path.join(BACKUP_DIR, oldBackup))
