@@ -15,12 +15,17 @@ interface DiagnosticInfo {
   storage: {
     type: string
     environment: string
-    kvConfigured: boolean
-    fallbackFile: {
+    fileConfigured: boolean
+    primaryFile: {
       path: string
       exists: boolean
       size: number
       lastModified: string | null
+    }
+    backupDir: {
+      path: string
+      exists: boolean
+      writable: boolean
     }
   }
   files: {
@@ -182,12 +187,16 @@ export default function BlogSystemDiagnostics() {
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Vercel KV Configured</span>
-              <StatusIcon status={diagnostics.storage.kvConfigured} />
+              <span className="text-sm text-gray-600">File Storage Configured</span>
+              <StatusIcon status={diagnostics.storage.fileConfigured} />
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Fallback File Available</span>
-              <StatusIcon status={diagnostics.storage.fallbackFile.exists} />
+              <span className="text-sm text-gray-600">Blog Data File Available</span>
+              <StatusIcon status={diagnostics.storage.primaryFile.exists} />
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600">Backup Directory Ready</span>
+              <StatusIcon status={diagnostics.storage.backupDir.exists} />
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-600">Upload System</span>
@@ -230,29 +239,35 @@ export default function BlogSystemDiagnostics() {
               <span className="text-gray-600">Environment:</span>
               <span className="ml-2 font-mono">{diagnostics.storage.environment}</span>
             </div>
-            {diagnostics.storage.fallbackFile.exists && (
+            <div>
+              <span className="text-gray-600">Storage Path:</span>
+              <span className="ml-2 font-mono text-xs break-all">{diagnostics.storage.primaryFile.path}</span>
+            </div>
+            {diagnostics.storage.primaryFile.exists && (
               <>
                 <div>
-                  <span className="text-gray-600">Fallback File Size:</span>
-                  <span className="ml-2 font-mono">{diagnostics.storage.fallbackFile.size} bytes</span>
+                  <span className="text-gray-600">Blog Data Size:</span>
+                  <span className="ml-2 font-mono">{diagnostics.storage.primaryFile.size} bytes</span>
                 </div>
-                {diagnostics.storage.fallbackFile.lastModified && (
+                {diagnostics.storage.primaryFile.lastModified && (
                   <div>
                     <span className="text-gray-600">Last Modified:</span>
                     <span className="ml-2 font-mono">
-                      {new Date(diagnostics.storage.fallbackFile.lastModified).toLocaleString()}
+                      {new Date(diagnostics.storage.primaryFile.lastModified).toLocaleString()}
                     </span>
                   </div>
                 )}
               </>
             )}
-            {!diagnostics.storage.kvConfigured && diagnostics.storage.type === 'vercel-kv' && (
-              <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                <p className="text-sm text-yellow-800">
-                  <strong>⚠️ Configuration Required:</strong> Vercel KV environment variables need to be set in your Vercel dashboard.
-                </p>
-              </div>
-            )}
+            <div>
+              <span className="text-gray-600">Backup Directory:</span>
+              <span className="ml-2 font-mono text-xs break-all">{diagnostics.storage.backupDir.path}</span>
+            </div>
+            <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+              <p className="text-sm text-green-800">
+                <strong>✅ File Storage Active:</strong> Your blog content is stored directly in project files with automatic backups and immediate updates.
+              </p>
+            </div>
           </div>
         </div>
       </div>

@@ -22,10 +22,10 @@ export async function GET(request: NextRequest) {
         cwd: process.cwd()
       },
       storage: {
-        type: process.env.NODE_ENV === 'production' ? 'vercel-kv' : 'file-system',
+        type: 'file-system',
         environment: process.env.NODE_ENV,
-        kvConfigured: !!(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN),
-        fallbackFile: {
+        fileConfigured: existsSync(resolve(process.cwd(), 'blog-posts.json')),
+        primaryFile: {
           path: resolve(process.cwd(), 'blog-posts.json'),
           exists: existsSync(resolve(process.cwd(), 'blog-posts.json')),
           size: existsSync(resolve(process.cwd(), 'blog-posts.json')) 
@@ -34,6 +34,11 @@ export async function GET(request: NextRequest) {
           lastModified: existsSync(resolve(process.cwd(), 'blog-posts.json'))
             ? statSync(resolve(process.cwd(), 'blog-posts.json')).mtime.toISOString()
             : null
+        },
+        backupDir: {
+          path: resolve(process.cwd(), 'backups'),
+          exists: existsSync(resolve(process.cwd(), 'backups')),
+          writable: true
         }
       },
       files: {

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Blog Fixes</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; max-width: 800px; margin: 0 auto; }
+        .test-section { margin: 20px 0; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
+        .success { color: green; } .error { color: red; }
+        button { padding: 10px 20px; margin: 10px 0; }
+        input[type="file"] { margin: 10px 0; }
+        #results { background: #f5f5f5; padding: 10px; margin: 10px 0; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Blog System Test Page</h1>
+    
+    <div class="test-section">
+        <h2>📝 Test 1: Blog Post URL Fix</h2>
+        <p>The problematic blog post should now load correctly:</p>
+        <a href="/blog/ai-tools-2025-trends-the-complete-guide-to-the-fut-1758804117635" target="_blank">
+            🔗 Test Blog Post Link
+        </a>
+        <p><em>This should now load instead of showing a 404 error.</em></p>
+    </div>
+
+    <div class="test-section">
+        <h2>📸 Test 2: Image Upload</h2>
+        <p>Test the image upload functionality:</p>
+        
+        <div>
+            <input type="file" id="imageFile" accept="image/*">
+            <button onclick="testImageUpload()">Upload Test Image</button>
+        </div>
+        
+        <div id="results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>📊 Test 3: Dashboard Access</h2>
+        <p>Access the blog dashboard:</p>
+        <a href="/blog/dashboard" target="_blank">🎛️ Open Blog Dashboard</a>
+        <p><em>This should show the blog management interface.</em></p>
+    </div>
+
+    <script>
+        function log(message, type = 'info') {
+            const results = document.getElementById('results');
+            const className = type === 'error' ? 'error' : type === 'success' ? 'success' : '';
+            results.innerHTML += `<div class="${className}">${message}</div>`;
+        }
+
+        async function testImageUpload() {
+            const fileInput = document.getElementById('imageFile');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                log('❌ Please select an image file first', 'error');
+                return;
+            }
+
+            log('🔄 Starting image upload test...');
+            
+            try {
+                // First, authenticate
+                const authResponse = await fetch('/api/blog/auth', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        username: 'admin', 
+                        password: 'your-secure-password-2024!' 
+                    })
+                });
+
+                if (!authResponse.ok) {
+                    log('❌ Authentication failed', 'error');
+                    return;
+                }
+
+                const authData = await authResponse.json();
+                log('✅ Authentication successful');
+
+                // Now upload the image
+                const formData = new FormData();
+                formData.append('file', file);
+
+                const uploadResponse = await fetch('/api/upload', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${authData.token}`
+                    },
+                    body: formData
+                });
+
+                if (uploadResponse.ok) {
+                    const result = await uploadResponse.json();
+                    log('✅ Image upload successful!', 'success');
+                    log(`📸 Image URL: ${result.imageUrl}`, 'success');
+                    
+                    // Show the uploaded image
+                    const img = document.createElement('img');
+                    img.src = result.imageUrl;
+                    img.style.maxWidth = '200px';
+                    img.style.margin = '10px 0';
+                    document.getElementById('results').appendChild(img);
+                } else {
+                    const errorText = await uploadResponse.text();
+                    log(`❌ Upload failed: ${uploadResponse.status} ${errorText}`, 'error');
+                }
+
+            } catch (error) {
+                log(`❌ Upload error: ${error.message}`, 'error');
+            }
+        }
+
+        // Test page load
+        window.addEventListener('load', () => {
+            log('🚀 Test page loaded successfully');
+            log('💡 Click the links above to test the fixes');
+        });
+    </script>
+</body>
+</html>

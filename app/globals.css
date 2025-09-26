@@ -180,3 +180,6 @@ button, a {
     --background-end-rgb: 0, 0, 0;
   }
 }
+
+/* Modern Article Styles */
+@import '../styles/modern-article.css';

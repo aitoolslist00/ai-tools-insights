@@ -2,7 +2,7 @@ import fs from 'fs/promises'
 import path from 'path'
 import { BlogPost } from './blog-data'
 import { revalidatePath, revalidateTag } from 'next/cache'
-import { vercelBlogStorage } from './blog-storage-vercel'
+import { fileOnlyBlogStorage } from './blog-storage-file-only'
 
 const BLOG_POSTS_FILE = path.join(process.cwd(), 'blog-posts.json')
 const BACKUP_DIR = path.join(process.cwd(), 'backups')
@@ -19,8 +19,8 @@ export class UnifiedBlogSystem {
   private static instance: UnifiedBlogSystem
   private lockFile = path.join(process.cwd(), '.blog-lock')
   private cache = new Map<string, { data: any; timestamp: number }>()
-  private readonly CACHE_TTL = 5000 // 5 seconds in development
-  private storage = vercelBlogStorage
+  private readonly CACHE_TTL = 2000 // 2 seconds for immediate updates
+  private storage = fileOnlyBlogStorage
 
   static getInstance(): UnifiedBlogSystem {
     if (!UnifiedBlogSystem.instance) {
@@ -108,8 +108,8 @@ export class UnifiedBlogSystem {
 
   async loadBlogPosts(): Promise<BlogOperationResult> {
     try {
-      console.log('🔄 UnifiedBlogSystem: Loading posts via Vercel storage...')
-      const result = await vercelBlogStorage.loadPosts()
+      console.log('🔄 UnifiedBlogSystem: Loading posts via file storage...')
+      const result = await this.storage.loadPosts()
       
       if (result.success) {
         // Cache the result in our local cache too
@@ -132,14 +132,12 @@ export class UnifiedBlogSystem {
 
   async saveBlogPost(post: BlogPost): Promise<BlogOperationResult> {
     try {
-      console.log('💾 UnifiedBlogSystem: Saving post via Vercel storage...')
+      console.log('💾 UnifiedBlogSystem: Saving post via file storage...')
       
-      // Create backup in development only
-      if (process.env.NODE_ENV === 'development') {
-        await this.createBackup()
-      }
+      // Create backup before making changes
+      await this.createBackup()
 
-      const result = await vercelBlogStorage.savePost(post)
+      const result = await this.storage.savePost(post)
       
       if (result.success) {
         // Clear local cache
@@ -165,14 +163,12 @@ export class UnifiedBlogSystem {
 
   async deleteBlogPost(postId: string): Promise<BlogOperationResult> {
     try {
-      console.log(`🗑️ UnifiedBlogSystem: Deleting post via Vercel storage: ${postId}`)
+      console.log(`🗑️ UnifiedBlogSystem: Deleting post via file storage: ${postId}`)
       
-      // Create backup in development only
-      if (process.env.NODE_ENV === 'development') {
-        await this.createBackup()
-      }
+      // Create backup before making changes
+      await this.createBackup()
 
-      const result = await vercelBlogStorage.deletePost(postId)
+      const result = await this.storage.deletePost(postId)
       
       if (result.success) {
         // Clear local cache

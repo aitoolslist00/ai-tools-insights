@@ -77,16 +77,14 @@ export default function BlogDashboardPage() {
             <p><strong>Publish/Unpublish:</strong> Use the eye icon to toggle post visibility on your site.</p>
             <p><strong>Feature Posts:</strong> Use the star icon to mark posts as featured (they'll appear in the featured section).</p>
             <p><strong>Filter & Search:</strong> Use the search bar and filters to quickly find specific posts.</p>
-            <p><strong>Refresh Blog:</strong> Click "Refresh Blog" to immediately update the public blog pages with your changes.</p>
-            <p><strong>Force Refresh (Dev):</strong> In development mode, use "Force Refresh" for aggressive cache clearing if changes don't appear.</p>
-            {process.env.NODE_ENV === 'development' && (
-              <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                <p className="text-sm text-yellow-800">
-                  <strong>🔧 Development Mode:</strong> Caching is disabled for real-time updates. 
-                  If changes don't appear immediately, try refreshing the page or restarting the dev server.
-                </p>
-              </div>
-            )}
+            <p><strong>Instant Updates:</strong> Changes made in the dashboard appear immediately on the live site thanks to direct file storage and automatic cache revalidation.</p>
+            <p><strong>Automatic Backups:</strong> A backup is automatically created in the /backups directory before any changes are made.</p>
+            <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+              <p className="text-sm text-green-800">
+                <strong>📂 File Storage:</strong> Your blog content is stored directly in blog-posts.json in your project directory. 
+                This ensures full control, easy backups, and immediate updates without external dependencies.
+              </p>
+            </div>
             <p><strong>Export/Import:</strong> Backup your posts or migrate content using the export/import functionality.</p>
           </div>
         </div>
@@ -97,18 +95,19 @@ export default function BlogDashboardPage() {
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
           <h3 className="text-lg font-medium text-yellow-900 mb-4">Development Note</h3>
           <div className="space-y-2 text-sm text-yellow-800">
-            <p><strong>Current State:</strong> This dashboard is fully connected to the blog system with automatic page revalidation.</p>
+            <p><strong>Current State:</strong> This dashboard is fully connected to the blog system with automatic page revalidation and direct file storage.</p>
             <p><strong>Features:</strong></p>
             <ul className="list-disc list-inside ml-4 space-y-1">
               <li>✅ Authentication and authorization</li>
-              <li>✅ Vercel KV storage for production</li>
-              <li>✅ File-based storage for development</li>
-              <li>✅ Automatic blog page updates</li>
+              <li>✅ Direct file-based storage (blog-posts.json)</li>
+              <li>✅ Immediate content updates on site</li>
+              <li>✅ Automatic blog page revalidation</li>
               <li>✅ Manual refresh capability</li>
               <li>✅ SEO optimization</li>
               <li>✅ Rich content management</li>
+              <li>✅ Automatic backups before changes</li>
             </ul>
-            <p><strong>Storage System:</strong> Uses Vercel KV (Redis) for production and local files for development, ensuring optimal performance in both environments.</p>
+            <p><strong>Storage System:</strong> Uses direct file-based storage in the project directory (blog-posts.json), ensuring immediate updates and full control over your content. All changes made in the dashboard appear instantly on the live site.</p>
           </div>
         </div>
       </div>

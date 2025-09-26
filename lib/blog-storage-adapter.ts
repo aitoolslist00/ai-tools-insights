@@ -1,4 +1,6 @@
 import { BlogPost } from './blog-data'
+import { fileOnlyBlogStorage } from './blog-storage-file-only'
+import { revalidatePath, revalidateTag } from 'next/cache'
 
 // Storage adapter interface
 export interface BlogStorageAdapter {
@@ -9,45 +11,54 @@ export interface BlogStorageAdapter {
   deletePost(postId: string): Promise<boolean>
 }
 
-// File-based storage (for development)
+// File-based storage adapter (unified for all environments)
 class FileStorageAdapter implements BlogStorageAdapter {
-  private async getFileManager() {
-    const { loadBlogPostsFromFile, saveBlogPostsToFile, addBlogPost } = await import('./blog-file-manager')
-    return { loadBlogPostsFromFile, saveBlogPostsToFile, addBlogPost }
+  private triggerRevalidation(): void {
+    try {
+      revalidateTag('blog-posts')
+      revalidatePath('/blog')
+      revalidatePath('/blog/[slug]', 'page')
+      console.log('🔄 Blog pages revalidated after storage change')
+    } catch (error) {
+      console.warn('Failed to revalidate pages:', error)
+    }
   }
 
   async loadPosts(): Promise<BlogPost[]> {
-    const { loadBlogPostsFromFile } = await this.getFileManager()
-    return await loadBlogPostsFromFile()
+    const result = await fileOnlyBlogStorage.loadPosts()
+    return result.success ? result.data || [] : []
   }
 
   async savePosts(posts: BlogPost[]): Promise<boolean> {
-    const { saveBlogPostsToFile } = await this.getFileManager()
-    return await saveBlogPostsToFile(posts)
+    const result = await fileOnlyBlogStorage.savePosts(posts)
+    if (result.success) {
+      this.triggerRevalidation()
+    }
+    return result.success
   }
 
   async addPost(post: BlogPost): Promise<boolean> {
-    const { addBlogPost } = await this.getFileManager()
-    return await addBlogPost(post)
+    const result = await fileOnlyBlogStorage.savePost(post)
+    if (result.success) {
+      this.triggerRevalidation()
+    }
+    return result.success
   }
 
   async updatePost(post: BlogPost): Promise<boolean> {
-    const posts = await this.loadPosts()
-    const index = posts.findIndex(p => p.id === post.id)
-    if (index >= 0) {
-      posts[index] = { ...post, updatedAt: new Date().toISOString() }
-      return await this.savePosts(posts)
+    const result = await fileOnlyBlogStorage.savePost(post)
+    if (result.success) {
+      this.triggerRevalidation()
     }
-    return false
+    return result.success
   }
 
   async deletePost(postId: string): Promise<boolean> {
-    const posts = await this.loadPosts()
-    const filteredPosts = posts.filter(p => p.id !== postId)
-    if (filteredPosts.length !== posts.length) {
-      return await this.savePosts(filteredPosts)
+    const result = await fileOnlyBlogStorage.deletePost(postId)
+    if (result.success) {
+      this.triggerRevalidation()
     }
-    return false
+    return result.success
   }
 }
 
