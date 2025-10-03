@@ -14,9 +14,8 @@ interface BlogPostPageProps {
   params: Promise<{ slug: string }>
 }
 
-// Pure Static Generation - No ISR
-export const dynamic = 'force-static'
-export const revalidate = false
+// Dynamic rendering for better compatibility in development
+export const dynamic = 'force-dynamic'
 
 // Get blog posts with static generation optimization
 const getBlogPosts = async () => {
@@ -24,19 +23,25 @@ const getBlogPosts = async () => {
   return await loadBlogPostsFromFile()
 }
 
+// Generate static params for published posts
 export async function generateStaticParams() {
-  const posts = await getBlogPosts()
-  return posts
-    .filter(post => post.published)
-    .map(post => ({
-      slug: post.id
-    }))
+  try {
+    const posts = await getBlogPosts()
+    return posts
+      .filter(post => post.published)
+      .map(post => ({
+        slug: post.slug || post.id
+      }))
+  } catch (error) {
+    console.error('Error generating static params:', error)
+    return []
+  }
 }
 
 export async function generateMetadata({ params }: BlogPostPageProps): Promise<Metadata> {
   const { slug } = await params
   const posts = await getBlogPosts()
-  const post = posts.find(p => p.id === slug && p.published)
+  const post = posts.find(p => (p.slug === slug || p.id === slug) && p.published)
 
   if (!post) {
     return {
@@ -56,7 +61,7 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
     openGraph: {
       title: (post.seo?.ogTitle || post.title).replace(/^#+\s*/, ''),
       description: post.seo?.ogDescription || post.excerpt,
-      url: `https://www.aitoolsinsights.com/blog/${post.id}`,
+      url: `https://www.aitoolsinsights.com/blog/${post.slug || post.id}`,
       siteName: 'AI Tools Insights',
       images: post.seo?.ogImage ? [post.seo.ogImage] : post.image ? [post.image] : [],
       type: 'article',
@@ -75,7 +80,7 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
       site: '@aitoolslist',
     },
     alternates: {
-      canonical: post.seo?.canonicalUrl || `https://www.aitoolslist.com/blog/${post.id}`,
+      canonical: post.seo?.canonicalUrl || `https://www.aitoolsinsights.com/blog/${post.slug || post.id}`,
     },
     other: {
       'article:author': post.author,
@@ -90,7 +95,7 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const { slug } = await params
   const posts = await getBlogPosts()
-  const post = posts.find(p => p.id === slug && p.published)
+  const post = posts.find(p => (p.slug === slug || p.id === slug) && p.published)
 
   if (!post) {
     notFound()
@@ -105,7 +110,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const breadcrumbs = [
     { name: 'Blog', href: '/blog' },
     { name: category?.name || 'Article', href: `/blog?category=${post.category}` },
-    { name: post.title.replace(/^#+\s*/, '').substring(0, 50) + '...', href: `/blog/${post.id}`, current: true }
+    { name: post.title.replace(/^#+\s*/, '').substring(0, 50) + '...', href: `/blog/${post.slug || post.id}`, current: true }
   ]
 
   // Generate comprehensive structured data for blog post
@@ -120,7 +125,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     ]
   })
   const breadcrumbSchema = SchemaGenerator.generateBreadcrumbSchema(
-    [{ name: 'Home', url: 'https://www.aitoolslist.com' }, ...breadcrumbs.map(b => ({ name: b.name, url: `https://www.aitoolslist.com${b.href}` }))]
+    [{ name: 'Home', url: 'https://www.aitoolsinsights.com' }, ...breadcrumbs.map(b => ({ name: b.name, url: `https://www.aitoolsinsights.com${b.href}` }))]
   )
 
   // Add NewsArticle schema if it's a news-type post
@@ -132,7 +137,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       author: post.author,
       datePublished: post.publishedAt || '',
       dateModified: post.updatedAt || '',
-      url: `https://www.aitoolslist.com/blog/${post.id}`,
+      url: `https://www.aitoolsinsights.com/blog/${post.slug || post.id}`,
       image: post.image
     })
     schemas.push(newsSchema)

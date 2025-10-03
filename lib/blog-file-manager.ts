@@ -8,7 +8,20 @@ export async function loadBlogPostsFromFile(): Promise<BlogPost[]> {
   try {
     if (fs.existsSync(BLOG_POSTS_FILE)) {
       const fileContent = fs.readFileSync(BLOG_POSTS_FILE, 'utf-8')
-      return JSON.parse(fileContent)
+      const rawPosts = JSON.parse(fileContent)
+      
+      // Transform data to match BlogPost interface
+      return rawPosts.map((post: any) => ({
+        ...post,
+        // Ensure required fields are present with correct types
+        tags: post.tags || post.keywords || [],
+        readTime: post.readTime || (post.readingTime ? `${post.readingTime} min read` : '5 min read'),
+        date: post.date || post.publishedAt || post.publishDate,
+        href: post.href || `/blog/${post.slug || post.id}`,
+        // Ensure boolean fields are properly typed
+        published: Boolean(post.published),
+        featured: Boolean(post.featured),
+      }))
     }
     return []
   } catch (error) {
@@ -35,10 +48,10 @@ export async function addBlogPost(post: BlogPost): Promise<boolean> {
     
     const now = new Date().toISOString()
     
-    // Ensure href is correctly set based on post ID
+    // Ensure href is correctly set based on post slug or ID
     const postWithHref = {
       ...post,
-      href: `/blog/${post.id}`
+      href: `/blog/${post.slug || post.id}`
     }
     
     if (existingIndex >= 0) {

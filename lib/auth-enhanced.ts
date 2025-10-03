@@ -6,7 +6,7 @@ import bcrypt from 'bcryptjs'
 export const ADMIN_CREDENTIALS = {
   username: process.env.ADMIN_USERNAME || 'ahmedibrahim',
   // Hash the password in production
-  passwordHash: process.env.ADMIN_PASSWORD_HASH || '$2b$12$YzgAzvsa48RtqclLs0LNgeRRMiItxoh9ZwDmuFzY3irIwqQ88pdFG' // 'ahmedibrahim' password hash
+  passwordHash: process.env.ADMIN_PASSWORD_HASH || '$2b$12$R5xQjIxlAeA0y0XvftLL4O5oFHV893.Zkyr1ZRn2kAV2aEGngwAsC' // '140796Aa@@##**' password hash
 }
 
 const JWT_SECRET = new TextEncoder().encode(
@@ -29,11 +29,27 @@ export async function verifyPassword(password: string, hash: string): Promise<bo
 }
 
 export async function checkAuth(username: string, password: string): Promise<boolean> {
+  console.log('Environment variables:', {
+    ADMIN_USERNAME: process.env.ADMIN_USERNAME,
+    ADMIN_PASSWORD_HASH: process.env.ADMIN_PASSWORD_HASH,
+    hasPasswordHash: !!process.env.ADMIN_PASSWORD_HASH
+  })
+  
+  console.log('checkAuth called with:', { 
+    username, 
+    expectedUsername: ADMIN_CREDENTIALS.username,
+    passwordHash: ADMIN_CREDENTIALS.passwordHash,
+    passwordHashLength: ADMIN_CREDENTIALS.passwordHash.length
+  })
+  
   if (username !== ADMIN_CREDENTIALS.username) {
+    console.log('Username mismatch')
     return false
   }
   
-  return await verifyPassword(password, ADMIN_CREDENTIALS.passwordHash)
+  const result = await verifyPassword(password, ADMIN_CREDENTIALS.passwordHash)
+  console.log('Password verification result:', result)
+  return result
 }
 
 export async function createJWT(username: string): Promise<string> {

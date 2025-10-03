@@ -9,9 +9,9 @@ export const metadata: Metadata = {
   description: 'Stay updated with the latest AI tools, reviews, comparisons, and industry insights. Expert analysis on artificial intelligence trends and technologies.',
 }
 
-// Pure Static Generation - Build time only
-export const dynamic = 'force-static'
-export const revalidate = false
+// Use ISR with short revalidation for fresh content
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 // Fetch blog posts directly from file system for SSG
 async function getBlogPosts(): Promise<BlogPost[]> {

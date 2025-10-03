@@ -1,40 +1,46 @@
-import { NextRequest } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { checkAuth, createJWT } from '@/lib/auth-enhanced'
-import { rateLimiter, createRateLimitResponse } from '@/lib/rate-limiter'
-import { ApiResponseBuilder, handleApiError } from '@/lib/api-response'
 
 export async function POST(request: NextRequest) {
   try {
-    // Apply strict rate limiting for login attempts
-    const rateLimit = rateLimiter.checkRateLimit(request, 5, 15 * 60 * 1000) // 5 attempts per 15 minutes
-    if (!rateLimit.allowed) {
-      return createRateLimitResponse(rateLimit.resetTime)
-    }
-
     const { username, password } = await request.json()
 
+    console.log('Login attempt:', { username, passwordLength: password?.length })
+
     if (!username || !password) {
-      return ApiResponseBuilder.validationError({
-        username: username ? undefined : 'Username is required',
-        password: password ? undefined : 'Password is required'
-      })
+      return NextResponse.json({ error: 'Username and password are required' }, { status: 400 })
     }
 
     const isValid = await checkAuth(username, password)
     
+    console.log('Auth check result:', isValid)
+    
     if (!isValid) {
-      // Add a small delay to prevent timing attacks
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      return ApiResponseBuilder.unauthorized('Invalid credentials')
+      return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 })
     }
 
     const token = await createJWT(username)
-    
-    return ApiResponseBuilder.success(
-      { token, expiresIn: '24h' },
-      'Login successful'
-    )
+
+    return NextResponse.json({
+      success: true,
+      data: {
+        token,
+        user: {
+          username,
+          isAdmin: true
+        }
+      }
+    })
+
   } catch (error) {
-    return handleApiError(error)
+    console.error('Login error:', error)
+    return NextResponse.json({ error: 'Login failed' }, { status: 500 })
   }
+}
+
+export async function GET() {
+  return NextResponse.json({
+    message: 'Admin Login API',
+    version: '1.0'
+  })
 }

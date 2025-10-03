@@ -10,8 +10,19 @@ export interface BlogPost {
   featured: boolean
   published: boolean
   image?: string
+  images?: Array<{
+    url: string
+    alt: string
+    title?: string
+    caption?: string
+    width?: number
+    height?: number
+    format?: string
+    size?: number
+  }>
   href: string
   tags: string[]
+  slug?: string // Optional slug for SEO-friendly URLs
   seo?: {
     metaTitle?: string
     metaDescription?: string
@@ -48,6 +59,13 @@ export interface BlogPost {
   updatedAt?: string
   status?: 'draft' | 'published' | 'scheduled' // Optional for backward compatibility
   scheduledFor?: string
+  lastModified?: string
+  imageGenerationMetadata?: {
+    generatedAt: string
+    method: 'real' | 'placeholder'
+    contentOptimized: boolean
+    keywordsUsed: string[]
+  }
 }
 
 export interface BlogCategory {
@@ -96,9 +114,33 @@ export const blogCategories: BlogCategory[] = [
   }
 ]
 
-export const blogPosts: BlogPost[] = [
-  // Sample posts will be loaded from blog-posts.json file instead
-]
+// Import the blog posts data
+import blogPostsData from '../blog-posts.json'
+
+// Transform the JSON data to match our BlogPost interface
+export const blogPosts: BlogPost[] = blogPostsData.map((post: any) => ({
+  id: post.id,
+  title: post.title,
+  excerpt: post.excerpt,
+  content: post.content,
+  author: post.author,
+  date: post.publishDate,
+  readTime: `${post.readingTime} min read`,
+  category: post.category,
+  featured: post.featured,
+  published: post.published,
+  image: post.image,
+  images: post.images,
+  href: `/blog/${post.slug || post.id}`,
+  tags: post.keywords || [],
+  slug: post.slug,
+  seo: {
+    metaTitle: post.title,
+    metaDescription: post.metaDescription,
+    keywords: post.keywords?.join(', '),
+    schema: post.schemas
+  }
+}))
 
 
 

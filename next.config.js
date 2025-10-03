@@ -22,7 +22,7 @@ const nextConfig = {
     minimumCacheTTL: 31536000, // 1 year cache
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
-    unoptimized: false, // Enable optimization for better SSG performance
+    unoptimized: true, // Disable optimization completely to fix generated images issue
   },
   
   // Compiler optimizations

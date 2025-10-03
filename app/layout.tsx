@@ -8,6 +8,7 @@ import InstantNavigation from '@/components/InstantNavigation'
 import { AdvancedPerformanceOptimizer as PerfOptimizer } from '@/lib/advanced-performance-optimizer'
 import SchemaValidator from '@/components/SchemaValidator'
 import AdvancedSEOOptimizer from '@/components/AdvancedSEOOptimizer'
+import { Toaster } from 'sonner'
 import './globals.css'
 
 // Optimized font loading with display swap for instant text rendering
@@ -90,6 +91,7 @@ export default function RootLayout({
         
         {/* PWA and Mobile Optimization */}
         <link rel="manifest" href="/manifest.json" />
+        <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="AI Tools List" />
@@ -136,6 +138,9 @@ export default function RootLayout({
         
         {/* Schema Validation in Development */}
         <SchemaValidator enabled={process.env.NODE_ENV === 'development'} />
+        
+        {/* Toast notifications */}
+        <Toaster />
       </body>
     </html>
   )

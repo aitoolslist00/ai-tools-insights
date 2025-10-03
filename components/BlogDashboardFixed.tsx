@@ -372,8 +372,6 @@ export default function BlogDashboardFixed() {
     event.target.value = ''
   }
 
-  const filteredPosts = posts
-
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Message Display */}
@@ -617,7 +615,7 @@ export default function BlogDashboardFixed() {
             <Loader2 className="h-8 w-8 animate-spin text-primary-600" />
             <span className="ml-2 text-gray-600">Loading posts...</span>
           </div>
-        ) : filteredPosts.length === 0 ? (
+        ) : posts.length === 0 ? (
           <div className="text-center py-12">
             <div className="text-gray-400 mb-4">
               <Edit className="h-12 w-12 mx-auto" />
@@ -659,7 +657,7 @@ export default function BlogDashboardFixed() {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {filteredPosts.map((post) => {
+                  {posts.map((post) => {
                     const category = blogCategories.find(c => c.id === post.category)
                     return (
                       <tr key={post.id} className="hover:bg-gray-50">

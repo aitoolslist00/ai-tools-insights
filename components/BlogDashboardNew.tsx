@@ -108,7 +108,14 @@ export default function BlogDashboardNew() {
       setError(null)
       
       console.log('🔄 Loading posts from unified API...')
-      const token = await getAuthToken()
+      const token = getAuthToken()
+      
+      if (!token) {
+        console.error('❌ Authentication token not found')
+        setError('Authentication required. Please log in again.')
+        setLoading(false)
+        return
+      }
       
       const response = await fetch('/api/blog/unified', {
         headers: {
@@ -188,11 +195,11 @@ export default function BlogDashboardNew() {
     if (searchTerm) {
       const term = searchTerm.toLowerCase()
       filtered = filtered.filter(post => 
-        post.title.toLowerCase().includes(term) ||
-        post.excerpt.toLowerCase().includes(term) ||
-        post.content.toLowerCase().includes(term) ||
-        post.tags.some(tag => tag.toLowerCase().includes(term)) ||
-        post.author.toLowerCase().includes(term)
+        post.title?.toLowerCase().includes(term) ||
+        post.excerpt?.toLowerCase().includes(term) ||
+        post.content?.toLowerCase().includes(term) ||
+        (post.tags && post.tags.some(tag => tag.toLowerCase().includes(term))) ||
+        post.author?.toLowerCase().includes(term)
       )
     }
 
@@ -268,7 +275,7 @@ export default function BlogDashboardNew() {
         href: post.href
       });
       
-      const token = await getAuthToken()
+      const token = getAuthToken()
       if (!token) {
         const errorMsg = 'Authentication required. Please log in again.'
         setError(errorMsg)
@@ -407,7 +414,7 @@ export default function BlogDashboardNew() {
   const handleRefreshBlog = async () => {
     try {
       console.log('🔄 Refreshing blog pages...')
-      const token = await getAuthToken()
+      const token = getAuthToken()
       
       if (!token) {
         console.warn('⚠️ No auth token for revalidation')
@@ -864,7 +871,7 @@ export default function BlogDashboardNew() {
                                   <Clock className="h-3 w-3 inline mr-1" />
                                   {post.readTime}
                                 </span>
-                                {post.tags.length > 0 && (
+                                {post.tags && post.tags.length > 0 && (
                                   <div className="flex items-center space-x-1">
                                     <Tag className="h-3 w-3 text-gray-400" />
                                     <span className="text-xs text-gray-400">

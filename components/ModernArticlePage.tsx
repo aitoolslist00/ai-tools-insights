@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { 
   Clock, 
   Calendar,
@@ -36,20 +37,8 @@ import {
 } from 'lucide-react'
 import { Disclosure } from '@headlessui/react'
 import { motion, AnimatePresence } from 'framer-motion'
-
-interface BlogPost {
-  id: string
-  title: string
-  excerpt: string
-  content: string
-  author: string
-  publishedAt?: string
-  readTime: string
-  image?: string
-  tags: string[]
-  category: string
-  href: string
-}
+import { BlogPost } from '@/lib/blog-data'
+import { formatContent as formatContentWithImages, formatContentForTOC, enhanceContentFormatting } from '@/lib/content-formatter'
 
 interface ModernArticlePageProps {
   post: BlogPost
@@ -87,12 +76,17 @@ export default function ModernArticlePage({
   const contentRef = useRef<HTMLDivElement>(null)
   const tocRef = useRef<HTMLDivElement>(null)
 
+  // Helper function to format content with images
+  const formatPostContent = (content: string) => {
+    return formatContentWithImages(content, post)
+  }
+
   // Extract Table of Contents and FAQs from content
   useEffect(() => {
     if (!post.content) return
 
     const tempDiv = document.createElement('div')
-    tempDiv.innerHTML = formatContent(post.content)
+    tempDiv.innerHTML = formatContentForTOC(post.content)
     
     // Extract TOC items
     const headers = tempDiv.querySelectorAll('h1, h2, h3')
@@ -113,22 +107,28 @@ export default function ModernArticlePage({
     
     setTableOfContents(tocItems)
 
-    // Extract FAQs
+    // Extract FAQs only if there's no dedicated FAQ section in the content
     const faqItems: FAQ[] = []
-    const paragraphs = tempDiv.querySelectorAll('p')
+    const hasExistingFAQSection = post.content.toLowerCase().includes('## faq') || 
+                                  post.content.toLowerCase().includes('# faq') ||
+                                  post.content.toLowerCase().includes('frequently asked questions')
     
-    paragraphs.forEach((p, index) => {
-      const text = p.textContent || ''
-      if (text.includes('?') && text.length < 200 && text.length > 20) {
-        const nextP = paragraphs[index + 1]
-        if (nextP) {
-          faqItems.push({
-            question: text,
-            answer: nextP.textContent || ''
-          })
+    if (!hasExistingFAQSection) {
+      const paragraphs = tempDiv.querySelectorAll('p')
+      
+      paragraphs.forEach((p, index) => {
+        const text = p.textContent || ''
+        if (text.includes('?') && text.length < 200 && text.length > 20) {
+          const nextP = paragraphs[index + 1]
+          if (nextP) {
+            faqItems.push({
+              question: text,
+              answer: nextP.textContent || ''
+            })
+          }
         }
-      }
-    })
+      })
+    }
     
     setFAQs(faqItems.slice(0, 8)) // Limit to 8 FAQs
   }, [post.content])
@@ -191,35 +191,7 @@ export default function ModernArticlePage({
     setShowShareMenu(false)
   }
 
-  // Enhanced content formatter (simplified version of the existing one)
-  const formatContent = (content: string) => {
-    let processedContent = content
-    
-    // Add IDs to headers for TOC
-    processedContent = processedContent.replace(
-      /^(#{1,6})\s+(.+)$/gm, 
-      (match, hashes, text) => {
-        const level = hashes.length
-        const id = text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
-        const className = level === 1 ? 'text-4xl font-bold mb-8 mt-12' :
-                         level === 2 ? 'text-3xl font-bold mb-6 mt-10' :
-                         level === 3 ? 'text-2xl font-semibold mb-4 mt-8' :
-                         'text-xl font-medium mb-4 mt-6'
-        
-        return `<h${level} id="${id}" class="${className} text-gray-900 leading-tight scroll-mt-24">${text}</h${level}>`
-      }
-    )
 
-    // Format other elements
-    processedContent = processedContent
-      .replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold text-gray-900">$1</strong>')
-      .replace(/\*(.*?)\*/g, '<em class="italic">$1</em>')
-      .replace(/`([^`]+)`/g, '<code class="bg-gray-100 text-gray-800 px-2 py-1 rounded text-sm font-mono">$1</code>')
-      .replace(/\n\n/g, '</p><p class="mb-6 text-gray-700 leading-relaxed">')
-      .replace(/^(.+)$/gm, '<p class="mb-6 text-gray-700 leading-relaxed">$1</p>')
-
-    return processedContent
-  }
 
   // Callout box component
   const CalloutBox = ({ type, children }: { type: 'tip' | 'warning' | 'info' | 'success', children: React.ReactNode }) => {
@@ -322,15 +294,25 @@ export default function ModernArticlePage({
           </div>
 
           {/* Featured Image */}
-          {post.image && (
+          {post.image ? (
             <div className="mb-16 group">
               <div className="relative overflow-hidden rounded-2xl shadow-2xl">
-                <img
+                <Image
                   src={post.image}
-                  alt={post.title}
+                  alt={post.images && post.images.length > 0 ? post.images[0].alt : post.title}
+                  width={1200}
+                  height={675}
                   className="w-full h-64 md:h-96 lg:h-[28rem] object-cover transition-transform duration-700 group-hover:scale-105"
+                  priority
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              </div>
+            </div>
+          ) : (
+            <div className="mb-16">
+              <div className="bg-gray-200 h-64 md:h-96 lg:h-[28rem] rounded-2xl flex items-center justify-center">
+                <p className="text-gray-500">No featured image available</p>
               </div>
             </div>
           )}
@@ -394,7 +376,7 @@ export default function ModernArticlePage({
               {/* Article Content */}
               <div 
                 className="article-content"
-                dangerouslySetInnerHTML={{ __html: formatContent(post.content) }}
+                dangerouslySetInnerHTML={{ __html: enhanceContentFormatting(formatPostContent(post.content)) }}
               />
 
               {/* Callout Examples */}

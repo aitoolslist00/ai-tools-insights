@@ -78,10 +78,28 @@ export class FileOnlyBlogStorage {
         }
       }
 
-      // Validate and clean posts
-      const validPosts = posts.filter(post => {
-        return post.id && post.title && post.content && post.href
-      })
+      // Validate and clean posts, adding href if missing
+      const validPosts = posts
+        .filter(post => {
+          return post.id && post.title && post.content
+        })
+        .map(post => {
+          const processedPost = {
+            ...post,
+            // Ensure href is present
+            href: post.href || `/blog/${post.slug || post.id}`,
+            // Ensure other required fields
+            tags: post.tags || (post as any).keywords || [],
+            readTime: post.readTime || ((post as any).readingTime ? `${(post as any).readingTime} min read` : '5 min read'),
+            date: post.date || (post as any).publishedAt || (post as any).publishDate,
+            published: Boolean(post.published),
+            featured: Boolean(post.featured),
+          }
+          
+
+          
+          return processedPost
+        })
 
       // Sort by date (newest first)
       validPosts.sort((a, b) => {

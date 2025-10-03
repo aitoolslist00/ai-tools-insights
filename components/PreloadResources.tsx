@@ -56,19 +56,9 @@ export default function PreloadResources() {
       document.head.appendChild(prefetchLink)
     })
 
-    // Preload critical JavaScript chunks for instant navigation
-    const criticalChunks = [
-      '/_next/static/chunks/pages/ai-tools.js',
-      '/_next/static/chunks/pages/blog.js'
-    ]
-
-    criticalChunks.forEach(chunk => {
-      const link = document.createElement('link')
-      link.rel = 'preload'
-      link.as = 'script'
-      link.href = chunk
-      document.head.appendChild(link)
-    })
+    // Note: In Next.js 15 App Router, JavaScript chunks are automatically optimized
+    // and don't follow the pages/_app.js pattern. Removing manual chunk preloading
+    // as Next.js handles this automatically with better optimization.
 
   }, [])
 

@@ -33,6 +33,7 @@ import { BlogPost, BlogCategory, blogCategories } from '@/lib/blog-data'
 import { getImageUrlError, optimizeImageUrl } from '@/lib/utils'
 import { getAuthToken } from '@/lib/auth-enhanced'
 import EnhancedArticleContent from './EnhancedArticleContent'
+import ImageGenerator from './ImageGenerator'
 
 interface ModernArticleEditorProps {
   post?: BlogPost | null
@@ -73,7 +74,7 @@ export default function ModernArticleEditor({
   const [focusKeyword, setFocusKeyword] = useState(post?.seo?.focusKeyword || '')
 
   // UI state
-  const [activeTab, setActiveTab] = useState<'content' | 'seo' | 'preview'>('content')
+  const [activeTab, setActiveTab] = useState<'content' | 'seo' | 'images' | 'preview'>('content')
   const [showPreview, setShowPreview] = useState(false)
   const [seoAnalysis, setSeoAnalysis] = useState<SEOAnalysis | null>(null)
   const [wordCount, setWordCount] = useState(0)
@@ -612,6 +613,7 @@ Overall assessment and recommendation.`
           {[
             { id: 'content', label: 'Content', icon: FileText },
             { id: 'seo', label: 'SEO', icon: TrendingUp },
+            { id: 'images', label: 'Images', icon: ImageIcon },
             { id: 'preview', label: 'Preview', icon: Eye }
           ].map(tab => (
             <button
@@ -1195,6 +1197,24 @@ Wrap up with key takeaways..."
                     </div>
                   </div>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'images' && (
+            <div className="h-full overflow-y-auto p-6">
+              <div className="max-w-6xl mx-auto">
+                <ImageGenerator
+                  postId={post?.id || 'new-post'}
+                  postTitle={title || 'Untitled Post'}
+                  keywords={tags}
+                  onImagesGenerated={(images) => {
+                    // Update the main image with the first generated image
+                    if (images.length > 0 && !image) {
+                      setImage(images[0].url);
+                    }
+                  }}
+                />
               </div>
             </div>
           )}

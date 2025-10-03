@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Image Injection</title>
+</head>
+<body>
+    <h1>Test Image Injection</h1>
+    
+    <div id="test-content">
+        <!-- Content will be inserted here -->
+    </div>
+
+    <script type="module">
+        // Simulate the blog post data
+        const testPost = {
+            slug: "test-post",
+            images: [
+                {
+                    url: "/generated-images/multimodal-ai-assistants-1.jpg",
+                    alt: "Test image 1",
+                    width: 1200,
+                    height: 630
+                },
+                {
+                    url: "/generated-images/multimodal-ai-assistants-2.jpg", 
+                    alt: "Test image 2",
+                    width: 1200,
+                    height: 630
+                }
+            ]
+        };
+
+        // Test markdown content
+        const testContent = `# Main Title
+
+## 1. First Section
+
+Some content here with multiple paragraphs.
+
+This is another paragraph in the first section.
+
+## 2. Second Section
+
+More content here in the second section.
+
+This section also has multiple paragraphs.
+
+## 3. Third Section
+
+Final content in the third section.
+
+This is the last paragraph.`;
+
+        // Simulate the marked library conversion
+        function simpleMarkdownToHtml(markdown) {
+            return markdown
+                .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+                .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+                .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+                .replace(/\n\n/g, '</p><p>')
+                .replace(/^(?!<h|<\/p>)(.+)$/gm, '<p>$1</p>')
+                .replace(/<p><\/p>/g, '');
+        }
+
+        // Simulate the image injection function
+        function injectImagesIntoContent(html, post) {
+            if (!post.images || post.images.length === 0) return html;
+            
+            console.log('Starting image injection...');
+            console.log('HTML before injection:', html);
+            
+            // Split content into sections (by h2 headers)
+            const sections = html.split(/(<h2[^>]*>.*?<\/h2>)/gi);
+            
+            console.log('Sections:', sections);
+            console.log('Number of sections:', sections.length);
+            
+            let imageIndex = 0;
+            let result = '';
+            
+            for (let i = 0; i < sections.length; i++) {
+                result += sections[i];
+                
+                console.log(`Processing section ${i}: "${sections[i].substring(0, 50)}..."`);
+                
+                // After every h2 section (except the last one), try to insert an image
+                if (i > 0 && i % 2 === 1 && imageIndex < post.images.length) {
+                    const image = post.images[imageIndex];
+                    console.log(`Inserting image ${imageIndex} after section ${i}:`, image.url);
+                    
+                    const imageHtml = `
+                        <div class="my-8 text-center">
+                            <img 
+                                src="${image.url}" 
+                                alt="${image.alt}" 
+                                class="w-full max-w-4xl mx-auto h-auto rounded-xl shadow-lg"
+                                loading="lazy"
+                                width="${image.width}"
+                                height="${image.height}"
+                            />
+                            ${image.alt ? `<p class="text-sm text-gray-600 mt-2 italic">${image.alt}</p>` : ''}
+                        </div>
+                    `;
+                    
+                    result += imageHtml;
+                    imageIndex++;
+                }
+            }
+            
+            console.log('Final result:', result);
+            return result;
+        }
+
+        // Test the process
+        console.log('Original markdown:', testContent);
+        
+        const html = simpleMarkdownToHtml(testContent);
+        console.log('Converted HTML:', html);
+        
+        const finalHtml = injectImagesIntoContent(html, testPost);
+        console.log('Final HTML with images:', finalHtml);
+        
+        // Display the result
+        document.getElementById('test-content').innerHTML = finalHtml;
+    </script>
+</body>
+</html>

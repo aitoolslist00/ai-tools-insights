@@ -167,58 +167,10 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
       {/* Modern Article Page Component */}
       <ModernArticlePage 
-        post={{
-          id: post.id,
-          title: post.title,
-          excerpt: post.excerpt,
-          content: post.content,
-          author: post.author,
-          publishedAt: post.publishedAt || post.updatedAt || new Date().toISOString(),
-          readTime: post.readTime,
-          image: post.image,
-          tags: post.tags,
-          category: category?.name || post.category,
-          href: post.href
-        }}
-        relatedPosts={relatedPosts.map(p => ({
-          id: p.id,
-          title: p.title,
-          excerpt: p.excerpt,
-          content: p.content,
-          author: p.author,
-          publishedAt: p.publishedAt || p.updatedAt || new Date().toISOString(),
-          readTime: p.readTime,
-          image: p.image,
-          tags: p.tags,
-          category: p.category,
-          href: p.href
-        }))}
-        nextPost={nextPost ? {
-          id: nextPost.id,
-          title: nextPost.title,
-          excerpt: nextPost.excerpt,
-          content: nextPost.content,
-          author: nextPost.author,
-          publishedAt: nextPost.publishedAt || nextPost.updatedAt || new Date().toISOString(),
-          readTime: nextPost.readTime,
-          image: nextPost.image,
-          tags: nextPost.tags,
-          category: nextPost.category,
-          href: nextPost.href
-        } : undefined}
-        prevPost={prevPost ? {
-          id: prevPost.id,
-          title: prevPost.title,
-          excerpt: prevPost.excerpt,
-          content: prevPost.content,
-          author: prevPost.author,
-          publishedAt: prevPost.publishedAt || prevPost.updatedAt || new Date().toISOString(),
-          readTime: prevPost.readTime,
-          image: prevPost.image,
-          tags: prevPost.tags,
-          category: prevPost.category,
-          href: prevPost.href
-        } : undefined}
+        post={post}
+        relatedPosts={relatedPosts}
+        nextPost={nextPost}
+        prevPost={prevPost}
       />
     </>
   )

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Images</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .image-test { margin: 20px 0; padding: 20px; border: 1px solid #ccc; }
+        img { max-width: 100%; height: auto; }
+    </style>
+</head>
+<body>
+    <h1>Testing Multimodal AI Assistants Images</h1>
+    
+    <div class="image-test">
+        <h2>Image 1: multimodal-ai-assistants-1759415169042.jpg</h2>
+        <img src="/generated-images/multimodal-ai-assistants-1759415169042.jpg" alt="a woman wearing a pair of ear buds" />
+        <p>Alt text: a woman wearing a pair of ear buds</p>
+        <p>Size: 1200x675</p>
+    </div>
+    
+    <div class="image-test">
+        <h2>Image 2: multimodal-ai-1759415190055.jpg</h2>
+        <img src="/generated-images/multimodal-ai-1759415190055.jpg" alt="yellow and green light digital wallpaper" />
+        <p>Alt text: yellow and green light digital wallpaper</p>
+        <p>Size: 800x600</p>
+    </div>
+    
+    <div class="image-test">
+        <h2>Image 3: ai-assistants-1759415204826.jpg</h2>
+        <img src="/generated-images/ai-assistants-1759415204826.jpg" alt="a green square with a white speech bubble" />
+        <p>Alt text: a green square with a white speech bubble</p>
+        <p>Size: 800x600</p>
+    </div>
+    
+    <script>
+        // Test if images load successfully
+        document.querySelectorAll('img').forEach((img, index) => {
+            img.onload = function() {
+                console.log(`Image ${index + 1} loaded successfully:`, this.src);
+            };
+            img.onerror = function() {
+                console.error(`Image ${index + 1} failed to load:`, this.src);
+                this.style.border = '2px solid red';
+                this.parentElement.style.backgroundColor = '#ffeeee';
+            };
+        });
+    </script>
+</body>
+</html>
