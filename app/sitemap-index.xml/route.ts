@@ -22,21 +22,19 @@ export async function GET() {
     <lastmod>${now}</lastmod>
   </sitemap>
   <sitemap>
-    <loc>${baseUrl}/sitemap-articles.xml</loc>
+    <loc>${baseUrl}/sitemap-images.xml</loc>
     <lastmod>${now}</lastmod>
   </sitemap>
   <sitemap>
-    <loc>${baseUrl}/sitemap-images.xml</loc>
+    <loc>${baseUrl}/sitemap-news.xml</loc>
     <lastmod>${now}</lastmod>
   </sitemap>
 </sitemapindex>`
 
   return new NextResponse(sitemapIndex, {
     headers: {
-      'Content-Type': 'application/xml; charset=utf-8',
-      'Cache-Control': 'public, max-age=1800, s-maxage=1800, stale-while-revalidate=3600',
-      'X-Robots-Tag': 'noindex',
-      'Vary': 'Accept-Encoding',
+      'Content-Type': 'application/xml',
+      'Cache-Control': 'public, max-age=86400, s-maxage=86400',
     },
   })
 }

@@ -9,26 +9,53 @@ export default function robots(): MetadataRoute.Robots {
   
   return {
     rules: [
-      // Googlebot - Highest priority with MAXIMUM crawling permissions
+      // Googlebot - MAXIMUM crawling permissions for fastest indexing
       {
         userAgent: 'Googlebot',
         allow: '/',
         disallow: [
+          '/api/auth/',
+          '/api/admin/',
+          '/admin/',
+          '/dashboard/',
+          '/_next/static/chunks/',
+          '/temp/',
+          '/test-*',
+          '/*.json$',
+          '/blog/dashboard',
+          '/uploads/temp/',
+        ],
+        // NO crawlDelay for Google - Maximum speed
+      },
+      
+      // Google Image Bot - Critical for AI tool screenshots and blog images
+      {
+        userAgent: 'Googlebot-Image',
+        allow: [
+          '/',
+          '/screenshots/',
+          '/uploads/',
+          '/generated-images/',
+          '/public/',
+        ],
+        disallow: [
           '/api/',
           '/admin/',
           '/dashboard/',
-          '/_next/',
+          '/_next/static/chunks/',
           '/temp/',
-          '/blog/dashboard',
-          '/test-*',
-          '/*.json$',
+          '/uploads/temp/',
         ],
-        crawlDelay: 0, // ZERO delay - Maximum crawl speed for Google
       },
-      // Google Image Bot - for AI tool images
+      
+      // Google News Bot - For blog content
       {
-        userAgent: 'Googlebot-Image',
-        allow: '/',
+        userAgent: 'Googlebot-News',
+        allow: [
+          '/',
+          '/blog/',
+          '/ai-tools/',
+        ],
         disallow: [
           '/api/',
           '/admin/',
@@ -36,37 +63,72 @@ export default function robots(): MetadataRoute.Robots {
           '/_next/',
           '/temp/',
         ],
-        crawlDelay: 0.1,
       },
-      // Bingbot - Second priority
+      
+      // Bingbot - Second priority search engine
       {
         userAgent: 'Bingbot',
         allow: '/',
         disallow: [
-          '/api/',
+          '/api/auth/',
+          '/api/admin/',
           '/admin/',
           '/dashboard/',
-          '/_next/',
+          '/_next/static/chunks/',
           '/temp/',
           '/test-*',
+          '/uploads/temp/',
         ],
         crawlDelay: 0.5,
       },
-      // Other major search engines
+      
+      // Other major search engines - Allow full access
       {
-        userAgent: ['Slurp', 'DuckDuckBot', 'Baiduspider'],
+        userAgent: ['Slurp', 'DuckDuckBot', 'Baiduspider', 'YandexBot'],
         allow: '/',
+        disallow: [
+          '/api/auth/',
+          '/api/admin/',
+          '/admin/',
+          '/dashboard/',
+          '/_next/static/chunks/',
+          '/temp/',
+          '/test-*',
+          '/uploads/temp/',
+        ],
+        crawlDelay: 1,
+      },
+      
+      // Social Media Crawlers - Allow for rich previews
+      {
+        userAgent: [
+          'facebookexternalhit',
+          'Twitterbot',
+          'LinkedInBot',
+          'WhatsApp',
+          'SkypeUriPreview',
+          'TelegramBot',
+          'Applebot',
+          'Slackbot',
+          'DiscordBot',
+        ],
+        allow: [
+          '/',
+          '/ai-tools/',
+          '/blog/',
+          '/screenshots/',
+          '/uploads/',
+          '/generated-images/',
+        ],
         disallow: [
           '/api/',
           '/admin/',
           '/dashboard/',
-          '/_next/',
           '/temp/',
-          '/test-*',
         ],
-        crawlDelay: 1,
       },
-      // All other crawlers - more restrictive
+      
+      // All other crawlers - Selective access
       {
         userAgent: '*',
         allow: [
@@ -81,6 +143,10 @@ export default function robots(): MetadataRoute.Robots {
           '/cookie-policy',
           '/privacy-policy',
           '/terms-of-service',
+          '/sitemap',
+          '/screenshots/',
+          '/uploads/',
+          '/generated-images/',
         ],
         disallow: [
           '/api/',
@@ -88,7 +154,7 @@ export default function robots(): MetadataRoute.Robots {
           '/dashboard/',
           '/test-*',
           '/_next/',
-          '/uploads/',
+          '/uploads/temp/',
           '/temp/',
           '/*.json$',
           '/*?*sort=*',
@@ -96,29 +162,49 @@ export default function robots(): MetadataRoute.Robots {
           '/*?utm_*',
           '/*?ref=*',
           '/*?source=*',
+          '/*?fbclid=*',
+          '/*?gclid=*',
+          '/*?_ga=*',
+          '/*?sessionid=*',
         ],
         crawlDelay: 2,
       },
-      // Block aggressive/commercial crawlers to preserve server resources
+      
+      // Block resource-intensive crawlers but allow SEO tools
       {
         userAgent: [
-          'AhrefsBot',
-          'SemrushBot',
           'MJ12bot',
           'DotBot',
           'BLEXBot',
           'DataForSeoBot',
           'PetalBot',
-          'YandexBot',
           'SeznamBot',
-          'facebookexternalhit',
-          'Twitterbot',
-          'LinkedInBot',
-          'WhatsApp',
-          'SkypeUriPreview',
-          'Applebot',
+          'CCBot',
+          'GPTBot',
+          'ChatGPT-User',
+          'CCBot',
+          'anthropic-ai',
+          'Claude-Web',
         ],
         disallow: '/',
+      },
+      
+      // Allow important SEO crawlers with restrictions
+      {
+        userAgent: ['AhrefsBot', 'SemrushBot'],
+        allow: [
+          '/',
+          '/ai-tools/',
+          '/blog/',
+        ],
+        disallow: [
+          '/api/',
+          '/admin/',
+          '/dashboard/',
+          '/uploads/',
+          '/screenshots/',
+        ],
+        crawlDelay: 10, // Slow them down to preserve resources
       },
     ],
     sitemap: [
@@ -126,8 +212,8 @@ export default function robots(): MetadataRoute.Robots {
       `${baseUrl}/sitemap.xml`,
       `${baseUrl}/sitemap-tools.xml`,
       `${baseUrl}/sitemap-blog.xml`,
-      `${baseUrl}/sitemap-articles.xml`,
       `${baseUrl}/sitemap-images.xml`,
+      `${baseUrl}/sitemap-news.xml`,
     ],
     host: baseUrl,
   }

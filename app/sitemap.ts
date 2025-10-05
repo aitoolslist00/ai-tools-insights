@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next'
 
 // Pure Static Generation for main sitemap - optimized for immediate indexing
 export const dynamic = 'force-static'
-export const revalidate = false
+export const revalidate = 3600 // Revalidate every hour
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://www.aitoolsinsights.com'
@@ -10,84 +10,103 @@ export default function sitemap(): MetadataRoute.Sitemap {
   
   // Static pages with optimized priorities for SEO ranking
   const staticPages = [
-    // Homepage - Maximum priority
+    // Homepage - Maximum priority for fastest indexing
     {
       url: baseUrl,
       lastModified: now,
-      changeFrequency: 'daily' as const,
+      changeFrequency: 'hourly' as const,
       priority: 1.0,
     },
-    // Main category pages - High priority
+    // Main category pages - High priority for discovery
     {
       url: `${baseUrl}/ai-tools`,
       lastModified: now,
-      changeFrequency: 'daily' as const,
+      changeFrequency: 'hourly' as const,
       priority: 0.95,
     },
     {
       url: `${baseUrl}/blog`,
       lastModified: now,
-      changeFrequency: 'daily' as const,
+      changeFrequency: 'hourly' as const,
       priority: 0.9,
     },
-    // Search functionality - Important for user experience
+    // Search functionality - Critical for user experience
     {
       url: `${baseUrl}/search`,
+      lastModified: now,
+      changeFrequency: 'daily' as const,
+      priority: 0.8,
+    },
+    // About page - Trust and authority signals
+    {
+      url: `${baseUrl}/about`,
       lastModified: now,
       changeFrequency: 'weekly' as const,
       priority: 0.7,
     },
-    // About page - Important for trust and authority
-    {
-      url: `${baseUrl}/about`,
-      lastModified: now,
-      changeFrequency: 'monthly' as const,
-      priority: 0.6,
-    },
-    // Contact page - Important for business
+    // Contact page - Business credibility
     {
       url: `${baseUrl}/contact`,
       lastModified: now,
-      changeFrequency: 'monthly' as const,
+      changeFrequency: 'weekly' as const,
+      priority: 0.6,
+    },
+    // Sitemap page for transparency and crawlability
+    {
+      url: `${baseUrl}/sitemap`,
+      lastModified: now,
+      changeFrequency: 'daily' as const,
       priority: 0.5,
     },
-    // Legal pages - Required but lower priority
+    // Legal pages - Required for compliance
     {
       url: `${baseUrl}/privacy`,
       lastModified: now,
-      changeFrequency: 'yearly' as const,
-      priority: 0.3,
+      changeFrequency: 'monthly' as const,
+      priority: 0.4,
     },
     {
       url: `${baseUrl}/privacy-policy`,
       lastModified: now,
-      changeFrequency: 'yearly' as const,
-      priority: 0.3,
+      changeFrequency: 'monthly' as const,
+      priority: 0.4,
     },
     {
       url: `${baseUrl}/terms`,
       lastModified: now,
-      changeFrequency: 'yearly' as const,
-      priority: 0.3,
+      changeFrequency: 'monthly' as const,
+      priority: 0.4,
     },
     {
       url: `${baseUrl}/terms-of-service`,
       lastModified: now,
-      changeFrequency: 'yearly' as const,
-      priority: 0.3,
+      changeFrequency: 'monthly' as const,
+      priority: 0.4,
     },
     {
       url: `${baseUrl}/cookie-policy`,
       lastModified: now,
-      changeFrequency: 'yearly' as const,
-      priority: 0.3,
-    },
-    // Sitemap page for transparency
-    {
-      url: `${baseUrl}/sitemap`,
-      lastModified: now,
       changeFrequency: 'monthly' as const,
-      priority: 0.2,
+      priority: 0.4,
+    },
+    // Additional important pages for SEO
+    {
+      url: `${baseUrl}/ai-tools/categories`,
+      lastModified: now,
+      changeFrequency: 'daily' as const,
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/blog/categories`,
+      lastModified: now,
+      changeFrequency: 'daily' as const,
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/blog/tags`,
+      lastModified: now,
+      changeFrequency: 'daily' as const,
+      priority: 0.6,
     },
   ]
 
