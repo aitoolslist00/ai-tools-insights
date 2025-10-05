@@ -4,6 +4,20 @@ import { blogPosts } from '@/lib/blog-data'
 export const dynamic = 'force-static'
 export const revalidate = 1800 // Revalidate every 30 minutes for fresh content
 
+// Helper function to escape XML characters
+function escapeXml(unsafe: string): string {
+  return unsafe.replace(/[<>&'"]/g, function (c) {
+    switch (c) {
+      case '<': return '&lt;';
+      case '>': return '&gt;';
+      case '&': return '&amp;';
+      case '\'': return '&apos;';
+      case '"': return '&quot;';
+      default: return c;
+    }
+  });
+}
+
 export async function GET() {
   const baseUrl = 'https://www.aitoolsinsights.com'
   const now = new Date().toISOString()
@@ -19,8 +33,8 @@ export async function GET() {
       const imageXml = post.image ? `
     <image:image>
       <image:loc>${baseUrl}${post.image}</image:loc>
-      <image:title>${post.title}</image:title>
-      <image:caption>${post.excerpt}</image:caption>
+      <image:title>${escapeXml(post.title)}</image:title>
+      <image:caption>${escapeXml(post.excerpt || '')}</image:caption>
     </image:image>` : ''
       
       return `  <url>
@@ -32,7 +46,7 @@ export async function GET() {
     }).join('\n')
 
   // Generate category pages for blog
-  const categorySet = new Set(blogPosts.filter(post => post.published).map(post => post.category))
+  const categorySet = new Set(blogPosts.filter(post => post.published && post.category).map(post => post.category))
   const categories = Array.from(categorySet)
   const categoryUrls = categories.map(category => {
     const slug = category.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
@@ -45,7 +59,7 @@ export async function GET() {
   }).join('\n')
 
   // Generate tag pages
-  const tagSet = new Set(blogPosts.filter(post => post.published).flatMap(post => post.tags))
+  const tagSet = new Set(blogPosts.filter(post => post.published && post.tags).flatMap(post => post.tags))
   const allTags = Array.from(tagSet)
   const tagUrls = allTags.map(tag => {
     const slug = tag.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')

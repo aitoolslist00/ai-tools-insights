@@ -5,6 +5,20 @@ import { blogPosts } from '@/lib/blog-data'
 export const dynamic = 'force-static'
 export const revalidate = 3600 // Revalidate every hour
 
+// Helper function to escape XML characters
+function escapeXml(unsafe: string): string {
+  return unsafe.replace(/[<>&'"]/g, function (c) {
+    switch (c) {
+      case '<': return '&lt;';
+      case '>': return '&gt;';
+      case '&': return '&amp;';
+      case '\'': return '&apos;';
+      case '"': return '&quot;';
+      default: return c;
+    }
+  });
+}
+
 export async function GET() {
   const baseUrl = 'https://www.aitoolsinsights.com'
   const now = new Date().toISOString()
@@ -16,8 +30,8 @@ export async function GET() {
     <lastmod>${now}</lastmod>
     <image:image>
       <image:loc>${baseUrl}/screenshots/${tool.id}.jpg</image:loc>
-      <image:title>${tool.name} - AI Tool Interface</image:title>
-      <image:caption>${tool.description}</image:caption>
+      <image:title>${escapeXml(tool.name)} - AI Tool Interface</image:title>
+      <image:caption>${escapeXml(tool.description)}</image:caption>
       <image:geo_location>United States</image:geo_location>
       <image:license>${baseUrl}/terms</image:license>
     </image:image>
@@ -34,8 +48,8 @@ export async function GET() {
     <lastmod>${post.date ? new Date(post.date).toISOString() : now}</lastmod>
     <image:image>
       <image:loc>${baseUrl}${post.image}</image:loc>
-      <image:title>${post.title}</image:title>
-      <image:caption>${post.excerpt}</image:caption>
+      <image:title>${escapeXml(post.title)}</image:title>
+      <image:caption>${escapeXml(post.excerpt || '')}</image:caption>
       <image:geo_location>United States</image:geo_location>
       <image:license>${baseUrl}/terms</image:license>
     </image:image>

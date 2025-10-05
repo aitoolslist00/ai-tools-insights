@@ -4,6 +4,20 @@ import { blogPosts } from '@/lib/blog-data'
 export const dynamic = 'force-static'
 export const revalidate = 900 // Revalidate every 15 minutes for news freshness
 
+// Helper function to escape XML characters
+function escapeXml(unsafe: string): string {
+  return unsafe.replace(/[<>&'"]/g, function (c) {
+    switch (c) {
+      case '<': return '&lt;';
+      case '>': return '&gt;';
+      case '&': return '&amp;';
+      case '\'': return '&apos;';
+      case '"': return '&quot;';
+      default: return c;
+    }
+  });
+}
+
 export async function GET() {
   const baseUrl = 'https://www.aitoolsinsights.com'
   const now = new Date()
@@ -46,8 +60,8 @@ export async function GET() {
         <news:language>en</news:language>
       </news:publication>
       <news:publication_date>${pubDate}</news:publication_date>
-      <news:title>${post.title}</news:title>
-      <news:keywords>${post.tags.join(', ')}</news:keywords>
+      <news:title>${escapeXml(post.title)}</news:title>
+      <news:keywords>${post.tags ? escapeXml(post.tags.join(', ')) : 'AI, Technology'}</news:keywords>
     </news:news>
     <lastmod>${pubDate}</lastmod>
     <changefreq>hourly</changefreq>
