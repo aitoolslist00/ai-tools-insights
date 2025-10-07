@@ -23,21 +23,31 @@ export async function GET() {
   const now = new Date()
   const twoDaysAgo = new Date(now.getTime() - (2 * 24 * 60 * 60 * 1000))
   
-  // Only include recent blog posts (within last 2 days) for news sitemap
-  const recentPosts = blogPosts
+  // Get recent blog posts for news sitemap
+  // First try to get posts from last 2 days, then fall back to most recent posts
+  let recentPosts = blogPosts
     .filter(post => {
       if (!post.published || !post.date) return false
       const postDate = new Date(post.date)
-      return postDate >= twoDaysAgo
+      return postDate >= twoDaysAgo && postDate <= now
     })
     .sort((a, b) => new Date(b.date!).getTime() - new Date(a.date!).getTime())
     .slice(0, 1000) // Google News limit
 
+  // If no posts in last 2 days, get the most recent published posts
   if (recentPosts.length === 0) {
-    // Return empty news sitemap if no recent posts
+    recentPosts = blogPosts
+      .filter(post => post.published && post.date)
+      .sort((a, b) => new Date(b.date!).getTime() - new Date(a.date!).getTime())
+      .slice(0, 10) // Limit to 10 most recent posts for news sitemap
+  }
+
+  // If still no posts, return empty sitemap (this should rarely happen)
+  if (recentPosts.length === 0) {
     const emptySitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
+  <!-- No published articles available -->
 </urlset>`
 
     return new NextResponse(emptySitemap, {
