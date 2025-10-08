@@ -8,6 +8,7 @@ import InstantNavigation from '@/components/InstantNavigation'
 import { AdvancedPerformanceOptimizer as PerfOptimizer } from '@/lib/advanced-performance-optimizer'
 import SchemaValidator from '@/components/SchemaValidator'
 import AdvancedSEOOptimizer from '@/components/AdvancedSEOOptimizer'
+import MonetagScript from '@/components/MonetagScript'
 import { Toaster } from 'sonner'
 import './globals.css'
 
@@ -123,6 +124,9 @@ export default function RootLayout({
         
         {/* Advanced SEO Optimization Engine */}
         <AdvancedSEOOptimizer />
+        
+        {/* Monetag Ad Script */}
+        <MonetagScript />
         
         <div className="min-h-screen flex flex-col">
           {/* Navigation */}
