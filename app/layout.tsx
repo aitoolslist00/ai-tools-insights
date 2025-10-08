@@ -103,6 +103,9 @@ export default function RootLayout({
         <meta name="color-scheme" content="light dark" />
         <meta name="supported-color-schemes" content="light dark" />
         
+        {/* Monetag Ads */}
+        <meta name="monetag" content="f8b80cf7c7b1e52f0a54caeb5b9bd7b0" />
+        
         {/* Advanced Performance Optimization */}
         <style dangerouslySetInnerHTML={{ __html: PerfOptimizer.generateCriticalCSS() }} />
         
