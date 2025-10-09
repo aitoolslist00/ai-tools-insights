@@ -9,6 +9,7 @@ import { AdvancedPerformanceOptimizer as PerfOptimizer } from '@/lib/advanced-pe
 import SchemaValidator from '@/components/SchemaValidator'
 import AdvancedSEOOptimizer from '@/components/AdvancedSEOOptimizer'
 import MonetagScript from '@/components/MonetagScript'
+import AdScripts from '@/components/AdScripts'
 import { Toaster } from 'sonner'
 import './globals.css'
 
@@ -114,6 +115,8 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: PerfOptimizer.generateWebVitalsOptimization() }} />
       </head>
       <body className={`${inter.className} antialiased`} suppressHydrationWarning>
+        {/* Ad Scripts - Load after head tag */}
+        <AdScripts />
         {/* Advanced Performance Monitoring - Commented out to fix build */}
         {/* <AdvancedPerformanceOptimizer /> */}
         

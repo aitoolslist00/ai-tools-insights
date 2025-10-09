@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import BlogDashboardNew from '@/components/BlogDashboardNew'
 import BlogSystemDiagnostics from '@/components/BlogSystemDiagnostics'
 import EnhancedAISEOEditor from '@/components/EnhancedAISEOEditor'
+import AdManagement from '@/components/AdManagement'
 import LoginForm from '@/components/LoginForm'
 import { isAuthenticated, logout } from '@/lib/auth-enhanced'
 import { LogOut } from 'lucide-react'
@@ -102,6 +103,11 @@ export default function BlogDashboardPage() {
           <EnhancedAISEOEditor />
         </div>
 
+        {/* Ad Management */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-6">
+          <AdManagement />
+        </div>
+
         {/* Dashboard */}
         <BlogDashboardNew />
 
@@ -111,6 +117,7 @@ export default function BlogDashboardPage() {
           <h3 className="text-lg font-medium text-blue-900 mb-4">How to Use the Blog Dashboard</h3>
           <div className="space-y-2 text-sm text-blue-800">
             <p><strong>🤖 AI SEO Editor Pro:</strong> Use the Enhanced AI SEO Editor above for complete automated workflow. Enter your target keyword and Gemini API key, then click "Start Complete AI SEO Workflow" to generate content, analyze SEO, create schemas, generate professional images, and publish SEO-optimized articles automatically.</p>
+            <p><strong>💰 Ad Script Management:</strong> Use the Ad Management section to add JavaScript ad codes (Google AdSense, Monetag, etc.). Simply paste your ad code, choose the position (head, body-start, or body-end), and publish. The ads will automatically appear on your site.</p>
             <p><strong>Create Posts:</strong> Click "New Post" to create a new blog post with all necessary fields.</p>
             <p><strong>Edit Posts:</strong> Click the edit icon to modify existing posts, including title, content, SEO settings, and more.</p>
             <p><strong>Publish/Unpublish:</strong> Use the eye icon to toggle post visibility on your site.</p>
@@ -144,6 +151,9 @@ export default function BlogDashboardPage() {
               <li>✅ Real-time SEO analysis and optimization</li>
               <li>✅ Comprehensive schema markup generation</li>
               <li>✅ Smart publishing with automation</li>
+              <li>✅ Ad Script Management with dynamic injection</li>
+              <li>✅ Support for multiple ad networks (AdSense, Monetag, etc.)</li>
+              <li>✅ Position-based ad placement (head, body-start, body-end)</li>
               <li>✅ Direct file-based storage (blog-posts.json)</li>
               <li>✅ Immediate content updates on site</li>
               <li>✅ Automatic blog page revalidation</li>
