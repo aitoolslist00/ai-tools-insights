@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'AI Tools Blog - Latest AI News & Reviews',
     description: 'Expert insights on AI tools, reviews, and industry trends.',
-    url: 'https://www.aitoolslist.com/blog',
+    url: 'https://www.aitoolsinsights.com/blog',
   },
 }
 

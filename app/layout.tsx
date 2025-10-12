@@ -8,6 +8,12 @@ import InstantNavigation from '@/components/InstantNavigation'
 import { AdvancedPerformanceOptimizer as PerfOptimizer } from '@/lib/advanced-performance-optimizer'
 import SchemaValidator from '@/components/SchemaValidator'
 import AdvancedSEOOptimizer from '@/components/AdvancedSEOOptimizer'
+import Enhanced2025SEO from '@/components/Enhanced2025SEO'
+import CoreWebVitalsMonitor from '@/components/CoreWebVitalsMonitor'
+import CoreWebVitalsOptimizer from '@/components/CoreWebVitalsOptimizer'
+import AIContentOptimizer from '@/components/AIContentOptimizer'
+import SEO2025ComplianceChecker from '@/components/SEO2025ComplianceChecker'
+import IntentSatisfactionTracker from '@/components/IntentSatisfactionTracker'
 import MonetagScript from '@/components/MonetagScript'
 import AdScripts from '@/components/AdScripts'
 import { Toaster } from 'sonner'
@@ -24,12 +30,17 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: 'AI Tools Insights - Discover the Best AI Tools for Your Business',
-  description: 'Comprehensive directory of AI tools including image generators, video tools, chatbots, coding assistants, and more. Find the perfect AI solution for your needs.',
-  keywords: 'AI tools, artificial intelligence, AI directory, machine learning tools, AI software, business AI, productivity tools',
-  authors: [{ name: 'AI Tools Insights' }],
+  title: {
+    default: 'AI Tools Insights - Discover the Best AI Tools for Your Business 2025',
+    template: '%s | AI Tools Insights'
+  },
+  description: 'Comprehensive directory of 500+ AI tools including image generators, video tools, chatbots, coding assistants, and more. Find the perfect AI solution for your business needs. Updated 2025.',
+  keywords: 'AI tools 2025, artificial intelligence directory, best AI tools, AI software comparison, business AI solutions, free AI tools, AI image generators, AI video tools, AI writing tools, AI coding assistants, machine learning tools, enterprise AI, productivity AI tools',
+  authors: [{ name: 'AI Tools Insights Team', url: 'https://www.aitoolsinsights.com/about' }],
   creator: 'AI Tools Insights',
   publisher: 'AI Tools Insights',
+  category: 'Technology',
+  classification: 'AI Tools Directory',
   formatDetection: {
     email: false,
     address: false,
@@ -38,13 +49,43 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://www.aitoolsinsights.com'),
   alternates: {
     canonical: '/',
+    languages: {
+      'en-US': '/',
+      'en-GB': '/',
+    },
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: 'https://www.aitoolsinsights.com',
+    siteName: 'AI Tools Insights',
+    title: 'AI Tools Insights - Best AI Tools Directory 2025',
+    description: 'Discover 500+ AI tools for business, creativity, and productivity. Expert reviews, comparisons, and recommendations.',
+    images: [
+      {
+        url: '/og-home.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'AI Tools Insights - Comprehensive AI Tools Directory',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    site: '@aitoolsinsights',
+    creator: '@aitoolsinsights',
+    title: 'AI Tools Insights - Best AI Tools Directory 2025',
+    description: 'Discover 500+ AI tools for business, creativity, and productivity. Expert reviews and comparisons.',
+    images: ['/og-home.jpg'],
   },
   robots: {
     index: true,
     follow: true,
+    nocache: false,
     googleBot: {
       index: true,
       follow: true,
+      noimageindex: false,
       'max-video-preview': -1,
       'max-image-preview': 'large',
       'max-snippet': -1,
@@ -52,11 +93,19 @@ export const metadata: Metadata = {
   },
   verification: {
     google: 'verified-via-dns',
+    yandex: 'pending-setup',
+    yahoo: 'pending-setup',
+    other: {
+      'msvalidate.01': 'pending-setup',
+      'facebook-domain-verification': 'pending-setup',
+    },
   },
   other: {
     'google-site-verification': 'verified-via-dns',
     'msvalidate.01': 'pending-setup',
     'yandex-verification': 'pending-setup',
+    'p:domain_verify': 'pending-setup',
+    'norton-safeweb-site-verification': 'pending-setup',
   },
 }
 
@@ -128,6 +177,31 @@ export default function RootLayout({
         {/* Advanced SEO Optimization Engine */}
         <AdvancedSEOOptimizer />
         
+        {/* Enhanced 2025 SEO Compliance */}
+        <Enhanced2025SEO pageType="homepage" />
+        
+        {/* Core Web Vitals Monitoring */}
+        <CoreWebVitalsMonitor />
+        
+        {/* Enhanced Core Web Vitals Optimization for 2025 */}
+        <CoreWebVitalsOptimizer enableReporting={true} enableOptimizations={true} />
+        
+        {/* AI Content Understanding Optimization for 2025 */}
+        <AIContentOptimizer 
+          pageType="homepage"
+          contentType="directory"
+          keywords={['ai tools', 'artificial intelligence', 'directory', 'business solutions']}
+          enableStructuredData={true}
+          enableSemanticMarkup={true}
+        />
+        
+        {/* Intent Satisfaction Tracking for 2025 Algorithm */}
+        <IntentSatisfactionTracker 
+          pageType="homepage"
+          contentType="navigation"
+          keywords={['ai tools', 'artificial intelligence', 'directory']}
+        />
+        
         {/* Monetag Ad Script */}
         <MonetagScript />
         
@@ -148,6 +222,9 @@ export default function RootLayout({
         
         {/* Schema Validation in Development */}
         <SchemaValidator enabled={process.env.NODE_ENV === 'development'} />
+        
+        {/* SEO 2025 Compliance Checker (Development Only) */}
+        <SEO2025ComplianceChecker />
         
         {/* Toast notifications */}
         <Toaster />

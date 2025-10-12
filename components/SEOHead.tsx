@@ -36,7 +36,7 @@ export default function SEOHead({
   articleSection,
   tags
 }: SEOHeadProps) {
-  const baseUrl = 'https://www.aitoolslist.com'
+  const baseUrl = 'https://www.aitoolsinsights.com'
   const fullCanonicalUrl = canonicalUrl ? `${baseUrl}${canonicalUrl}` : baseUrl
   const fullOgImage = ogImage.startsWith('http') ? ogImage : `${baseUrl}${ogImage}`
 

@@ -8,7 +8,7 @@ export interface SchemaMarkup {
 }
 
 export class SchemaGenerator {
-  private static baseUrl = 'https://www.aitoolslist.com'
+  private static baseUrl = 'https://www.aitoolsinsights.com'
 
   // Organization Schema for the entire site
   static generateOrganizationSchema(): SchemaMarkup {

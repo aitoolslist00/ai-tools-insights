@@ -4,6 +4,8 @@ import SSGPerformanceMonitor from '@/components/SSGPerformanceMonitor'
 import LazySection from '@/components/LazySection'
 import FAQSection, { homepageFAQs } from '@/components/FAQSection'
 import AdvancedAnalytics from '@/components/AdvancedAnalytics'
+import IntentSatisfactionTracker from '@/components/IntentSatisfactionTracker'
+import EnhancedStructuredData from '@/components/EnhancedStructuredData'
 import { Metadata } from 'next'
 import { SchemaGenerator } from '@/lib/schema-generator'
 import { AdvancedSEOOptimizer } from '@/lib/advanced-seo-optimizer'
@@ -46,7 +48,7 @@ export const metadata: Metadata = {
     site: '@aitoolslist',
   },
   alternates: {
-    canonical: 'https://www.aitoolslist.com',
+    canonical: 'https://www.aitoolsinsights.com',
   },
   other: {
     'google-site-verification': 'your-verification-code',
@@ -69,12 +71,12 @@ export default function Home() {
     title: 'AI Tools List - Discover the Best AI Tools for Your Business | 2025',
     description: 'Find the perfect AI tools for your business. Comprehensive directory featuring 100+ AI tools with expert reviews, pricing comparisons, and detailed features analysis.',
     image: '/og-home.jpg',
-    url: 'https://www.aitoolslist.com',
+    url: 'https://www.aitoolsinsights.com',
     keywords: ['AI tools', 'artificial intelligence', 'business AI', 'AI directory', 'machine learning tools']
   }
   
   const breadcrumbs = [
-    { name: 'Home', url: 'https://www.aitoolslist.com' }
+    { name: 'Home', url: 'https://www.aitoolsinsights.com' }
   ]
 
   // Generate comprehensive homepage schema with all critical types
@@ -91,6 +93,20 @@ export default function Home() {
     <div>
       {/* Advanced Analytics */}
       <AdvancedAnalytics />
+      
+      {/* Intent Satisfaction Tracking for Homepage */}
+      <IntentSatisfactionTracker 
+        pageType="homepage"
+        contentType="directory"
+        keywords={[
+          'ai tools 2025', 'best ai tools', 'artificial intelligence directory',
+          'ai software comparison', 'business ai solutions', 'free ai tools',
+          'ai image generators', 'ai video tools', 'ai writing tools'
+        ]}
+      />
+      
+      {/* Enhanced Structured Data for 2025 AI Understanding */}
+      <EnhancedStructuredData pageType="homepage" />
       
       {/* Comprehensive Structured Data with Rich Snippets */}
       <script

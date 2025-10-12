@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Adobe Firefly Review 2024 - AI Image Generator for Professionals',
     description: 'Create commercial-safe AI images with Adobe Firefly. Complete review and guide.',
-    url: 'https://www.aitoolslist.com/ai-tools/adobe-firefly',
+    url: 'https://www.aitoolsinsights.com/ai-tools/adobe-firefly',
   },
 }
 

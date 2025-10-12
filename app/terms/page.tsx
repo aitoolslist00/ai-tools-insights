@@ -135,7 +135,7 @@ export default function TermsPage() {
             If you have any questions about these Terms of Service, please contact us at:
           </p>
           <ul>
-            <li>Email: legal@aitoolslist.com</li>
+            <li>Email: legal@aitoolsinsights.com</li>
             <li>Address: 123 AI Street, San Francisco, CA 94105</li>
           </ul>
         </div>

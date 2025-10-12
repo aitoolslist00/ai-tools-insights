@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Copy.ai Review 2024 - AI Copywriting Tool',
     description: 'Create compelling copy with Copy.ai\'s AI templates. Complete review and guide.',
-    url: 'https://www.aitoolslist.com/ai-tools/copy-ai',
+    url: 'https://www.aitoolsinsights.com/ai-tools/copy-ai',
   },
 }
 

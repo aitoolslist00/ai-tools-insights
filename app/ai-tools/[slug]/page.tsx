@@ -4,6 +4,7 @@ import ToolPage from '@/components/ToolPage'
 import BreadcrumbNavigation from '@/components/BreadcrumbNavigation'
 import FAQSection, { aiToolsFAQs } from '@/components/FAQSection'
 import AdvancedAnalytics from '@/components/AdvancedAnalytics'
+import IntentSatisfactionTracker from '@/components/IntentSatisfactionTracker'
 import { getToolById, aiToolsData } from '@/lib/tools-data'
 import { SchemaGenerator } from '@/lib/schema-generator'
 
@@ -48,7 +49,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
       title: `${tool.name} Review 2025 - ${tool.category}`,
       description: tool.description,
-      url: `https://www.aitoolslist.com/ai-tools/${tool.id}`,
+      url: `https://www.aitoolsinsights.com/ai-tools/${tool.id}`,
       siteName: 'AI Tools List',
       images: [
         {
@@ -70,7 +71,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       site: '@aitoolslist',
     },
     alternates: {
-      canonical: `https://www.aitoolslist.com/ai-tools/${tool.id}`,
+      canonical: `https://www.aitoolsinsights.com/ai-tools/${tool.id}`,
     },
     other: {
       'article:author': 'AI Tools List',
@@ -100,7 +101,7 @@ export default async function DynamicToolPage({ params }: Props) {
   // Generate comprehensive structured data for maximum rich snippets
   const toolPageSchema = SchemaGenerator.generateToolPageSchema(tool)
   const breadcrumbSchema = SchemaGenerator.generateBreadcrumbSchema(
-    [{ name: 'Home', url: 'https://www.aitoolslist.com' }, ...breadcrumbs.map(b => ({ name: b.name, url: `https://www.aitoolslist.com${b.href}` }))]
+    [{ name: 'Home', url: 'https://www.aitoolsinsights.com' }, ...breadcrumbs.map(b => ({ name: b.name, url: `https://www.aitoolsinsights.com${b.href}` }))]
   )
   const faqSchema = SchemaGenerator.generateFAQSchema(aiToolsFAQs || [])
 
@@ -115,6 +116,21 @@ export default async function DynamicToolPage({ params }: Props) {
     <div>
       {/* Advanced Analytics */}
       <AdvancedAnalytics />
+      
+      {/* Intent Satisfaction Tracking for Tool Pages */}
+      <IntentSatisfactionTracker 
+        pageType="tool"
+        contentType="product-review"
+        keywords={[
+          tool.name.toLowerCase(),
+          tool.category.toLowerCase(),
+          `${tool.name.toLowerCase()} review`,
+          `${tool.name.toLowerCase()} features`,
+          `${tool.name.toLowerCase()} pricing`,
+          'ai tool review',
+          'ai software comparison'
+        ]}
+      />
       
       {/* Structured Data */}
       <script

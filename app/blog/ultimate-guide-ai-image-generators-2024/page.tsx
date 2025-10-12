@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'The Ultimate Guide to AI Image Generators in 2024',
     description: 'Compare the best AI image generators and find the perfect tool for your creative projects.',
-    url: 'https://www.aitoolslist.com/blog/ultimate-guide-ai-image-generators-2024',
+    url: 'https://www.aitoolsinsights.com/blog/ultimate-guide-ai-image-generators-2024',
   },
 }
 

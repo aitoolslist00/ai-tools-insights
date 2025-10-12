@@ -14,9 +14,9 @@ export default function ToolPage({ tool }: ToolPageProps) {
   // Generate comprehensive structured data for the tool
   const toolSchema = SchemaGenerator.generateSoftwareApplicationSchema(tool)
   const breadcrumbSchema = SchemaGenerator.generateBreadcrumbSchema([
-    { name: 'Home', url: 'https://www.aitoolslist.com' },
-    { name: 'AI Tools', url: 'https://www.aitoolslist.com/ai-tools' },
-    { name: tool.name, url: `https://www.aitoolslist.com/ai-tools/${tool.id}` }
+    { name: 'Home', url: 'https://www.aitoolsinsights.com' },
+    { name: 'AI Tools', url: 'https://www.aitoolsinsights.com/ai-tools' },
+    { name: tool.name, url: `https://www.aitoolsinsights.com/ai-tools/${tool.id}` }
   ])
   
   // Combine schemas for better SEO

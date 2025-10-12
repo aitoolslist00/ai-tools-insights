@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Ideogram Review 2024 - AI Image Generator with Perfect Text',
     description: 'Create images with perfect text rendering using Ideogram AI. Complete review and guide.',
-    url: 'https://www.aitoolslist.com/ai-tools/ideogram',
+    url: 'https://www.aitoolsinsights.com/ai-tools/ideogram',
   },
 }
 

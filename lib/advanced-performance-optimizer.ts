@@ -8,7 +8,7 @@ export class AdvancedPerformanceOptimizer {
       { rel: 'dns-prefetch', href: '//fonts.googleapis.com' },
       { rel: 'dns-prefetch', href: '//fonts.gstatic.com' },
       { rel: 'dns-prefetch', href: '//images.unsplash.com' },
-      { rel: 'dns-prefetch', href: '//api.aitoolslist.com' },
+      { rel: 'dns-prefetch', href: '//api.aitoolsinsights.com' },
       { rel: 'dns-prefetch', href: '//analytics.google.com' },
       { rel: 'dns-prefetch', href: '//www.googletagmanager.com' },
       

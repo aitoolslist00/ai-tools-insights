@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Jasper AI Review 2024 - AI Content Creation Platform',
     description: 'Create high-converting content with Jasper AI. Complete review and guide.',
-    url: 'https://www.aitoolslist.com/ai-tools/jasper-ai',
+    url: 'https://www.aitoolsinsights.com/ai-tools/jasper-ai',
   },
 }
 

@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'ElevenLabs Review 2024 - Advanced AI Voice Synthesis',
     description: 'Create realistic voices with ElevenLabs AI. Complete review and guide.',
-    url: 'https://www.aitoolslist.com/ai-tools/elevenlabs',
+    url: 'https://www.aitoolsinsights.com/ai-tools/elevenlabs',
   },
 }
 

@@ -33,7 +33,7 @@ export default function NewsletterSignup() {
         // Send confirmation email
         const subject = 'Newsletter Subscription Confirmation';
         const body = `Thank you for subscribing to AI Tools List newsletter!\n\nEmail: ${email}\nDate: ${new Date().toLocaleDateString()}\n\nWe'll keep you updated with the latest AI tools and insights.`;
-        const mailtoUrl = `mailto:contact@aitoolslist.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        const mailtoUrl = `mailto:contact@aitoolsinsights.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
         
         // Optional: Open email client for confirmation
         // window.location.href = mailtoUrl;

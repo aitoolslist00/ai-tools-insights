@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Codeium Review 2024 - Free AI Code Assistant',
     description: 'Code faster with Codeium\'s free AI assistant. Complete review and guide.',
-    url: 'https://www.aitoolslist.com/ai-tools/codeium',
+    url: 'https://www.aitoolsinsights.com/ai-tools/codeium',
   },
 }
 

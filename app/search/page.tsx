@@ -50,7 +50,7 @@ export async function generateMetadata({ searchParams }: SearchPageProps): Promi
       site: '@aitoolslist',
     },
     alternates: {
-      canonical: `https://www.aitoolslist.com/search${query ? `?q=${encodeURIComponent(query)}` : ''}`,
+      canonical: `https://www.aitoolsinsights.com/search${query ? `?q=${encodeURIComponent(query)}` : ''}`,
     },
     robots: {
       index: query ? false : true, // Don't index specific search results
@@ -78,7 +78,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   // Generate structured data for search page with SearchResultsPage schema
   const websiteSchema = SchemaGenerator.generateWebsiteSchema()
   const breadcrumbSchema = SchemaGenerator.generateBreadcrumbSchema(
-    [{ name: 'Home', url: 'https://www.aitoolslist.com' }, ...breadcrumbs.map(b => ({ name: b.name, url: `https://www.aitoolslist.com${b.href}` }))]
+    [{ name: 'Home', url: 'https://www.aitoolsinsights.com' }, ...breadcrumbs.map(b => ({ name: b.name, url: `https://www.aitoolsinsights.com${b.href}` }))]
   )
   
   // Add SearchResultsPage schema if there's a query

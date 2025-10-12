@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Perplexity AI Review 2024 - Complete Guide',
     description: 'Everything you need to know about Perplexity AI, the AI-powered search engine.',
-    url: 'https://www.aitoolslist.com/ai-tools/perplexity-ai',
+    url: 'https://www.aitoolsinsights.com/ai-tools/perplexity-ai',
   },
 }
 

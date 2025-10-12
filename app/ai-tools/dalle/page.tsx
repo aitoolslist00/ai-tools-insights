@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'DALL-E 3 Review 2024 - OpenAI Image Generator',
     description: 'Create amazing AI images with DALL-E 3. Complete review and guide.',
-    url: 'https://www.aitoolslist.com/ai-tools/dalle',
+    url: 'https://www.aitoolsinsights.com/ai-tools/dalle',
   },
 }
 

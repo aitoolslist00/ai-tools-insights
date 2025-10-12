@@ -18,14 +18,14 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL('https://www.aitoolslist.com'),
+  metadataBase: new URL('https://www.aitoolsinsights.com'),
   alternates: {
     canonical: '/',
   },
   openGraph: {
     title: 'AI Tools List - Discover the Best AI Tools for Your Business',
     description: 'Comprehensive directory of AI tools including image generators, video tools, chatbots, coding assistants, and more.',
-    url: 'https://www.aitoolslist.com',
+    url: 'https://www.aitoolsinsights.com',
     siteName: 'AI Tools List',
     images: [
       {

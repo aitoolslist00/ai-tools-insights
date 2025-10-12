@@ -44,10 +44,10 @@ export default function Contact() {
                 Send us an email and we'll get back to you within 24 hours.
               </p>
               <a 
-                href="mailto:contact@aitoolslist.com" 
+                href="mailto:contact@aitoolsinsights.com" 
                 className="text-blue-600 hover:text-blue-800 font-medium transition-colors duration-200"
               >
-                contact@aitoolslist.com
+                contact@aitoolsinsights.com
               </a>
             </div>
 
@@ -184,7 +184,7 @@ export default function Contact() {
               </h3>
               <p className="text-gray-600">
                 You can suggest a new AI tool by using our contact form above or sending us an email at 
-                contact@aitoolslist.com with the tool details.
+                contact@aitoolsinsights.com with the tool details.
               </p>
             </div>
             

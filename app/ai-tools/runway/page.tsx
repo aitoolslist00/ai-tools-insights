@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Runway Review 2024 - AI Video Editing Platform',
     description: 'Create stunning videos with Runway\'s AI tools. Complete review and guide.',
-    url: 'https://www.aitoolslist.com/ai-tools/runway',
+    url: 'https://www.aitoolsinsights.com/ai-tools/runway',
   },
 }
 

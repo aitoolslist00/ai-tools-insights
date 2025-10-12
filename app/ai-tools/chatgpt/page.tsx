@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'ChatGPT Review 2024 - Complete Guide',
     description: 'Everything you need to know about ChatGPT, the leading AI chatbot.',
-    url: 'https://www.aitoolslist.com/ai-tools/chatgpt',
+    url: 'https://www.aitoolsinsights.com/ai-tools/chatgpt',
   },
 }
 

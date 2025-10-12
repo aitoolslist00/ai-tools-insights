@@ -28,7 +28,7 @@ export default function ContactForm() {
       // Send email using mailto (opens email client)
       const subject = `Contact Form: ${formData.subject}`;
       const body = `Name: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`;
-      const mailtoUrl = `mailto:contact@aitoolslist.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      const mailtoUrl = `mailto:contact@aitoolsinsights.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
       
       // Store form data locally for user reference
       const formSubmission = {

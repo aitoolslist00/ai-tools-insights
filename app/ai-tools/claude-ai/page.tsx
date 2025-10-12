@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Claude AI Review 2024 - Complete Guide',
     description: 'Everything you need to know about Claude AI, Anthropic\'s advanced AI assistant.',
-    url: 'https://www.aitoolslist.com/ai-tools/claude-ai',
+    url: 'https://www.aitoolsinsights.com/ai-tools/claude-ai',
   },
 }
 

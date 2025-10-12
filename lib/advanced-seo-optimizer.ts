@@ -7,12 +7,12 @@ export class AdvancedSEOOptimizer {
     // Base Organization Schema (always include)
     schemas.push({
       "@type": "Organization",
-      "@id": "https://www.aitoolslist.com/#organization",
+      "@id": "https://www.aitoolsinsights.com/#organization",
       "name": "AI Tools List",
-      "url": "https://www.aitoolslist.com",
+      "url": "https://www.aitoolsinsights.com",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://www.aitoolslist.com/logo.png",
+        "url": "https://www.aitoolsinsights.com/logo.png",
         "width": 512,
         "height": 512
       },
@@ -25,26 +25,26 @@ export class AdvancedSEOOptimizer {
       "contactPoint": {
         "@type": "ContactPoint",
         "contactType": "customer service",
-        "email": "contact@aitoolslist.com",
-        "url": "https://www.aitoolslist.com/contact"
+        "email": "contact@aitoolsinsights.com",
+        "url": "https://www.aitoolsinsights.com/contact"
       }
     })
 
     // Website Schema
     schemas.push({
       "@type": "WebSite",
-      "@id": "https://www.aitoolslist.com/#website",
-      "url": "https://www.aitoolslist.com",
+      "@id": "https://www.aitoolsinsights.com/#website",
+      "url": "https://www.aitoolsinsights.com",
       "name": "AI Tools List",
       "description": "Discover the best AI tools for your business",
       "publisher": {
-        "@id": "https://www.aitoolslist.com/#organization"
+        "@id": "https://www.aitoolsinsights.com/#organization"
       },
       "potentialAction": {
         "@type": "SearchAction",
         "target": {
           "@type": "EntryPoint",
-          "urlTemplate": "https://www.aitoolslist.com/search?q={search_term_string}"
+          "urlTemplate": "https://www.aitoolsinsights.com/search?q={search_term_string}"
         },
         "query-input": "required name=search_term_string"
       }
@@ -55,14 +55,14 @@ export class AdvancedSEOOptimizer {
       case 'homepage':
         schemas.push({
           "@type": "WebPage",
-          "@id": "https://www.aitoolslist.com/#webpage",
-          "url": "https://www.aitoolslist.com",
+          "@id": "https://www.aitoolsinsights.com/#webpage",
+          "url": "https://www.aitoolsinsights.com",
           "name": "AI Tools List - Discover the Best AI Tools for Your Business",
           "isPartOf": {
-            "@id": "https://www.aitoolslist.com/#website"
+            "@id": "https://www.aitoolsinsights.com/#website"
           },
           "about": {
-            "@id": "https://www.aitoolslist.com/#organization"
+            "@id": "https://www.aitoolsinsights.com/#organization"
           },
           "description": "Find the perfect AI tools for your business. Comprehensive directory featuring 100+ AI tools with expert reviews.",
           "breadcrumb": {
@@ -72,7 +72,7 @@ export class AdvancedSEOOptimizer {
                 "@type": "ListItem",
                 "position": 1,
                 "name": "Home",
-                "item": "https://www.aitoolslist.com"
+                "item": "https://www.aitoolsinsights.com"
               }
             ]
           }
@@ -143,20 +143,20 @@ export class AdvancedSEOOptimizer {
             "@type": "BlogPosting",
             "headline": data.post.title,
             "description": data.post.description,
-            "image": data.post.image || "https://www.aitoolslist.com/og-blog.jpg",
+            "image": data.post.image || "https://www.aitoolsinsights.com/og-blog.jpg",
             "author": {
               "@type": "Person",
               "name": data.post.author || "AI Tools List Team",
-              "url": "https://www.aitoolslist.com/about"
+              "url": "https://www.aitoolsinsights.com/about"
             },
             "publisher": {
-              "@id": "https://www.aitoolslist.com/#organization"
+              "@id": "https://www.aitoolsinsights.com/#organization"
             },
             "datePublished": data.post.publishedAt,
             "dateModified": data.post.updatedAt || data.post.publishedAt,
             "mainEntityOfPage": {
               "@type": "WebPage",
-              "@id": `https://www.aitoolslist.com/blog/${data.post.slug}`
+              "@id": `https://www.aitoolsinsights.com/blog/${data.post.slug}`
             },
             "keywords": data.post.tags?.join(', '),
             "articleSection": data.post.category,

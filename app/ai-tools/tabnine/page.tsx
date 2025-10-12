@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Tabnine Review 2024 - Privacy-Focused AI Code Assistant',
     description: 'Code faster with Tabnine\'s privacy-focused AI assistant. Complete review and guide.',
-    url: 'https://www.aitoolslist.com/ai-tools/tabnine',
+    url: 'https://www.aitoolsinsights.com/ai-tools/tabnine',
   },
 }
 

@@ -90,78 +90,84 @@ export default function FeaturedTools() {
           </p>
         </div>
 
-        {/* Tools grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {/* Tools grid - Enhanced semantic structure */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" role="list" aria-label="Featured AI tools">
           {featuredTools.map((tool) => (
-            <div key={tool.id} className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden card-hover">
+            <article key={tool.id} className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden card-hover" role="listitem" itemScope itemType="https://schema.org/SoftwareApplication">
               {/* Tool image */}
-              <div className="h-48 bg-gradient-to-br from-primary-100 to-primary-200 flex items-center justify-center">
-                <div className="text-6xl font-bold text-primary-600 opacity-20">
+              <header className="h-48 bg-gradient-to-br from-primary-100 to-primary-200 flex items-center justify-center">
+                <div className="text-6xl font-bold text-primary-600 opacity-20" aria-hidden="true">
                   {tool.name.charAt(0)}
                 </div>
-              </div>
+              </header>
 
               <div className="p-6">
                 {/* Tool header */}
-                <div className="flex items-start justify-between mb-3">
+                <header className="flex items-start justify-between mb-3">
                   <div>
-                    <h3 className="text-xl font-semibold text-gray-900 mb-1">
+                    <h3 className="text-xl font-semibold text-gray-900 mb-1" itemProp="name">
                       {tool.name}
                     </h3>
-                    <span className="inline-block px-3 py-1 bg-primary-100 text-primary-700 text-sm font-medium rounded-full">
+                    <span className="inline-block px-3 py-1 bg-primary-100 text-primary-700 text-sm font-medium rounded-full" itemProp="applicationCategory">
                       {tool.category}
                     </span>
                   </div>
-                  <div className="flex items-center">
-                    <Star className="h-4 w-4 text-yellow-400 fill-current" />
-                    <span className="ml-1 text-sm font-medium text-gray-700">
+                  <div className="flex items-center" itemProp="aggregateRating" itemScope itemType="https://schema.org/AggregateRating">
+                    <Star className="h-4 w-4 text-yellow-400 fill-current" aria-hidden="true" />
+                    <span className="ml-1 text-sm font-medium text-gray-700" itemProp="ratingValue">
                       {tool.rating}
                     </span>
+                    <meta itemProp="bestRating" content="5" />
+                    <meta itemProp="worstRating" content="1" />
                   </div>
-                </div>
+                </header>
 
                 {/* Description */}
-                <p className="text-gray-600 mb-4 line-clamp-3">
+                <p className="text-gray-600 mb-4 line-clamp-3" itemProp="description">
                   {tool.description}
                 </p>
 
                 {/* Features */}
-                <div className="mb-4">
-                  <div className="flex flex-wrap gap-2">
+                <section className="mb-4" aria-label="Key features">
+                  <ul className="flex flex-wrap gap-2" role="list">
                     {tool.features.slice(0, 3).map((feature, index) => (
-                      <span
+                      <li
                         key={index}
                         className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-md"
+                        role="listitem"
+                        itemProp="featureList"
                       >
                         {feature}
-                      </span>
+                      </li>
                     ))}
                     {tool.features.length > 3 && (
-                      <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-md">
+                      <li className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-md" role="listitem">
                         +{tool.features.length - 3} more
-                      </span>
+                      </li>
                     )}
-                  </div>
-                </div>
+                  </ul>
+                </section>
 
                 {/* Stats */}
-                <div className="flex items-center mb-4 text-sm text-gray-500">
+                <aside className="flex items-center mb-4 text-sm text-gray-500" aria-label="Usage statistics">
                   <div className="flex items-center">
-                    <Users className="h-4 w-4 mr-1" />
-                    {tool.users} users
+                    <Users className="h-4 w-4 mr-1" aria-hidden="true" />
+                    <span itemProp="interactionCount">{tool.users} users</span>
                   </div>
-                </div>
+                </aside>
 
                 {/* CTA */}
                 <Link
                   href={tool.href}
                   className="w-full bg-primary-600 hover:bg-primary-700 text-white py-2 px-4 rounded-lg font-medium transition-colors flex items-center justify-center group"
+                  aria-label={`Learn more about ${tool.name}`}
+                  itemProp="url"
                 >
                   Learn More
-                  <ExternalLink className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                  <ExternalLink className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
                 </Link>
               </div>
-            </div>
+            </article>
           ))}
         </div>
 

@@ -118,7 +118,7 @@ export default function PrivacyPage() {
 
           <p>
             To exercise these rights or if you have questions about your personal information, 
-            please contact us at privacy@aitoolslist.com.
+            please contact us at privacy@aitoolsinsights.com.
           </p>
 
           <h2>Newsletter and Marketing Communications</h2>
@@ -154,7 +154,7 @@ export default function PrivacyPage() {
             contact us at:
           </p>
           <ul>
-            <li>Email: privacy@aitoolslist.com</li>
+            <li>Email: privacy@aitoolsinsights.com</li>
             <li>Address: 123 AI Street, San Francisco, CA 94105</li>
           </ul>
         </div>

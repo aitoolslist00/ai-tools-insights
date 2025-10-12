@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Replit Ghostwriter Review 2024 - Cloud-Based AI Coding',
     description: 'Code collaboratively with Replit Ghostwriter\'s AI assistant. Complete review and guide.',
-    url: 'https://www.aitoolslist.com/ai-tools/replit-ghostwriter',
+    url: 'https://www.aitoolsinsights.com/ai-tools/replit-ghostwriter',
   },
 }
 

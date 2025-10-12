@@ -69,35 +69,35 @@ export default function HeroSection() {
             </div>
           </form>
 
-          {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto mb-16">
-            <div className="text-center animate-slide-up">
-              <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-100 rounded-lg mb-4 transition-transform duration-200 hover:scale-110">
-                <Sparkles className="h-6 w-6 text-blue-600" />
-              </div>
-              <div className="text-3xl font-bold text-gray-900 mb-2">500+</div>
-              <div className="text-gray-600">AI Tools Listed</div>
-            </div>
-            <div className="text-center animate-slide-up">
-              <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-100 rounded-lg mb-4 transition-transform duration-200 hover:scale-110">
-                <Zap className="h-6 w-6 text-blue-600" />
-              </div>
-              <div className="text-3xl font-bold text-gray-900 mb-2">50+</div>
-              <div className="text-gray-600">Categories</div>
-            </div>
-            <div className="text-center animate-slide-up">
-              <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-100 rounded-lg mb-4 transition-transform duration-200 hover:scale-110">
-                <Target className="h-6 w-6 text-blue-600" />
-              </div>
-              <div className="text-3xl font-bold text-gray-900 mb-2">100K+</div>
-              <div className="text-gray-600">Monthly Users</div>
-            </div>
-          </div>
+          {/* Stats - Enhanced semantic structure */}
+          <aside className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto mb-16" role="complementary" aria-label="Platform statistics">
+            <article className="text-center animate-slide-up">
+              <header className="inline-flex items-center justify-center w-12 h-12 bg-blue-100 rounded-lg mb-4 transition-transform duration-200 hover:scale-110">
+                <Sparkles className="h-6 w-6 text-blue-600" aria-hidden="true" />
+              </header>
+              <data value="500" className="text-3xl font-bold text-gray-900 mb-2">500+</data>
+              <p className="text-gray-600">AI Tools Listed</p>
+            </article>
+            <article className="text-center animate-slide-up">
+              <header className="inline-flex items-center justify-center w-12 h-12 bg-blue-100 rounded-lg mb-4 transition-transform duration-200 hover:scale-110">
+                <Zap className="h-6 w-6 text-blue-600" aria-hidden="true" />
+              </header>
+              <data value="50" className="text-3xl font-bold text-gray-900 mb-2">50+</data>
+              <p className="text-gray-600">Categories</p>
+            </article>
+            <article className="text-center animate-slide-up">
+              <header className="inline-flex items-center justify-center w-12 h-12 bg-blue-100 rounded-lg mb-4 transition-transform duration-200 hover:scale-110">
+                <Target className="h-6 w-6 text-blue-600" aria-hidden="true" />
+              </header>
+              <data value="100000" className="text-3xl font-bold text-gray-900 mb-2">100K+</data>
+              <p className="text-gray-600">Monthly Users</p>
+            </article>
+          </aside>
 
-          {/* Popular searches */}
-          <div className="animate-slide-up">
-            <p className="text-gray-500 mb-4">Popular searches:</p>
-            <div className="flex flex-wrap justify-center gap-3">
+          {/* Popular searches - Enhanced semantic structure */}
+          <nav className="animate-slide-up" role="navigation" aria-label="Popular AI tool searches">
+            <h3 className="text-gray-500 mb-4 text-center">Popular searches:</h3>
+            <ul className="flex flex-wrap justify-center gap-3" role="list">
               {[
                 'ChatGPT',
                 'Midjourney',
@@ -108,16 +108,18 @@ export default function HeroSection() {
                 'ElevenLabs',
                 'Claude AI'
               ].map((term) => (
-                <button
-                  key={term}
-                  onClick={() => handlePopularSearch(term)}
-                  className="px-4 py-2 bg-white border border-gray-200 rounded-full text-sm text-gray-700 hover:border-blue-300 hover:text-blue-600 transition-all duration-200 shadow-sm hover:shadow-md transform hover:scale-105 active:scale-95 no-tap-highlight"
-                >
-                  {term}
-                </button>
+                <li key={term} role="listitem">
+                  <button
+                    onClick={() => handlePopularSearch(term)}
+                    className="px-4 py-2 bg-white border border-gray-200 rounded-full text-sm text-gray-700 hover:border-blue-300 hover:text-blue-600 transition-all duration-200 shadow-sm hover:shadow-md transform hover:scale-105 active:scale-95 no-tap-highlight"
+                    aria-label={`Search for ${term} AI tools`}
+                  >
+                    {term}
+                  </button>
+                </li>
               ))}
-            </div>
-          </div>
+            </ul>
+          </nav>
         </div>
       </div>
     </section>

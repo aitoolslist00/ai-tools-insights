@@ -72,7 +72,7 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
       site: '@aitoolslist',
     },
     alternates: {
-      canonical: post.seo?.canonicalUrl || `https://www.aitoolslist.com/blog/${post.id}`,
+      canonical: post.seo?.canonicalUrl || `https://www.aitoolsinsights.com/blog/${post.id}`,
     },
     other: {
       'article:author': post.author,
@@ -127,7 +127,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     ]
   })
   const breadcrumbSchema = SchemaGenerator.generateBreadcrumbSchema(
-    [{ name: 'Home', url: 'https://www.aitoolslist.com' }, ...breadcrumbs.map(b => ({ name: b.name, url: `https://www.aitoolslist.com${b.href}` }))]
+    [{ name: 'Home', url: 'https://www.aitoolsinsights.com' }, ...breadcrumbs.map(b => ({ name: b.name, url: `https://www.aitoolsinsights.com${b.href}` }))]
   )
 
   // Add NewsArticle schema if it's a news-type post
@@ -139,7 +139,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       author: post.author,
       datePublished: post.publishedAt || '',
       dateModified: post.updatedAt || '',
-      url: `https://www.aitoolslist.com/blog/${post.id}`,
+      url: `https://www.aitoolsinsights.com/blog/${post.id}`,
       image: post.image
     })
     schemas.push(newsSchema)

@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Stable Diffusion Review 2024 - Open Source AI Image Generator',
     description: 'Create unlimited AI images with Stable Diffusion. Complete review and guide.',
-    url: 'https://www.aitoolslist.com/ai-tools/stable-diffusion',
+    url: 'https://www.aitoolsinsights.com/ai-tools/stable-diffusion',
   },
 }
 

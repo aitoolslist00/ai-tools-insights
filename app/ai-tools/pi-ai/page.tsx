@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Pi AI Review 2024 - Complete Guide',
     description: 'Everything you need to know about Pi AI, the personal AI assistant.',
-    url: 'https://www.aitoolslist.com/ai-tools/pi-ai',
+    url: 'https://www.aitoolsinsights.com/ai-tools/pi-ai',
   },
 }
 

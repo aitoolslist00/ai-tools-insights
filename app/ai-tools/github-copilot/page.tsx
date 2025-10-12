@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'GitHub Copilot Review 2024 - AI Coding Assistant',
     description: 'Boost your coding productivity with GitHub Copilot AI assistant.',
-    url: 'https://www.aitoolslist.com/ai-tools/github-copilot',
+    url: 'https://www.aitoolsinsights.com/ai-tools/github-copilot',
   },
 }
 

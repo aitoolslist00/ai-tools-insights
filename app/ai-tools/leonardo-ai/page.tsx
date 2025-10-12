@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Leonardo AI Review 2024 - AI Image Generator for Game Assets',
     description: 'Create game assets and concept art with Leonardo AI. Complete review and guide.',
-    url: 'https://www.aitoolslist.com/ai-tools/leonardo-ai',
+    url: 'https://www.aitoolsinsights.com/ai-tools/leonardo-ai',
   },
 }
 

@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'AI Tools Directory - Complete List of AI Tools',
     description: 'Browse our comprehensive directory of AI tools organized by category.',
-    url: 'https://www.aitoolslist.com/ai-tools',
+    url: 'https://www.aitoolsinsights.com/ai-tools',
   },
 }
 

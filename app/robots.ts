@@ -170,23 +170,47 @@ export default function robots(): MetadataRoute.Robots {
         crawlDelay: 2,
       },
       
-      // Block resource-intensive crawlers but allow SEO tools
+      // Block AI training crawlers and resource-intensive bots
       {
         userAgent: [
           'MJ12bot',
           'DotBot',
           'BLEXBot',
-          'DataForSeoBot',
           'PetalBot',
           'SeznamBot',
           'CCBot',
           'GPTBot',
           'ChatGPT-User',
-          'CCBot',
           'anthropic-ai',
           'Claude-Web',
+          'OpenAI-SearchBot',
+          'PerplexityBot',
+          'YouBot',
+          'Meta-ExternalAgent',
+          'Meta-ExternalFetcher',
+          'FacebookBot',
+          'Bytespider',
+          'ImagesiftBot',
         ],
         disallow: '/',
+      },
+      
+      // Allow DataForSeoBot with restrictions for SEO monitoring
+      {
+        userAgent: 'DataForSeoBot',
+        allow: [
+          '/',
+          '/ai-tools/',
+          '/blog/',
+        ],
+        disallow: [
+          '/api/',
+          '/admin/',
+          '/dashboard/',
+          '/uploads/',
+          '/screenshots/',
+        ],
+        crawlDelay: 5,
       },
       
       // Allow important SEO crawlers with restrictions

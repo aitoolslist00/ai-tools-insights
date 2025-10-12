@@ -24,7 +24,7 @@ export default function AdvancedSEOHead({
   breadcrumbs,
   faqs 
 }: AdvancedSEOHeadProps) {
-  const currentUrl = url || (typeof window !== 'undefined' ? window.location.href : 'https://www.aitoolslist.com')
+  const currentUrl = url || (typeof window !== 'undefined' ? window.location.href : 'https://www.aitoolsinsights.com')
   
   // Generate advanced structured data
   const structuredData = AdvancedSEOOptimizer.generateAdvancedStructuredData(pageType, data || {})

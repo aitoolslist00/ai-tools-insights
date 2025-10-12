@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Midjourney Review 2024 - AI Art Generator',
     description: 'Create stunning AI artwork with Midjourney. Complete review and guide.',
-    url: 'https://www.aitoolslist.com/ai-tools/midjourney',
+    url: 'https://www.aitoolsinsights.com/ai-tools/midjourney',
   },
 }
 
