@@ -192,6 +192,11 @@ const nextConfig = {
   async redirects() {
     return [
       {
+        source: '/ads.txt',
+        destination: 'https://srv.adstxtmanager.com/19390/aitoolsinsights.com',
+        permanent: true,
+      },
+      {
         source: '/tools/:path*',
         destination: '/ai-tools/:path*',
         permanent: true,
