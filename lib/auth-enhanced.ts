@@ -1,12 +1,14 @@
 import { NextRequest } from 'next/server'
 import { SignJWT, jwtVerify } from 'jose'
 import bcrypt from 'bcryptjs'
+import { AUTH_CONFIG } from './auth-config'
 
-// Enhanced authentication system with JWT and environment variables
+// Enhanced authentication system with JWT
+// Using config file for password hash to avoid .env parsing issues with $ characters
 export const ADMIN_CREDENTIALS = {
-  username: process.env.ADMIN_USERNAME || 'ahmedibrahim',
-  // Hash the password in production
-  passwordHash: process.env.ADMIN_PASSWORD_HASH || '$2b$12$R5xQjIxlAeA0y0XvftLL4O5oFHV893.Zkyr1ZRn2kAV2aEGngwAsC' // '140796Aa@@##**' password hash
+  username: process.env.ADMIN_USERNAME || AUTH_CONFIG.USERNAME,
+  // Hash for password: 140796Aa@@##**
+  passwordHash: AUTH_CONFIG.PASSWORD_HASH
 }
 
 const JWT_SECRET = new TextEncoder().encode(
