@@ -89,25 +89,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'monthly' as const,
       priority: 0.4,
     },
-    // Additional important pages for SEO
-    {
-      url: `${baseUrl}/ai-tools/categories`,
-      lastModified: now,
-      changeFrequency: 'daily' as const,
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/blog/categories`,
-      lastModified: now,
-      changeFrequency: 'daily' as const,
-      priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/blog/tags`,
-      lastModified: now,
-      changeFrequency: 'daily' as const,
-      priority: 0.6,
-    },
   ]
 
   return staticPages

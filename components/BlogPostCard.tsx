@@ -22,28 +22,35 @@ export default function BlogPostCard({ post, featured = false, compact = false }
           {post.image ? (
             <>
               <img
-                src={optimizeImageUrl(post.image, 800, 400)}
+                src={post.image}
                 alt={post.title}
                 className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                 onError={(e) => {
+                  console.log('Featured image failed to load:', post.image);
                   const target = e.target as HTMLImageElement;
                   target.style.display = 'none';
                   const fallback = target.nextElementSibling as HTMLElement;
                   if (fallback) fallback.style.display = 'flex';
                 }}
+                onLoad={(e) => {
+                  console.log('Featured image loaded successfully:', post.image);
+                  const target = e.target as HTMLImageElement;
+                  const fallback = target.nextElementSibling as HTMLElement;
+                  if (fallback) fallback.style.display = 'none';
+                }}
               />
               <div 
-                className="absolute inset-0 bg-gradient-to-br from-primary-100 via-primary-200 to-primary-300 flex items-center justify-center"
+                className="absolute inset-0 bg-gradient-to-br from-blue-100 via-blue-200 to-blue-300 flex items-center justify-center"
                 style={{ display: 'none' }}
               >
-                <div className="text-8xl font-bold text-white/20 select-none">
+                <div className="text-8xl font-bold text-white/30 select-none">
                   {category?.name.charAt(0) || post.category.charAt(0)}
                 </div>
               </div>
             </>
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-primary-100 via-primary-200 to-primary-300 flex items-center justify-center">
-              <div className="text-8xl font-bold text-white/20 select-none">
+            <div className="w-full h-full bg-gradient-to-br from-blue-100 via-blue-200 to-blue-300 flex items-center justify-center">
+              <div className="text-8xl font-bold text-white/30 select-none">
                 {category?.name.charAt(0) || post.category.charAt(0)}
               </div>
             </div>
@@ -222,28 +229,35 @@ export default function BlogPostCard({ post, featured = false, compact = false }
         {post.image ? (
           <>
             <img
-              src={optimizeImageUrl(post.image, 600, 300)}
+              src={post.image}
               alt={post.title}
               className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
               onError={(e) => {
+                console.log('Image failed to load:', post.image);
                 const target = e.target as HTMLImageElement;
                 target.style.display = 'none';
                 const fallback = target.nextElementSibling as HTMLElement;
                 if (fallback) fallback.style.display = 'flex';
               }}
+              onLoad={(e) => {
+                console.log('Image loaded successfully:', post.image);
+                const target = e.target as HTMLImageElement;
+                const fallback = target.nextElementSibling as HTMLElement;
+                if (fallback) fallback.style.display = 'none';
+              }}
             />
             <div 
-              className="absolute inset-0 bg-gradient-to-br from-primary-100 via-primary-200 to-primary-300 flex items-center justify-center"
+              className="absolute inset-0 bg-gradient-to-br from-blue-100 via-blue-200 to-blue-300 flex items-center justify-center"
               style={{ display: 'none' }}
             >
-              <div className="text-6xl font-bold text-white/20 select-none">
+              <div className="text-6xl font-bold text-white/30 select-none">
                 {category?.name.charAt(0) || post.category.charAt(0)}
               </div>
             </div>
           </>
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-primary-100 via-primary-200 to-primary-300 flex items-center justify-center">
-            <div className="text-6xl font-bold text-white/20 select-none">
+          <div className="w-full h-full bg-gradient-to-br from-blue-100 via-blue-200 to-blue-300 flex items-center justify-center">
+            <div className="text-6xl font-bold text-white/30 select-none">
               {category?.name.charAt(0) || post.category.charAt(0)}
             </div>
           </div>

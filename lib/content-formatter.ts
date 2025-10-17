@@ -39,6 +39,13 @@ export function formatContentForTOC(content: string): string {
 function injectImagesIntoContent(html: string, post: BlogPost): string {
   if (!post.images || post.images.length === 0) return html;
   
+  // Filter out placeholder images
+  const validImages = post.images.filter(img => 
+    img.url && !img.url.includes('placeholder')
+  );
+  
+  if (validImages.length === 0) return html;
+  
   // Split content into sections (by h2 headers)
   const sections = html.split(/(<h2[^>]*>.*?<\/h2>)/gi);
   
@@ -49,8 +56,8 @@ function injectImagesIntoContent(html: string, post: BlogPost): string {
     result += sections[i];
     
     // After every h2 section (except the last one), try to insert an image
-    if (i > 0 && i % 2 === 1 && imageIndex < post.images.length) {
-      const image = post.images[imageIndex];
+    if (i > 0 && i % 2 === 1 && imageIndex < validImages.length) {
+      const image = validImages[imageIndex];
       const imageHtml = `
         <div class="my-8 text-center">
           <img 
@@ -60,6 +67,7 @@ function injectImagesIntoContent(html: string, post: BlogPost): string {
             loading="lazy"
             width="${image.width}"
             height="${image.height}"
+            onerror="this.parentElement.style.display='none'"
           />
           ${image.alt ? `<p class="text-sm text-gray-600 mt-2 italic">${image.alt}</p>` : ''}
         </div>
@@ -70,8 +78,8 @@ function injectImagesIntoContent(html: string, post: BlogPost): string {
   }
   
   // If there are remaining images, add them at the end
-  while (imageIndex < post.images.length) {
-    const image = post.images[imageIndex];
+  while (imageIndex < validImages.length) {
+    const image = validImages[imageIndex];
     const imageHtml = `
       <div class="my-8 text-center">
         <img 
@@ -81,6 +89,7 @@ function injectImagesIntoContent(html: string, post: BlogPost): string {
           loading="lazy"
           width="${image.width}"
           height="${image.height}"
+          onerror="this.parentElement.style.display='none'"
         />
         ${image.alt ? `<p class="text-sm text-gray-600 mt-2 italic">${image.alt}</p>` : ''}
       </div>

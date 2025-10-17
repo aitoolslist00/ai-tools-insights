@@ -62,6 +62,37 @@ export async function POST(request: NextRequest) {
       tone
     })
 
+    // Generate images automatically if imagePrompts are available
+    let generatedImages: any[] = []
+    if (workflow === 'complete' && generatedContent.imagePrompts && generatedContent.imagePrompts.length > 0) {
+      try {
+        // Import image generator
+        const { RealImageGenerator } = await import('@/lib/real-image-generator')
+        const realImageGenerator = new RealImageGenerator()
+        
+        // Generate up to 3 images from the prompts
+        const imagePrompts = generatedContent.imagePrompts.slice(0, 3)
+        const imageKeywords = [keyword, ...generatedContent.keywords.slice(0, 2)]
+        
+        for (let i = 0; i < imagePrompts.length; i++) {
+          try {
+            const image = await realImageGenerator.generateImage({
+              keyword: imageKeywords[i] || keyword,
+              style: 'tech' as any,
+              aspectRatio: i === 0 ? '16:9' : '4:3',
+              width: i === 0 ? 1200 : 800,
+              height: i === 0 ? 675 : 600
+            })
+            generatedImages.push(image)
+          } catch (imageError) {
+            console.warn(`Failed to generate image ${i + 1}:`, imageError)
+          }
+        }
+      } catch (error) {
+        console.warn('Image generation failed, continuing without images:', error)
+      }
+    }
+
     // Add publication date and recency metadata
     const publicationDate = new Date()
     const enhancedContent = {
@@ -69,7 +100,17 @@ export async function POST(request: NextRequest) {
       publicationDate: publicationDate.toISOString(),
       lastUpdated: publicationDate.toISOString(),
       recencyScore: 100, // Fresh content gets maximum recency score
-      contentFreshness: 'latest'
+      contentFreshness: 'latest',
+      // Add generated images if available
+      ...(generatedImages.length > 0 && {
+        images: generatedImages,
+        image: generatedImages[0]?.url, // Set first image as featured image
+        imageGenerationMetadata: {
+          generatedAt: publicationDate.toISOString(),
+          method: 'real' as const,
+          imagesGenerated: generatedImages.length
+        }
+      })
     }
 
     return NextResponse.json({
@@ -77,6 +118,7 @@ export async function POST(request: NextRequest) {
       content: enhancedContent,
       timestamp: publicationDate.toISOString(),
       workflow: workflow,
+      imagesGenerated: generatedImages.length,
       recencyMetadata: {
         generatedOn: publicationDate.toISOString(),
         contentType: 'fresh',
@@ -135,8 +177,8 @@ async function generateEnhancedSEOContent(params: {
   const currentMonth = currentDate.toLocaleString('default', { month: 'long' })
   const formattedDate = `${currentMonth} ${currentYear}`
 
-  // Enhanced prompt for comprehensive SEO content with emphasis on recency
-  const prompt = `You are an expert SEO content writer. Create a comprehensive, SEO-optimized article about "${keyword}" with the most current and up-to-date information available.
+  // Enhanced prompt for ultra-comprehensive SEO content with massive keyword coverage
+  const prompt = `You are an elite SEO content strategist and topical authority expert. Create an ULTRA-COMPREHENSIVE, SEO-optimized article about "${keyword}" that will dominate Google's first page with the most current and up-to-date information available.
 
 CRITICAL RECENCY REQUIREMENTS:
 - ALL information must be current and reflect the latest state of the topic
@@ -156,28 +198,58 @@ CONTENT REQUIREMENTS:
 - Target audience: ${targetAudience || 'professionals and enthusiasts interested in AI tools'}
 - Additional context: ${additionalContext || 'Focus on practical applications and current trends'}
 
-CONTENT STRUCTURE:
+ULTRA-COMPREHENSIVE CONTENT STRUCTURE:
 1. Compelling, SEO-optimized title (50-60 characters) - focus on value, not dates
 2. Engaging introduction with hook, keyword placement, and emphasis on current relevance
-3. ${specs.sections} main sections with H2 headings focusing on latest information
-4. Subsections with H3 headings covering recent developments
-5. Conclusion with call-to-action and future outlook
-6. FAQ section (5 questions) addressing current concerns and recent changes
+3. **MINIMUM 20+ HIGH-AUTHORITY H2 AND H3 HEADINGS** covering EVERY possible aspect of "${keyword}":
+   - Core definitions and fundamentals
+   - Latest features and capabilities
+   - Benefits and advantages
+   - Challenges and limitations
+   - Use cases and applications
+   - Comparisons with alternatives
+   - Implementation guides
+   - Best practices and strategies
+   - Industry trends and future outlook
+   - Case studies and examples
+   - Pricing and cost analysis
+   - Technical specifications
+   - Integration possibilities
+   - Security and compliance
+   - Performance metrics
+   - User experience considerations
+   - Market analysis and competition
+   - Expert opinions and reviews
+   - Troubleshooting and solutions
+   - Advanced techniques and tips
+   - Related tools and technologies
+4. Comprehensive conclusion with call-to-action and future outlook
+5. Extensive FAQ section (10+ questions) addressing every possible query about "${keyword}"
 
-IMPORTANT: Do not force dates into titles or content unless they are naturally relevant to the topic. Focus on providing the most current information without making the content sound date-heavy or unprofessional.
+MASSIVE KEYWORD INTEGRATION REQUIREMENTS:
+- Primary keyword density: 1.5-2%
+- **INTEGRATE MASSIVE AMOUNTS OF:**
+  - **LSI Keywords**: Include 50+ Latent Semantic Indexing terms naturally related to "${keyword}"
+  - **Entity Keywords**: Mention 30+ relevant entities, brands, people, places, concepts
+  - **Cluster Keywords**: Cover 40+ topic cluster keywords that support the main keyword
+  - **Long-tail variations**: Include 25+ long-tail keyword variations
+  - **Semantic variations**: Use 20+ semantic keyword variations and synonyms
+  - **Related search terms**: Incorporate "People Also Ask" and "Related Searches" terms
+  - **Industry jargon**: Include technical terms and industry-specific language
+  - **Contextual keywords**: Add location-based, time-based, and situation-specific keywords
 
-SEO OPTIMIZATION REQUIREMENTS:
-- Primary keyword density: 1-2%
-- Include semantic keywords and LSI terms
-- Use keyword in title, first paragraph, headings, and conclusion
+ADVANCED SEO OPTIMIZATION:
+- Use keyword in title, first paragraph, multiple headings, and conclusion
 - Write compelling meta description (150-160 characters) highlighting recency
-- Include internal linking opportunities
+- Include internal linking opportunities to related topics
 - Add external link suggestions to authoritative and recently updated sources
-- Suggest relevant images with alt text descriptions
+- Suggest relevant images with keyword-rich alt text descriptions
+- Optimize for featured snippets and "People Also Ask" sections
+- Include schema markup suggestions for enhanced SERP appearance
 
-CONTENT QUALITY STANDARDS FOR RECENCY:
+CONTENT QUALITY STANDARDS FOR MAXIMUM AUTHORITY:
 - Original, engaging, and informative content with latest insights
-- Clear, scannable structure with bullet points and lists
+- Clear, scannable structure with bullet points, tables, and lists
 - Actionable insights based on current best practices
 - Most recent information and trends available
 - Expert-level depth covering latest developments
@@ -186,13 +258,13 @@ CONTENT QUALITY STANDARDS FOR RECENCY:
 - Address current challenges and solutions in the field
 - Provide forward-looking insights and predictions for the near future
 
-RESEARCH DEPTH REQUIREMENTS:
-- Conduct thorough analysis of current market conditions
-- Include latest industry reports and findings
-- Reference recent expert opinions and thought leadership
-- Cover emerging trends and technologies
-- Analyze recent competitive landscape changes
-- Provide current pricing, features, and availability information
+TOPICAL AUTHORITY REQUIREMENTS:
+- Cover EVERY subtopic related to "${keyword}"
+- Address all user intents (informational, commercial, navigational, transactional)
+- Include beginner to advanced level information
+- Provide comprehensive resource coverage
+- Establish expertise through detailed explanations
+- Build trust through authoritative sources and data
 
 FORMAT YOUR RESPONSE AS JSON:
 {
@@ -200,17 +272,32 @@ FORMAT YOUR RESPONSE AS JSON:
   "metaDescription": "Compelling meta description",
   "slug": "url-friendly-slug",
   "excerpt": "Brief article summary",
-  "content": "Full article content in markdown format",
+  "content": "Full article content in markdown format with 20+ H2/H3 headings",
   "keywords": ["primary keyword", "secondary keywords", "LSI keywords"],
-  "headings": ["H2 and H3 headings used"],
+  "lsiKeywords": ["50+ LSI terms naturally integrated"],
+  "entityKeywords": ["30+ relevant entities, brands, people, places"],
+  "clusterKeywords": ["40+ topic cluster keywords"],
+  "longTailKeywords": ["25+ long-tail variations"],
+  "semanticKeywords": ["20+ semantic variations and synonyms"],
+  "headings": ["All 20+ H2 and H3 headings used"],
   "internalLinks": ["suggested internal link opportunities"],
   "externalLinks": ["authoritative external sources to link"],
-  "imagePrompts": ["descriptions for relevant images"],
+  "imagePrompts": ["descriptions for relevant images with keyword-rich alt text"],
   "readingTime": estimated_reading_time_in_minutes,
-  "wordCount": actual_word_count
+  "wordCount": actual_word_count,
+  "keywordDensity": "calculated primary keyword density percentage",
+  "topicalCoverage": ["list of all subtopics covered"],
+  "userIntents": ["informational", "commercial", "navigational", "transactional intents addressed"]
 }
 
-Create content that will rank #1 on Google for "${keyword}" while providing genuine, current value to readers. The article must be so up-to-date and comprehensive that readers will consider it the most authoritative and current source on the topic. Ensure every piece of information is current, relevant, and valuable. Focus on substance and value rather than explicit date references.`
+ULTRA-CRITICAL SUCCESS REQUIREMENTS:
+- The article MUST contain a MINIMUM of 20 high-authority H2 and H3 headings
+- MASSIVE integration of 50+ LSI keywords, 30+ entities, 40+ cluster keywords
+- Cover EVERY possible aspect, question, and subtopic related to "${keyword}"
+- Create the most comprehensive resource available on the internet for this topic
+- Establish complete topical authority that makes this THE definitive guide
+
+Create content that will DOMINATE Google's #1 position for "${keyword}" while providing genuine, current value to readers. The article must be so comprehensive, up-to-date, and keyword-rich that it becomes the ultimate authority source that competitors cannot match. Focus on creating an encyclopedia-level resource with massive keyword coverage.`
 
   // Call Gemini API with multiple model fallbacks
   const models = [

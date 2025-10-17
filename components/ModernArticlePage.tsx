@@ -294,7 +294,7 @@ export default function ModernArticlePage({
           </div>
 
           {/* Featured Image */}
-          {post.image ? (
+          {post.image && !post.image.includes('placeholder') ? (
             <div className="mb-16 group">
               <div className="relative overflow-hidden rounded-2xl shadow-2xl">
                 <Image
@@ -305,14 +305,41 @@ export default function ModernArticlePage({
                   className="w-full h-64 md:h-96 lg:h-[28rem] object-cover transition-transform duration-700 group-hover:scale-105"
                   priority
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = 'none';
+                    const parent = target.parentElement?.parentElement;
+                    if (parent) {
+                      parent.innerHTML = `
+                        <div class="bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 h-64 md:h-96 lg:h-[28rem] rounded-2xl flex items-center justify-center">
+                          <div class="text-center text-white p-8">
+                            <svg class="w-24 h-24 mx-auto mb-4 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                            </svg>
+                            <h3 class="text-2xl font-bold mb-2">${post.title.replace(/^#+\s*/, '').substring(0, 60)}</h3>
+                            <p class="text-sm opacity-90">${post.category}</p>
+                          </div>
+                        </div>
+                      `;
+                    }
+                  }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               </div>
             </div>
           ) : (
             <div className="mb-16">
-              <div className="bg-gray-200 h-64 md:h-96 lg:h-[28rem] rounded-2xl flex items-center justify-center">
-                <p className="text-gray-500">No featured image available</p>
+              <div className="bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 h-64 md:h-96 lg:h-[28rem] rounded-2xl flex items-center justify-center relative overflow-hidden">
+                <div className="absolute inset-0 opacity-10" style={{
+                  backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke='rgb(255 255 255 / 0.3)'%3e%3cpath d='M0 .5l32 32M31.5 0L0 32'/%3e%3c/svg%3e")`
+                }} />
+                <div className="text-center text-white p-8 relative z-10">
+                  <svg className="w-24 h-24 mx-auto mb-4 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                  </svg>
+                  <h3 className="text-2xl md:text-3xl font-bold mb-2">{post.title.replace(/^#+\s*/, '').substring(0, 60)}</h3>
+                  <p className="text-sm md:text-base opacity-90">{post.category}</p>
+                </div>
               </div>
             </div>
           )}
