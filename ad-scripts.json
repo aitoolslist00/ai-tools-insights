@@ -18,12 +18,12 @@
     "updatedAt": "2025-10-17T22:07:50.451Z"
   },
   {
-    "id": "ad-1760748089534",
+    "id": "ad-1760750140735",
     "name": "Ezoic Ads",
     "code": "<div id=\"ezoic-pub-ad-placeholder-101\"></div>\n<div id=\"ezoic-pub-ad-placeholder-102\"></div>\n<div id=\"ezoic-pub-ad-placeholder-103\"></div>\n<div id=\"ezoic-pub-ad-placeholder-104\"></div>\n<div id=\"ezoic-pub-ad-placeholder-105\"></div>\n\n<script>\n  ezstandalone.cmd.push(function () {\n    ezstandalone.showAds(101, 102, 103, 104, 105);\n  });\n</script>\n",
     "active": true,
-    "position": "head",
-    "createdAt": "2025-10-18T00:41:29.549Z",
-    "updatedAt": "2025-10-18T00:41:29.549Z"
+    "position": "body-end",
+    "createdAt": "2025-10-18T01:15:40.728Z",
+    "updatedAt": "2025-10-18T01:15:40.728Z"
   }
 ]

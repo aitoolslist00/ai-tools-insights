@@ -14,7 +14,6 @@ import CoreWebVitalsOptimizer from '@/components/CoreWebVitalsOptimizer'
 import AIContentOptimizer from '@/components/AIContentOptimizer'
 import SEO2025ComplianceChecker from '@/components/SEO2025ComplianceChecker'
 import IntentSatisfactionTracker from '@/components/IntentSatisfactionTracker'
-import MonetagScript from '@/components/MonetagScript'
 import AdScripts from '@/components/AdScripts'
 import { Toaster } from 'sonner'
 import './globals.css'
@@ -201,9 +200,6 @@ export default function RootLayout({
           contentType="navigation"
           keywords={['ai tools', 'artificial intelligence', 'directory']}
         />
-        
-        {/* Monetag Ad Script */}
-        <MonetagScript />
         
         <div className="min-h-screen flex flex-col">
           {/* Navigation */}
