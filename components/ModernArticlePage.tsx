@@ -191,6 +191,17 @@ export default function ModernArticlePage({
     setShowShareMenu(false)
   }
 
+  // Smooth scroll to section
+  const scrollToSection = (id: string, e?: React.MouseEvent) => {
+    e?.preventDefault()
+    const element = document.getElementById(id)
+    if (element) {
+      const yOffset = -100 // Offset for fixed header
+      const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset
+      window.scrollTo({ top: y, behavior: 'smooth' })
+    }
+  }
+
 
 
   // Callout box component
@@ -375,6 +386,7 @@ export default function ModernArticlePage({
                           <a
                             key={item.id}
                             href={`#${item.id}`}
+                            onClick={(e) => scrollToSection(item.id, e)}
                             className={`block py-2 px-3 rounded-lg text-sm transition-all duration-200 ${
                               activeSection === item.id
                                 ? 'bg-blue-50 text-blue-700 font-medium border-l-2 border-blue-500'

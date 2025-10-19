@@ -1,17 +1,35 @@
 import { marked } from 'marked';
 import { BlogPost } from './blog-data';
 
+// Helper function to generate slug from text
+function generateSlug(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
+}
+
 // Configure marked options
 marked.setOptions({
   breaks: true,
   gfm: true,
 });
 
-// Custom renderer for images
+// Custom renderer for images and headings with IDs
 const renderer = new marked.Renderer();
+
 renderer.image = function(token: any) {
   const { href, title, text } = token;
   return `<img src="${href}" alt="${text}" title="${title || ''}" class="w-full h-auto rounded-lg shadow-lg my-6" loading="lazy" />`;
+};
+
+// Custom heading renderer to add IDs and scroll-margin
+renderer.heading = function(token: any) {
+  const text = token.text;
+  const level = token.depth;
+  const id = generateSlug(text);
+  
+  return `<h${level} id="${id}" class="scroll-mt-24">${text}</h${level}>`;
 };
 
 marked.use({ renderer });
@@ -106,11 +124,11 @@ export function enhanceContentFormatting(html: string): string {
   return html
     // Add better spacing for paragraphs
     .replace(/<p>/g, '<p class="mb-6 text-gray-800 leading-relaxed">')
-    // Style headings
-    .replace(/<h1>/g, '<h1 class="text-4xl font-bold text-gray-900 mb-8 mt-12">')
-    .replace(/<h2>/g, '<h2 class="text-3xl font-semibold text-gray-900 mb-6 mt-10">')
-    .replace(/<h3>/g, '<h3 class="text-2xl font-semibold text-gray-900 mb-4 mt-8">')
-    .replace(/<h4>/g, '<h4 class="text-xl font-semibold text-gray-900 mb-3 mt-6">')
+    // Style headings while preserving id and other attributes
+    .replace(/<h1([^>]*)>/g, '<h1$1 class="text-4xl font-bold text-gray-900 mb-8 mt-12">')
+    .replace(/<h2([^>]*)>/g, '<h2$1 class="text-3xl font-semibold text-gray-900 mb-6 mt-10">')
+    .replace(/<h3([^>]*)>/g, '<h3$1 class="text-2xl font-semibold text-gray-900 mb-4 mt-8">')
+    .replace(/<h4([^>]*)>/g, '<h4$1 class="text-xl font-semibold text-gray-900 mb-3 mt-6">')
     // Style lists
     .replace(/<ul>/g, '<ul class="list-disc list-inside mb-6 space-y-2 text-gray-800">')
     .replace(/<ol>/g, '<ol class="list-decimal list-inside mb-6 space-y-2 text-gray-800">')
