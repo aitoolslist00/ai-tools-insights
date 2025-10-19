@@ -588,6 +588,7 @@ export class SchemaGenerator {
   }
 
   // Event Schema for webinars and launches
+  // All fields are now properly validated and required
   static generateEventSchema(event: {
     name: string
     description: string
@@ -596,22 +597,46 @@ export class SchemaGenerator {
     location?: string
     isVirtual?: boolean
     organizer?: string
+    image?: string
+    eventUrl?: string
   }): SchemaMarkup {
+    // Validate required fields
+    if (!event.name || event.name.trim() === '') {
+      throw new Error('Event name is required')
+    }
+    if (!event.description || event.description.trim() === '') {
+      throw new Error('Event description is required')
+    }
+    if (!event.startDate || event.startDate.trim() === '') {
+      throw new Error('Event startDate is required')
+    }
+
+    const isVirtual = event.isVirtual !== false // Default to virtual if not specified
+    const locationData = event.location || this.baseUrl
+
     return {
       '@context': 'https://schema.org',
       '@type': 'Event',
-      name: event.name,
-      description: event.description,
+      name: event.name.trim(),
+      description: event.description.trim(),
+      image: event.image || `${this.baseUrl}/og-home.jpg`,
       startDate: event.startDate,
       endDate: event.endDate || event.startDate,
       eventStatus: 'https://schema.org/EventScheduled',
-      eventAttendanceMode: event.isVirtual ? 'https://schema.org/OnlineEventAttendanceMode' : 'https://schema.org/OfflineEventAttendanceMode',
-      location: event.isVirtual ? {
+      eventAttendanceMode: isVirtual 
+        ? 'https://schema.org/OnlineEventAttendanceMode' 
+        : 'https://schema.org/OfflineEventAttendanceMode',
+      location: isVirtual ? {
         '@type': 'VirtualLocation',
-        url: event.location || this.baseUrl
+        url: locationData,
+        name: 'Online Event'
       } : {
         '@type': 'Place',
-        name: event.location || 'Online'
+        name: locationData,
+        address: {
+          '@type': 'PostalAddress',
+          addressCountry: 'US'
+        }
       },
       organizer: {
         '@type': 'Organization',
@@ -623,7 +648,12 @@ export class SchemaGenerator {
         price: '0',
         priceCurrency: 'USD',
         availability: 'https://schema.org/InStock',
-        url: `${this.baseUrl}/events`
+        url: event.eventUrl || `${this.baseUrl}/events`,
+        validFrom: event.startDate
+      },
+      performer: {
+        '@type': 'Organization',
+        name: event.organizer || 'AI Tools List'
       }
     }
   }
