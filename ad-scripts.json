@@ -18,12 +18,75 @@
     "updatedAt": "2025-10-17T22:07:50.451Z"
   },
   {
-    "id": "ad-1760750140735",
-    "name": "Ezoic Ads",
-    "code": "<div id=\"ezoic-pub-ad-placeholder-101\"></div>\n<div id=\"ezoic-pub-ad-placeholder-102\"></div>\n<div id=\"ezoic-pub-ad-placeholder-103\"></div>\n<div id=\"ezoic-pub-ad-placeholder-104\"></div>\n<div id=\"ezoic-pub-ad-placeholder-105\"></div>\n\n<script>\n  ezstandalone.cmd.push(function () {\n    ezstandalone.showAds(101, 102, 103, 104, 105);\n  });\n</script>\n",
+    "id": "ad-1760904047873",
+    "name": "101 ezoic",
+    "code": "<div id=\"ezoic-pub-ad-placeholder-101\"></div>\n<script>\n    ezstandalone.cmd.push(function () {\n        ezstandalone.showAds(101);\n    });\n</script>",
     "active": true,
     "position": "body-end",
-    "createdAt": "2025-10-18T01:15:40.728Z",
-    "updatedAt": "2025-10-18T01:15:40.728Z"
+    "createdAt": "2025-10-19T20:00:47.881Z",
+    "updatedAt": "2025-10-19T20:00:47.881Z"
+  },
+  {
+    "id": "ad-1760904071489",
+    "name": "102 ezoic",
+    "code": "<div id=\"ezoic-pub-ad-placeholder-102\"></div>\n<script>\n    ezstandalone.cmd.push(function () {\n        ezstandalone.showAds(102);\n    });\n</script>",
+    "active": true,
+    "position": "head",
+    "createdAt": "2025-10-19T20:01:11.497Z",
+    "updatedAt": "2025-10-19T20:01:11.497Z"
+  },
+  {
+    "id": "ad-1760904095913",
+    "name": "103 ezoic",
+    "code": "<div id=\"ezoic-pub-ad-placeholder-103\"></div>\n<script>\n    ezstandalone.cmd.push(function () {\n        ezstandalone.showAds(103);\n    });\n</script>",
+    "active": true,
+    "position": "head",
+    "createdAt": "2025-10-19T20:01:35.920Z",
+    "updatedAt": "2025-10-19T20:01:35.920Z"
+  },
+  {
+    "id": "ad-1760904114649",
+    "name": "104 ezoic",
+    "code": "<div id=\"ezoic-pub-ad-placeholder-104\"></div>\n<script>\n    ezstandalone.cmd.push(function () {\n        ezstandalone.showAds(104);\n    });\n</script>",
+    "active": true,
+    "position": "head",
+    "createdAt": "2025-10-19T20:01:54.655Z",
+    "updatedAt": "2025-10-19T20:02:32.575Z"
+  },
+  {
+    "id": "ad-1760904134745",
+    "name": "105 ezoic",
+    "code": "<div id=\"ezoic-pub-ad-placeholder-105\"></div>\n<script>\n    ezstandalone.cmd.push(function () {\n        ezstandalone.showAds(105);\n    });\n</script>",
+    "active": true,
+    "position": "head",
+    "createdAt": "2025-10-19T20:02:14.751Z",
+    "updatedAt": "2025-10-19T20:02:14.751Z"
+  },
+  {
+    "id": "ad-1760904291783",
+    "name": "109 ezoic",
+    "code": "<div id=\"ezoic-pub-ad-placeholder-109\"></div>\n<script>\n    ezstandalone.cmd.push(function () {\n        ezstandalone.showAds(109);\n    });\n</script>",
+    "active": true,
+    "position": "head",
+    "createdAt": "2025-10-19T20:04:51.791Z",
+    "updatedAt": "2025-10-19T20:04:51.791Z"
+  },
+  {
+    "id": "ad-1760904314095",
+    "name": "110 ezoic",
+    "code": "<div id=\"ezoic-pub-ad-placeholder-110\"></div>\n<script>\n    ezstandalone.cmd.push(function () {\n        ezstandalone.showAds(110);\n    });\n</script>",
+    "active": true,
+    "position": "head",
+    "createdAt": "2025-10-19T20:05:14.101Z",
+    "updatedAt": "2025-10-19T20:05:14.101Z"
+  },
+  {
+    "id": "ad-1760904333814",
+    "name": "111 ezoic",
+    "code": "<div id=\"ezoic-pub-ad-placeholder-111\"></div>\n<script>\n    ezstandalone.cmd.push(function () {\n        ezstandalone.showAds(111);\n    });\n</script>",
+    "active": true,
+    "position": "head",
+    "createdAt": "2025-10-19T20:05:33.821Z",
+    "updatedAt": "2025-10-19T20:05:33.821Z"
   }
 ]
