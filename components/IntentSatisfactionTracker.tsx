@@ -194,27 +194,28 @@ export default function IntentSatisfactionTracker({
   }, [pageType, contentType, keywords])
 
   // Generate structured data for Intent Satisfaction
+  // Using valid Schema.org WebPage type with interactionStatistic
   const intentSatisfactionSchema = {
     '@context': 'https://schema.org',
-    '@type': 'UserInteraction',
-    'interactionType': 'https://schema.org/ReadAction',
-    'object': {
-      '@type': 'WebPage',
-      'url': typeof window !== 'undefined' ? window.location.href : '',
-      'name': typeof document !== 'undefined' ? document.title : ''
-    },
-    'agent': {
-      '@type': 'Person',
-      'name': 'Anonymous User'
-    },
-    'result': {
-      '@type': 'InteractionCounter',
-      'userInteractionCount': metrics.engagementScore,
-      'interactionService': {
-        '@type': 'WebSite',
-        'name': 'AI Tools Insights',
-        'url': 'https://www.aitoolsinsights.com'
+    '@type': 'WebPage',
+    'url': typeof window !== 'undefined' ? window.location.href : '',
+    'name': typeof document !== 'undefined' ? document.title : '',
+    'interactionStatistic': [
+      {
+        '@type': 'InteractionCounter',
+        'interactionType': 'https://schema.org/ReadAction',
+        'userInteractionCount': metrics.engagementScore
+      },
+      {
+        '@type': 'InteractionCounter',
+        'interactionType': 'https://schema.org/ViewAction',
+        'userInteractionCount': Math.max(1, metrics.engagementScore)
       }
+    ],
+    'isPartOf': {
+      '@type': 'WebSite',
+      'name': 'AI Tools Insights',
+      'url': 'https://www.aitoolsinsights.com'
     }
   }
 
