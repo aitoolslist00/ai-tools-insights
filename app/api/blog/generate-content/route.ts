@@ -113,6 +113,9 @@ Your mission is to write a **real-time, long-form, authority-building article** 
                 text: prompt
               }]
             }],
+            tools: [{
+              googleSearch: {}
+            }],
             generationConfig: {
               temperature: 0.7,
               topK: 40,

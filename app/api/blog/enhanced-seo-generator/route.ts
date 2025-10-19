@@ -325,6 +325,9 @@ Create content that will DOMINATE Google's #1 position for "${keyword}" while pr
               text: prompt
             }]
           }],
+          tools: [{
+            googleSearch: {}
+          }],
           generationConfig: {
             temperature: 0.7,
             topK: 40,
@@ -385,15 +388,14 @@ Create content that will DOMINATE Google's #1 position for "${keyword}" while pr
           throw new Error('Generated content missing required fields')
         }
 
-        // Generate slug if not provided
-        if (!contentData.slug) {
-          contentData.slug = contentData.title
-            .toLowerCase()
-            .replace(/[^a-z0-9\s-]/g, '')
-            .replace(/\s+/g, '-')
-            .replace(/-+/g, '-')
-            .trim()
-        }
+        // ✅ FIX: Always use the exact keyword for the slug (user's requirement)
+        // Convert the user's keyword directly to a URL-friendly slug
+        contentData.slug = keyword
+          .toLowerCase()
+          .replace(/[^a-z0-9\s-]/g, '')
+          .replace(/\s+/g, '-')
+          .replace(/-+/g, '-')
+          .trim()
 
         // Calculate reading time and word count if not provided
         const wordCount = contentData.content.split(/\s+/).length
