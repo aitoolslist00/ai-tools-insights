@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { validateApiAuth } from '@/lib/auth-enhanced'
+import { fetchRecentNews, formatNewsForPrompt } from '@/lib/news-fetcher'
 
 /**
  * ENHANCED AI SEO CONTENT GENERATOR
@@ -177,8 +178,21 @@ async function generateEnhancedSEOContent(params: {
   const currentMonth = currentDate.toLocaleString('default', { month: 'long' })
   const formattedDate = `${currentMonth} ${currentYear}`
 
+  // 🔥 FETCH REAL-TIME NEWS DATA
+  console.log(`📰 Fetching real-time news for: "${keyword}"`)
+  const newsData = await fetchRecentNews(keyword)
+  const newsContext = newsData ? formatNewsForPrompt(newsData) : ''
+  
+  if (newsData) {
+    console.log(`✅ Successfully fetched ${newsData.articles.length} recent articles - Content will be GENUINELY CURRENT`)
+  } else {
+    console.log(`⚠️ No news data available - Using AI training data only`)
+  }
+
   // Enhanced prompt for ultra-comprehensive SEO content with massive keyword coverage
   const prompt = `You are an elite SEO content strategist and topical authority expert. Create an ULTRA-COMPREHENSIVE, SEO-optimized article about "${keyword}" that will dominate Google's first page with the most current and up-to-date information available.
+
+${newsContext}
 
 CRITICAL RECENCY REQUIREMENTS:
 - ALL information must be current and reflect the latest state of the topic
@@ -324,9 +338,6 @@ Create content that will DOMINATE Google's #1 position for "${keyword}" while pr
             parts: [{
               text: prompt
             }]
-          }],
-          tools: [{
-            googleSearch: {}
           }],
           generationConfig: {
             temperature: 0.7,
