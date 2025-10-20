@@ -38,3 +38,7 @@ next-env.d.ts
 # uploads directory - don't commit uploaded files
 /public/uploads/*
 !/public/uploads/.gitkeep
+
+# backup files
+*.backup-*
+/backups/
