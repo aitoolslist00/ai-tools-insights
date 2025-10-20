@@ -26,6 +26,7 @@ interface SmartPublishRequest {
   seoData?: any
   schemas?: any
   images?: any[]
+  googleBotOptimization?: any
   autoPublish: boolean
   publishDate?: string
   featured?: boolean
@@ -56,6 +57,11 @@ interface BlogPost {
   headings?: string[]
   images?: any[]
   image?: string
+  googleBotScore?: number
+  googleBotOriginalScore?: number
+  googleBotOptimized?: boolean
+  googleBotImprovements?: string[]
+  googleBotAnalysis?: any
 }
 
 export async function POST(request: NextRequest) {
@@ -67,9 +73,10 @@ export async function POST(request: NextRequest) {
     }
 
     const body: SmartPublishRequest = await request.json()
-    const { content, seoData, schemas, images, autoPublish, publishDate, featured = false, category = 'ai-tools' } = body
+    const { content, seoData, schemas, images, googleBotOptimization, autoPublish, publishDate, featured = false, category = 'ai-tools' } = body
 
     console.log('Smart publish received images:', images)
+    console.log('Smart publish received Google Bot optimization:', googleBotOptimization)
 
     if (!content?.title || !content?.content || !content?.slug) {
       return NextResponse.json({ error: 'Content title, body, and slug are required' }, { status: 400 })
@@ -118,6 +125,28 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Extract Google Bot optimization data
+    let googleBotScore: number | undefined
+    let googleBotOriginalScore: number | undefined
+    let googleBotOptimized: boolean | undefined
+    let googleBotImprovements: string[] | undefined
+    let googleBotAnalysis: any | undefined
+
+    if (googleBotOptimization) {
+      if (googleBotOptimization.optimizedScore !== undefined) {
+        // Article was optimized
+        googleBotScore = googleBotOptimization.optimizedScore
+        googleBotOriginalScore = googleBotOptimization.originalScore
+        googleBotOptimized = true
+        googleBotImprovements = googleBotOptimization.improvements || []
+        googleBotAnalysis = googleBotOptimization.analysis
+      } else if (googleBotOptimization.score !== undefined) {
+        // Article was already optimized or analyzed only
+        googleBotScore = googleBotOptimization.score
+        googleBotOptimized = googleBotOptimization.alreadyOptimized || false
+      }
+    }
+
     // Create new blog post
     const newPost: BlogPost = {
       id,
@@ -142,7 +171,12 @@ export async function POST(request: NextRequest) {
       imagePrompts: content.imagePrompts || [],
       headings: content.headings || [],
       images: generatedImages.length > 0 ? generatedImages : undefined,
-      image: generatedImages.length > 0 ? generatedImages[0]?.url : undefined
+      image: generatedImages.length > 0 ? generatedImages[0]?.url : undefined,
+      googleBotScore,
+      googleBotOriginalScore,
+      googleBotOptimized,
+      googleBotImprovements,
+      googleBotAnalysis
     }
 
     // Check for duplicate slug

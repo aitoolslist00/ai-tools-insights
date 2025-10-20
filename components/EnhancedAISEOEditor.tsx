@@ -124,6 +124,13 @@ export default function EnhancedAISEOEditor() {
       progress: 0
     },
     {
+      id: 'google-bot',
+      title: 'Google Bot Readability (95%+)',
+      description: 'Measuring & optimizing keyword understanding by Google bots',
+      status: 'pending',
+      progress: 0
+    },
+    {
       id: 'schema',
       title: 'Schema Generation',
       description: 'Creating comprehensive JSON-LD structured data',
@@ -242,8 +249,67 @@ export default function EnhancedAISEOEditor() {
       setSeoAnalysis(seoData.analysis)
       updateStepStatus('analyze', 'completed', 100, seoData.analysis)
 
-      // Step 3: Schema Generation
+      // Step 3: Google Bot Optimization (NEW - 95%+ Target)
       setCurrentStep(3)
+      updateStepStatus('google-bot', 'processing', 10)
+      
+      console.log('🤖 Starting Google Bot Readability Analysis & Optimization...')
+      
+      const googleBotResponse = await fetch('/api/google-bot-optimizer', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          action: 'analyze-and-optimize',
+          title: contentData.content.title,
+          content: contentData.content.content,
+          primaryKeyword: keyword.trim(),
+          metaDescription: contentData.content.metaDescription,
+          slug: contentData.content.slug,
+          targetScore: 95
+        })
+      })
+
+      if (!googleBotResponse.ok) {
+        console.error('Google Bot optimization failed, continuing with original content')
+        updateStepStatus('google-bot', 'completed', 100, { 
+          warning: 'Optimization skipped',
+          score: 0 
+        })
+      } else {
+        const googleBotData = await googleBotResponse.json()
+        
+        if (googleBotData.alreadyOptimized) {
+          console.log(`✅ Content already optimized: ${googleBotData.analysis.understandingScore}%`)
+          updateStepStatus('google-bot', 'completed', 100, {
+            score: googleBotData.analysis.understandingScore,
+            alreadyOptimized: true
+          })
+        } else if (googleBotData.result) {
+          console.log(`✅ Optimization complete: ${googleBotData.result.originalScore}% → ${googleBotData.result.optimizedScore}%`)
+          
+          // Update content with optimized version
+          contentData.content.title = googleBotData.result.optimizedContent.title
+          contentData.content.content = googleBotData.result.optimizedContent.content
+          contentData.content.metaDescription = googleBotData.result.optimizedContent.metaDescription
+          contentData.content.slug = googleBotData.result.optimizedContent.slug
+          contentData.content.excerpt = googleBotData.result.optimizedContent.excerpt
+          
+          setGeneratedContent(contentData.content)
+          
+          updateStepStatus('google-bot', 'completed', 100, {
+            originalScore: googleBotData.result.originalScore,
+            optimizedScore: googleBotData.result.optimizedScore,
+            improvements: googleBotData.result.improvements,
+            analysis: googleBotData.result.analysisComparison.after
+          })
+        }
+      }
+
+      // Step 4: Schema Generation
+      setCurrentStep(4)
       updateStepStatus('schema', 'processing', 25)
       
       const schemaResponse = await fetch('/api/schema-generator', {
@@ -263,8 +329,8 @@ export default function EnhancedAISEOEditor() {
       setSchemaData(schemaDataResult.schemas)
       updateStepStatus('schema', 'completed', 100, schemaDataResult.schemas)
 
-      // Step 4: AI Image Generation
-      setCurrentStep(4)
+      // Step 5: AI Image Generation
+      setCurrentStep(5)
       updateStepStatus('images', 'processing', 25)
       
       // Generate image prompts from content
@@ -301,9 +367,13 @@ export default function EnhancedAISEOEditor() {
         updateStepStatus('images', 'completed', 100, { images: [], count: 0, warning: 'Image generation failed' })
       }
 
-      // Step 5: Smart Publishing
-      setCurrentStep(5)
+      // Step 6: Smart Publishing
+      setCurrentStep(6)
       updateStepStatus('publish', 'processing', 25)
+      
+      // Extract Google Bot optimization data from workflow steps
+      const googleBotStep = workflowSteps.find(step => step.id === 'google-bot')
+      const googleBotData = googleBotStep?.result || null
       
       const publishResponse = await fetch('/api/blog/smart-publish', {
         method: 'POST',
@@ -316,6 +386,7 @@ export default function EnhancedAISEOEditor() {
           seoData: seoData.analysis,
           schemas: schemaDataResult.schemas,
           images: generatedImages,
+          googleBotOptimization: googleBotData,
           category: category,
           autoPublish: true
         })
@@ -332,7 +403,7 @@ export default function EnhancedAISEOEditor() {
       setError(errorMessage)
       
       // Mark current step as error
-      const stepIds = ['generate', 'analyze', 'schema', 'images', 'publish']
+      const stepIds = ['generate', 'analyze', 'google-bot', 'schema', 'images', 'publish']
       if (currentStep > 0 && currentStep <= stepIds.length) {
         updateStepStatus(stepIds[currentStep - 1], 'error', 0)
       }
@@ -391,7 +462,7 @@ export default function EnhancedAISEOEditor() {
         </div>
 
         {/* Workflow Progress */}
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {workflowSteps.map((step, index) => (
             <div key={step.id} className="bg-white/10 rounded-lg p-3 backdrop-blur-sm">
               <div className="flex items-center gap-2 mb-2">
