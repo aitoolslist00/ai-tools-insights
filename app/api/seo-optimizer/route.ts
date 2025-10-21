@@ -185,53 +185,91 @@ function calculateAdvancedSEOScore(config: any): {
     technical: 0,
     performance: 0,
     semantic: 0,
-    freshness: 0
+    freshness: 0,
+    eeat: 0,
+    snippets: 0
   }
   
-  // Title scoring (20 points max)
-  if (config.title.length >= 30 && config.title.length <= 60) scores.title += 15
-  if (config.title.toLowerCase().includes('ai')) scores.title += 5
+  // Title scoring (15 points max)
+  if (config.title.length >= 30 && config.title.length <= 60) scores.title += 10
+  if (config.title.toLowerCase().includes('ai')) scores.title += 3
+  if (config.title.includes('|') || config.title.includes(':')) scores.title += 2 // Modifier
   
-  // Description scoring (15 points max)
-  if (config.description.length >= 120 && config.description.length <= 160) scores.description += 15
+  // Description scoring (12 points max)
+  if (config.description.length >= 120 && config.description.length <= 160) scores.description += 8
+  if (config.description.toLowerCase().includes(config.keywords?.[0]?.toLowerCase())) scores.description += 4
   
-  // Content scoring (25 points max)
+  // Content scoring (20 points max)
   const wordCount = config.content.split(/\s+/).length
-  if (wordCount >= 300) scores.content += 10
-  if (wordCount >= 500) scores.content += 5
-  if (wordCount >= 1000) scores.content += 5
-  if (config.content.includes('<h1>') || config.content.includes('<h2>')) scores.content += 5
+  if (wordCount >= 1000) scores.content += 8
+  else if (wordCount >= 500) scores.content += 5
+  else if (wordCount >= 300) scores.content += 3
   
-  // Keywords scoring (15 points max)
-  if (config.keywords.length >= 3) scores.keywords += 10
-  if (config.keywords.length <= 7) scores.keywords += 5
+  // Check for proper structure
+  const h2Count = (config.content.match(/#+\s/g) || []).length
+  if (h2Count >= 3 && h2Count <= 12) scores.content += 7
+  if (config.content.includes('##') || config.content.includes('<h2>')) scores.content += 2
+  if (config.content.includes('\n-') || config.content.includes('\n1.')) scores.content += 3
+  
+  // Keywords scoring (12 points max)
+  if (config.keywords.length >= 3 && config.keywords.length <= 7) scores.keywords += 8
+  else if (config.keywords.length > 0 && config.keywords.length < 3) scores.keywords += 4
+  if (config.keywords.length > 10) scores.keywords -= 2 // Penalty for keyword dilution
   
   // Technical scoring (10 points max)
-  scores.technical = 10 // Assume good technical implementation
+  if (config.lastModified) scores.technical += 5
+  if (config.url) scores.technical += 3
+  scores.technical += 2 // Schema ready
   
-  // Performance scoring (10 points max)
-  scores.performance = 10 // Assume good performance
+  // Performance scoring (8 points max)
+  scores.performance = 8 // Assume good performance
   
   // Semantic scoring (5 points max)
   scores.semantic = 5 // Assume good semantic markup
   
   // Freshness scoring (5 points max)
-  scores.freshness = 5 // Content is fresh
+  if (config.lastModified) {
+    const lastModDate = new Date(config.lastModified)
+    const daysOld = (Date.now() - lastModDate.getTime()) / (1000 * 60 * 60 * 24)
+    if (daysOld < 7) scores.freshness = 5
+    else if (daysOld < 30) scores.freshness = 4
+    else if (daysOld < 90) scores.freshness = 3
+    else scores.freshness = 1
+  } else {
+    scores.freshness = 5 // Assume fresh
+  }
+  
+  // E-A-A-T scoring (10 points max) - NEW for 2024
+  const eeatKeywords = ['expert', 'experience', 'data', 'research', 'study', 'verified', 'certified', 'author']
+  const eeatCount = eeatKeywords.filter(kw => config.content.toLowerCase().includes(kw)).length
+  scores.eeat = Math.min(10, eeatCount * 1.5)
+  
+  // Featured snippet scoring (8 points max) - NEW for 2024
+  // Check for snippet-friendly format
+  if (config.content.includes('\n1.') || config.content.includes('\n-')) scores.snippets += 3
+  if (config.content.includes('|') && config.content.includes('---')) scores.snippets += 3
+  if (config.content.match(/\*\*[^*]+\*\*:/g)) scores.snippets += 2
   
   const overall = Object.values(scores).reduce((sum, score) => sum + score, 0)
   
+  // Convert to 100-point scale
+  const maxPossible = 100
+  const percentageScore = Math.min(100, Math.round((overall / maxPossible) * 100))
+  
   return {
-    overall,
+    overall: percentageScore,
     breakdown: scores,
     factors: {
-      title: scores.title >= 15 ? 'Excellent' : scores.title >= 10 ? 'Good' : 'Needs Improvement',
-      description: scores.description >= 12 ? 'Excellent' : scores.description >= 8 ? 'Good' : 'Needs Improvement',
-      content: scores.content >= 20 ? 'Excellent' : scores.content >= 15 ? 'Good' : 'Needs Improvement',
-      keywords: scores.keywords >= 12 ? 'Excellent' : scores.keywords >= 8 ? 'Good' : 'Needs Improvement',
-      technical: 'Excellent',
+      title: scores.title >= 12 ? 'Excellent' : scores.title >= 8 ? 'Good' : 'Needs Improvement',
+      description: scores.description >= 10 ? 'Excellent' : scores.description >= 6 ? 'Good' : 'Needs Improvement',
+      content: scores.content >= 16 ? 'Excellent' : scores.content >= 12 ? 'Good' : 'Needs Improvement',
+      keywords: scores.keywords >= 9 ? 'Excellent' : scores.keywords >= 5 ? 'Good' : 'Needs Improvement',
+      technical: scores.technical >= 8 ? 'Excellent' : 'Good',
       performance: 'Excellent',
       semantic: 'Excellent',
-      freshness: 'Excellent'
+      freshness: scores.freshness >= 4 ? 'Excellent' : scores.freshness >= 2 ? 'Good' : 'Needs Improvement',
+      eeat: scores.eeat >= 7 ? 'Excellent' : scores.eeat >= 4 ? 'Good' : 'Needs Improvement',
+      snippets: scores.snippets >= 6 ? 'Excellent' : scores.snippets >= 3 ? 'Good' : 'Needs Improvement'
     }
   }
 }

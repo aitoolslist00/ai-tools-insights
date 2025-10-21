@@ -131,6 +131,13 @@ export default function EnhancedAISEOEditor() {
       progress: 0
     },
     {
+      id: 'regenerate',
+      title: 'AI Content Regeneration Based on Google Bot Readability (95%+)',
+      description: 'Regenerating content using Gemini + News API for 95%+ keyword clarity',
+      status: 'pending',
+      progress: 0
+    },
+    {
       id: 'schema',
       title: 'Schema Generation',
       description: 'Creating comprehensive JSON-LD structured data',
@@ -308,8 +315,83 @@ export default function EnhancedAISEOEditor() {
         }
       }
 
-      // Step 4: Schema Generation
+      // Step 4: AI Content Regeneration Based on Google Bot Findings (NEW STEP)
       setCurrentStep(4)
+      updateStepStatus('regenerate', 'processing', 25)
+      
+      console.log('🔄 Starting AI Content Regeneration based on Google Bot findings...')
+      
+      // Get the Google Bot analysis data
+      const googleBotAnalysis = workflowSteps.find(step => step.id === 'google-bot')?.result
+      
+      try {
+        const regenerateResponse = await fetch('/api/blog/content-regeneration', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            originalContent: {
+              title: contentData.content.title,
+              content: contentData.content.content,
+              metaDescription: contentData.content.metaDescription,
+              excerpt: contentData.content.excerpt,
+              slug: contentData.content.slug,
+              keywords: contentData.content.keywords
+            },
+            primaryKeyword: keyword.trim(),
+            googleBotAnalysis: googleBotAnalysis,
+            category: category,
+            apiKey: apiKey.trim(),
+            targetReadabilityScore: 95
+          })
+        })
+
+        if (regenerateResponse.ok) {
+          const regenerateData = await regenerateResponse.json()
+          
+          if (regenerateData.success && regenerateData.regeneratedContent) {
+            console.log(`✅ Content regenerated successfully for Google Bot clarity`)
+            
+            // Update content with regenerated version
+            contentData.content = {
+              ...contentData.content,
+              ...regenerateData.regeneratedContent
+            }
+            
+            setGeneratedContent(contentData.content)
+            
+            updateStepStatus('regenerate', 'completed', 100, {
+              success: true,
+              improvements: regenerateData.improvements,
+              readabilityScore: regenerateData.readabilityScore,
+              regeneratedContent: regenerateData.regeneratedContent
+            })
+          } else {
+            console.log('⚠️ Content regeneration completed with warnings, continuing with original content')
+            updateStepStatus('regenerate', 'completed', 100, {
+              warning: 'Regeneration skipped',
+              reason: regenerateData.reason
+            })
+          }
+        } else {
+          console.error('Content regeneration failed, continuing with original content')
+          updateStepStatus('regenerate', 'completed', 100, {
+            warning: 'Regeneration failed',
+            error: 'API error'
+          })
+        }
+      } catch (regenerateError) {
+        console.error('Content regeneration error:', regenerateError)
+        updateStepStatus('regenerate', 'completed', 100, {
+          warning: 'Regeneration failed',
+          error: regenerateError instanceof Error ? regenerateError.message : 'Unknown error'
+        })
+      }
+
+      // Step 5: Schema Generation
+      setCurrentStep(5)
       updateStepStatus('schema', 'processing', 25)
       
       const schemaResponse = await fetch('/api/schema-generator', {
@@ -329,8 +411,8 @@ export default function EnhancedAISEOEditor() {
       setSchemaData(schemaDataResult.schemas)
       updateStepStatus('schema', 'completed', 100, schemaDataResult.schemas)
 
-      // Step 5: AI Image Generation
-      setCurrentStep(5)
+      // Step 6: AI Image Generation
+      setCurrentStep(6)
       updateStepStatus('images', 'processing', 25)
       
       // Generate image prompts from content
@@ -367,8 +449,8 @@ export default function EnhancedAISEOEditor() {
         updateStepStatus('images', 'completed', 100, { images: [], count: 0, warning: 'Image generation failed' })
       }
 
-      // Step 6: Smart Publishing
-      setCurrentStep(6)
+      // Step 7: Smart Publishing
+      setCurrentStep(7)
       updateStepStatus('publish', 'processing', 25)
       
       // Extract Google Bot optimization data from workflow steps
@@ -403,7 +485,7 @@ export default function EnhancedAISEOEditor() {
       setError(errorMessage)
       
       // Mark current step as error
-      const stepIds = ['generate', 'analyze', 'google-bot', 'schema', 'images', 'publish']
+      const stepIds = ['generate', 'analyze', 'google-bot', 'regenerate', 'schema', 'images', 'publish']
       if (currentStep > 0 && currentStep <= stepIds.length) {
         updateStepStatus(stepIds[currentStep - 1], 'error', 0)
       }
@@ -462,7 +544,7 @@ export default function EnhancedAISEOEditor() {
         </div>
 
         {/* Workflow Progress */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
           {workflowSteps.map((step, index) => (
             <div key={step.id} className="bg-white/10 rounded-lg p-3 backdrop-blur-sm">
               <div className="flex items-center gap-2 mb-2">
