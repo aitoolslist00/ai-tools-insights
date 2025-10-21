@@ -39,6 +39,7 @@ import { Disclosure } from '@headlessui/react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { BlogPost } from '@/lib/blog-data'
 import { formatContent as formatContentWithImages, formatContentForTOC, enhanceContentFormatting } from '@/lib/content-formatter'
+import '@/styles/modern-article.css'
 
 interface ModernArticlePageProps {
   post: BlogPost

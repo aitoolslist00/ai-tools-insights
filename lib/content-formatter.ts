@@ -122,6 +122,11 @@ function injectImagesIntoContent(html: string, post: BlogPost): string {
 // Enhanced content formatting with better typography
 export function enhanceContentFormatting(html: string): string {
   return html
+    // Convert remaining markdown bold (**text**) to HTML strong tags (if not already processed)
+    .replace(/\*\*([^*]+)\*\*/g, '<strong class="font-bold text-gray-900">$1</strong>')
+    // Convert remaining markdown italic (*text* or _text_) to HTML em tags (if not already processed)
+    .replace(/(?<!\*)\*(?!\*)([^*]+)(?<!\*)\*(?!\*)/g, '<em class="italic">$1</em>')
+    .replace(/_([^_]+)_/g, '<em class="italic">$1</em>')
     // Add better spacing for paragraphs
     .replace(/<p>/g, '<p class="mb-6 text-gray-800 leading-relaxed">')
     // Style headings while preserving id and other attributes
@@ -129,6 +134,9 @@ export function enhanceContentFormatting(html: string): string {
     .replace(/<h2([^>]*)>/g, '<h2$1 class="text-3xl font-semibold text-gray-900 mb-6 mt-10">')
     .replace(/<h3([^>]*)>/g, '<h3$1 class="text-2xl font-semibold text-gray-900 mb-4 mt-8">')
     .replace(/<h4([^>]*)>/g, '<h4$1 class="text-xl font-semibold text-gray-900 mb-3 mt-6">')
+    // Style strong/bold tags with better classes
+    .replace(/<strong>/g, '<strong class="font-bold text-gray-900">')
+    .replace(/<b>/g, '<b class="font-bold text-gray-900">')
     // Style lists
     .replace(/<ul>/g, '<ul class="list-disc list-inside mb-6 space-y-2 text-gray-800">')
     .replace(/<ol>/g, '<ol class="list-decimal list-inside mb-6 space-y-2 text-gray-800">')
