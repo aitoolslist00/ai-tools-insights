@@ -126,19 +126,31 @@
   @apply bg-gray-50;
 }
 
+/* Bold and strong text styling */
 .article-content strong,
 .article-content b {
-  @apply font-bold text-gray-900;
   font-weight: 700 !important;
+  font-weight: bold !important;
+  color: #111827 !important;
+  display: inline;
+  font-style: normal;
 }
 
 /* Enhanced styling for inline bold in text */
 .article-content p strong,
-.article-content p b,
+.article-content p b {
+  font-weight: 700 !important;
+  font-weight: bold !important;
+  color: #111827 !important;
+  letter-spacing: -0.025em;
+}
+
 .article-content li strong,
 .article-content li b {
-  @apply font-bold text-gray-900 tracking-tight;
   font-weight: 700 !important;
+  font-weight: bold !important;
+  color: #111827 !important;
+  letter-spacing: -0.025em;
 }
 
 .article-content em,
