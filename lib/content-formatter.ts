@@ -24,12 +24,16 @@ renderer.image = function(token: any) {
 };
 
 // Custom heading renderer to add IDs and scroll-margin
-renderer.heading = function(token: any) {
-  const text = token.text;
+renderer.heading = function(this: any, token: any) {
+  const rawText = token.text || '';
+  const inlineHtml = token.tokens && this.parser?.parseInline
+    ? this.parser.parseInline(token.tokens)
+    : rawText;
+  const plainText = rawText.replace(/<[^>]+>/g, '').replace(/[*_`~]/g, '');
   const level = token.depth;
-  const id = generateSlug(text);
-  
-  return `<h${level} id="${id}" class="scroll-mt-24">${text}</h${level}>`;
+  const id = generateSlug(plainText);
+
+  return `<h${level} id="${id}" class="scroll-mt-24">${inlineHtml}</h${level}>`;
 };
 
 marked.use({ renderer });
