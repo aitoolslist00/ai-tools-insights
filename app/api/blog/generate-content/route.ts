@@ -84,30 +84,24 @@ Your mission is to write a **real-time, long-form, authority-building article** 
 - The final output should be a complete, publishable article with NO additional sections about cluster topics, schema markup, or meta-suggestions.  
 - End the article with the conclusion and key takeaways only.`
 
-    // Call Gemini API - try different model names for compatibility
     let modelName = 'gemini-2.5-flash'
-    
-    // Try latest Gemini models first, then fallback to stable versions
     const tryModels = [
-      'gemini-2.5-flash',               // Latest stable Gemini 2.5 Flash
-      'gemini-2.5-pro',                 // Gemini 2.5 Pro
-      'gemini-2.0-flash',               // Gemini 2.0 Flash
-      'gemini-2.0-flash-exp',           // Gemini 2.0 Flash Experimental
-      'gemini-flash-latest',            // Latest Flash model
-      'gemini-pro-latest'               // Latest Pro model
+      'gemini-2.5-flash',
+      'gemini-2.5-pro',
+      'gemini-2.0-flash',
+      'gemini-2.0-flash-exp',
+      'gemini-flash-latest',
+      'gemini-pro-latest'
     ]
     
-    let response
-    let lastError
+    let responseData: any = null
+    let lastError: { status?: number; error: string; model: string; withSearch?: boolean } | null = null
     
     for (const model of tryModels) {
-      try {
-        response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
+      const attempts = [true, false]
+      for (const withSearch of attempts) {
+        try {
+          const body: Record<string, any> = {
             contents: [{
               parts: [{
                 text: prompt
@@ -119,26 +113,58 @@ Your mission is to write a **real-time, long-form, authority-building article** 
               topP: 0.95,
               maxOutputTokens: 8192,
             }
+          }
+
+          if (withSearch) {
+            body.tools = [{ googleSearch: {} }]
+          }
+
+          const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(body)
           })
-        })
-        
-        if (response.ok) {
+
+          if (!response.ok) {
+            const errorText = await response.text()
+            lastError = { status: response.status, error: errorText, model, withSearch }
+            console.log(`❌ Model ${model} ${withSearch ? 'with' : 'without'} search failed:`, response.status, errorText)
+            if (withSearch) {
+              console.log('⚠️ Google Search not available, trying standard generation')
+            }
+            continue
+          }
+
+          const data = await response.json()
+
+          if (!data.candidates || !data.candidates[0] || !data.candidates[0].content) {
+            lastError = { error: 'No content generated', model, withSearch }
+            console.log(`❌ Model ${model} ${withSearch ? 'with' : 'without'} search returned empty content`)
+            continue
+          }
+
+          responseData = data
           modelName = model
-          console.log(`✅ Successfully using model: ${model}`)
+          console.log(`✅ Successfully using model: ${model} ${withSearch ? 'with search' : 'without search'}`)
           break
-        } else {
-          const errorText = await response.text()
-          lastError = { status: response.status, error: errorText, model }
-          console.log(`❌ Model ${model} failed:`, response.status, errorText)
+        } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+          lastError = { error: errorMessage, model, withSearch }
+          console.log(`❌ Model ${model} ${withSearch ? 'with' : 'without'} search network error:`, errorMessage)
+          if (withSearch) {
+            console.log('⚠️ Google Search not available, trying standard generation')
+          }
         }
-      } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-        lastError = { error: errorMessage, model }
-        console.log(`❌ Model ${model} network error:`, errorMessage)
+      }
+
+      if (responseData) {
+        break
       }
     }
 
-    if (!response || !response.ok) {
+    if (!responseData) {
       console.error('All Gemini API models failed:', lastError)
       
       let errorMessage = 'Failed to generate content. Please check your API key and try again.'
@@ -157,16 +183,7 @@ Your mission is to write a **real-time, long-form, authority-building article** 
       )
     }
 
-    const data = await response.json()
-    
-    if (!data.candidates || !data.candidates[0] || !data.candidates[0].content) {
-      return NextResponse.json(
-        { error: 'No content generated. Please try again.' },
-        { status: 500 }
-      )
-    }
-
-    const generatedContent = data.candidates[0].content.parts[0].text
+    const generatedContent = responseData.candidates[0].content.parts[0].text
 
     return NextResponse.json({
       success: true,

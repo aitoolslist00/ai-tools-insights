@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { Calendar, Clock, ArrowRight } from 'lucide-react'
 import { getCategoryById, BlogPost } from '@/lib/blog-data'
 import { loadBlogPostsFromFile } from '@/lib/blog-file-manager'
+import { formatExcerpt } from '@/lib/content-formatter'
 
 // Server component for SSG
 export default async function LatestBlogPostsSSG() {
@@ -97,9 +98,10 @@ export default async function LatestBlogPostsSSG() {
                 </h3>
 
                 {/* Excerpt */}
-                <p className="text-gray-600 mb-4 line-clamp-3">
-                  {post.excerpt}
-                </p>
+                <p
+                  className="text-gray-600 mb-4 line-clamp-3"
+                  dangerouslySetInnerHTML={{ __html: formatExcerpt(post.excerpt) }}
+                />
 
                 {/* Author and date */}
                 <div className="flex items-center justify-between">

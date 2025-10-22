@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { Calendar, Clock, ArrowRight, User, Tag, Eye, Heart, Share2 } from 'lucide-react'
 import { BlogPost, getCategoryById } from '@/lib/blog-data'
 import { optimizeImageUrl } from '@/lib/utils'
+import { formatExcerpt } from '@/lib/content-formatter'
 
 interface BlogPostCardProps {
   post: BlogPost
@@ -106,9 +107,10 @@ export default function BlogPostCard({ post, featured = false, compact = false }
           </h2>
 
           {/* Excerpt */}
-          <p className="text-gray-600 mb-6 leading-relaxed">
-            {post.excerpt}
-          </p>
+          <p
+            className="text-gray-600 mb-6 leading-relaxed"
+            dangerouslySetInnerHTML={{ __html: formatExcerpt(post.excerpt) }}
+          />
 
           {/* Tags */}
           {post.tags.length > 0 && (
@@ -191,9 +193,10 @@ export default function BlogPostCard({ post, featured = false, compact = false }
           </h3>
 
           {/* Excerpt */}
-          <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-            {post.excerpt}
-          </p>
+          <p
+            className="text-gray-600 text-sm mb-4 line-clamp-2"
+            dangerouslySetInnerHTML={{ __html: formatExcerpt(post.excerpt) }}
+          />
 
           {/* Footer */}
           <div className="flex items-center justify-between text-xs text-gray-500">
@@ -302,9 +305,10 @@ export default function BlogPostCard({ post, featured = false, compact = false }
         </h3>
 
         {/* Excerpt */}
-        <p className="text-gray-600 mb-4 line-clamp-3 text-sm leading-relaxed">
-          {post.excerpt}
-        </p>
+        <p
+          className="text-gray-600 mb-4 line-clamp-3 text-sm leading-relaxed"
+          dangerouslySetInnerHTML={{ __html: formatExcerpt(post.excerpt) }}
+        />
 
         {/* Tags */}
         {post.tags.length > 0 && (

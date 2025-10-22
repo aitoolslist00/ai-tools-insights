@@ -75,6 +75,17 @@ export function formatContentForTOC(content: string): string {
   return marked(content) as string;
 }
 
+export function formatExcerpt(excerpt: string): string {
+  if (!excerpt) return '';
+  let preprocessed = excerpt;
+  preprocessed = preprocessed.replace(/\*\*([^*]+?)\*\*/g, '<strong>$1</strong>');
+  preprocessed = preprocessed.replace(/\*\*([^*]+?)\*\*(['s]?)/g, '<strong>$1</strong>$2');
+  preprocessed = preprocessed.replace(/(?<!\*)\*(?!\*)([^*]+?)(?<!\*)\*(?!\*)/g, '<em>$1</em>');
+  preprocessed = preprocessed.replace(/(?<!_)_([^_]+?)_(?!_)/g, '<em>$1</em>');
+  preprocessed = preprocessed.replace(/`([^`]+?)`/g, '<code class="bg-gray-100 text-gray-800 px-2 py-1 rounded text-sm">$1</code>');
+  return marked.parseInline(preprocessed) as string;
+}
+
 function injectImagesIntoContent(html: string, post: BlogPost): string {
   if (!post.images || post.images.length === 0) return html;
   

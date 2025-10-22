@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { Calendar, Clock, ArrowRight } from 'lucide-react'
 import { getCategoryById } from '@/lib/blog-data'
+import { formatExcerpt } from '@/lib/content-formatter'
 import { useEffect, useState } from 'react'
 
 interface BlogPost {
@@ -142,9 +143,10 @@ export default function LatestBlogPosts() {
                 </h3>
 
                 {/* Excerpt */}
-                <p className="text-gray-600 mb-4 line-clamp-3">
-                  {post.excerpt}
-                </p>
+                <p
+                  className="text-gray-600 mb-4 line-clamp-3"
+                  dangerouslySetInnerHTML={{ __html: formatExcerpt(post.excerpt) }}
+                />
 
                 {/* Author and date */}
                 <div className="flex items-center justify-between">

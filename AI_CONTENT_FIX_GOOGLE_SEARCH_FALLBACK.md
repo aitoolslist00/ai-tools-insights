@@ -31,8 +31,8 @@ You'll see one of these messages:
 - `✅ Using gemini-1.5-flash WITHOUT Google Search` - Fallback successful
 
 ## Files Modified
-1. `app/api/blog/enhanced-seo-generator/route.ts` - Added try/catch fallback logic
-2. `app/api/blog/generate-content/route.ts` - Added try/catch fallback logic
+1. `app/api/blog/enhanced-seo-generator/route.ts` - ✅ FIXED - Added Google Search fallback logic
+2. `app/api/blog/generate-content/route.ts` - ✅ ALREADY FIXED - Had Google Search fallback logic
 
 ## Testing
 1. Go to: http://localhost:3000/blog/dashboard

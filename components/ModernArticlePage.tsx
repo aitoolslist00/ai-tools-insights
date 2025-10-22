@@ -38,7 +38,7 @@ import {
 import { Disclosure } from '@headlessui/react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { BlogPost } from '@/lib/blog-data'
-import { formatContent as formatContentWithImages, formatContentForTOC, enhanceContentFormatting } from '@/lib/content-formatter'
+import { formatContent as formatContentWithImages, formatContentForTOC, enhanceContentFormatting, formatExcerpt } from '@/lib/content-formatter'
 import '@/styles/modern-article.css'
 
 interface ModernArticlePageProps {
@@ -269,9 +269,10 @@ export default function ModernArticlePage({
           </h1>
 
           {/* Excerpt */}
-          <p className="text-xl text-gray-600 mb-10 leading-relaxed max-w-3xl">
-            {post.excerpt}
-          </p>
+          <p
+            className="text-xl text-gray-600 mb-10 leading-relaxed max-w-3xl"
+            dangerouslySetInnerHTML={{ __html: formatExcerpt(post.excerpt) }}
+          />
 
           {/* Meta Information */}
           <div className="flex flex-wrap items-center gap-6 mb-10">
