@@ -88,5 +88,14 @@
     "position": "head",
     "createdAt": "2025-10-19T20:05:33.821Z",
     "updatedAt": "2025-10-19T20:05:33.821Z"
+  },
+  {
+    "id": "ad-1761324566233",
+    "name": "google analytics",
+    "code": "<!-- Google tag (gtag.js) -->\n<script async src=\"https://www.googletagmanager.com/gtag/js?id=G-T9K3W40PL0\"></script>\n<script>\n  window.dataLayer = window.dataLayer || [];\n  function gtag(){dataLayer.push(arguments);}\n  gtag('js', new Date());\n\n  gtag('config', 'G-T9K3W40PL0');\n</script>",
+    "active": true,
+    "position": "head",
+    "createdAt": "2025-10-24T16:49:26.242Z",
+    "updatedAt": "2025-10-24T16:49:26.242Z"
   }
 ]
