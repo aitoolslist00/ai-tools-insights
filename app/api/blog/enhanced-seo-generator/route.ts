@@ -196,7 +196,7 @@ async function generateEnhancedSEOContent(params: {
 
   // 🔥 FETCH REAL-TIME NEWS DATA
   console.log(`📰 Fetching real-time news for: "${keyword}"`)
-  const newsData = await fetchRecentNews(keyword)
+  const newsData = await fetchRecentNews(keyword, apiKey)
   const newsContext = newsData ? formatNewsForPrompt(newsData) : ''
   
   if (newsData) {

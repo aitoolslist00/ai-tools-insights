@@ -239,16 +239,32 @@ function calculateAdvancedSEOScore(config: any): {
     scores.freshness = 5 // Assume fresh
   }
   
-  // E-A-A-T scoring (10 points max) - NEW for 2024
-  const eeatKeywords = ['expert', 'experience', 'data', 'research', 'study', 'verified', 'certified', 'author']
+  // E-A-A-T scoring (10 points max) - ENHANCED for 2024/2025
+  const eeatKeywords = ['expert', 'experience', 'data', 'research', 'study', 'verified', 'certified', 'author', 'published', 'peer-reviewed', 'clinical', 'evidence-based', 'methodology', 'analysis', 'findings', 'conclusion', 'statistics', 'survey', 'report', 'whitepaper']
   const eeatCount = eeatKeywords.filter(kw => config.content.toLowerCase().includes(kw)).length
-  scores.eeat = Math.min(10, eeatCount * 1.5)
+  scores.eeat = Math.min(10, eeatCount * 0.8)
   
-  // Featured snippet scoring (8 points max) - NEW for 2024
+  // Bonus for current year mentions (freshness signal)
+  if (config.content.includes('2024') || config.content.includes('2025')) scores.eeat += 2
+  
+  // Featured snippet scoring (8 points max) - ENHANCED for 2024/2025
   // Check for snippet-friendly format
-  if (config.content.includes('\n1.') || config.content.includes('\n-')) scores.snippets += 3
-  if (config.content.includes('|') && config.content.includes('---')) scores.snippets += 3
+  if (config.content.includes('\n1.') || config.content.includes('\n-')) scores.snippets += 2
+  if (config.content.includes('|') && config.content.includes('---')) scores.snippets += 2
   if (config.content.match(/\*\*[^*]+\*\*:/g)) scores.snippets += 2
+  
+  // Advanced snippet optimization (2024/2025 techniques)
+  // Check for definition patterns (Google loves these)
+  if (config.content.match(/\b\w+\s+is\s+\w+/gi)) scores.snippets += 1
+  // Check for step-by-step patterns
+  if (config.content.match(/step\s+\d+/gi)) scores.snippets += 1
+  
+  // AI-specific scoring (2024/2025 trend)
+  let aiScore = 0
+  const aiKeywords = ['artificial intelligence', 'machine learning', 'neural network', 'deep learning', 'llm', 'gpt', 'claude', 'gemini', 'chatgpt', 'ai model', 'algorithm', 'automation', 'natural language processing', 'computer vision']
+  const aiCount = aiKeywords.filter(kw => config.content.toLowerCase().includes(kw)).length
+  aiScore = Math.min(5, aiCount * 0.8)
+  scores.snippets += aiScore
   
   const overall = Object.values(scores).reduce((sum, score) => sum + score, 0)
   

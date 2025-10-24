@@ -111,50 +111,50 @@ export default function EnhancedAISEOEditor() {
   const [workflowSteps, setWorkflowSteps] = useState<WorkflowStep[]>([
     {
       id: 'generate',
-      title: 'AI Content Generation',
-      description: 'Creating SEO-optimized content with Gemini 2.5 Flash',
+      title: 'AI Content Generation with Current Events',
+      description: 'Creating ultra-current, SEO-optimized content using Gemini 2.5 Flash with real-time news integration',
       status: 'pending',
       progress: 0
     },
     {
       id: 'analyze',
-      title: 'SEO Analysis & Optimization',
-      description: 'Analyzing content for Google algorithm compliance',
+      title: 'Advanced SEO Analysis & Optimization',
+      description: 'Comprehensive SEO analysis using latest Google algorithm factors and Core Web Vitals',
       status: 'pending',
       progress: 0
     },
     {
       id: 'google-bot',
-      title: 'Google Bot Readability (95%+)',
-      description: 'Measuring & optimizing keyword understanding by Google bots',
+      title: 'Google Bot Readability Optimization (95%+)',
+      description: 'Optimizing content specifically for Google\'s natural language processing algorithms',
       status: 'pending',
       progress: 0
     },
     {
       id: 'regenerate',
-      title: 'AI Content Regeneration Based on Google Bot Readability (95%+)',
-      description: 'Regenerating content using Gemini + News API for 95%+ keyword clarity',
+      title: 'AI Content Regeneration with News Integration',
+      description: 'Regenerating content using Google Bot insights and latest news for maximum relevance',
       status: 'pending',
       progress: 0
     },
     {
       id: 'schema',
-      title: 'Schema Generation',
-      description: 'Creating comprehensive JSON-LD structured data',
+      title: 'Comprehensive Schema Generation',
+      description: 'Generating advanced JSON-LD structured data for maximum search visibility',
       status: 'pending',
       progress: 0
     },
     {
       id: 'images',
-      title: 'AI Image Generation',
-      description: 'Generating professional images with Gemini AI',
+      title: 'AI Image Generation with SEO Optimization',
+      description: 'Generating professional, SEO-optimized images with proper alt text and metadata',
       status: 'pending',
       progress: 0
     },
     {
       id: 'publish',
-      title: 'Smart Publishing',
-      description: 'Publishing optimized content to your blog',
+      title: 'Smart Publishing with Immediate Indexing',
+      description: 'Publishing optimized content with immediate search engine submission and social signals',
       status: 'pending',
       progress: 0
     }
@@ -174,6 +174,21 @@ export default function EnhancedAISEOEditor() {
     }
   }, [apiKey])
 
+  // Enhanced validation functions
+  const validateKeyword = (keyword: string): { isValid: boolean; message?: string } => {
+    if (!keyword.trim()) return { isValid: false, message: 'Keyword cannot be empty' }
+    if (keyword.trim().length < 2) return { isValid: false, message: 'Keyword must be at least 2 characters' }
+    if (keyword.trim().split(' ').length > 10) return { isValid: false, message: 'Keyword should not exceed 10 words' }
+    return { isValid: true }
+  }
+
+  const validateApiKey = (apiKey: string): { isValid: boolean; message?: string } => {
+    if (!apiKey.trim()) return { isValid: false, message: 'API key is required' }
+    if (!apiKey.startsWith('AIza')) return { isValid: false, message: 'Invalid Gemini API key format' }
+    if (apiKey.length < 30) return { isValid: false, message: 'API key appears to be incomplete' }
+    return { isValid: true }
+  }
+
   const updateStepStatus = (stepId: string, status: WorkflowStep['status'], progress: number = 0, result?: any) => {
     setWorkflowSteps(prev => prev.map(step => 
       step.id === stepId 
@@ -182,14 +197,21 @@ export default function EnhancedAISEOEditor() {
     ))
   }
 
+  const logStepProgress = (stepId: string, message: string, data?: any) => {
+    console.log(`🔄 Step ${stepId}: ${message}`, data ? data : '')
+  }
+
   const runCompleteWorkflow = async () => {
-    if (!keyword.trim()) {
-      setError('Please enter a target keyword')
+    // Enhanced validation
+    const keywordValidation = validateKeyword(keyword)
+    if (!keywordValidation.isValid) {
+      setError(keywordValidation.message || 'Invalid keyword')
       return
     }
 
-    if (!apiKey.trim()) {
-      setError('Please enter your Gemini API key')
+    const apiKeyValidation = validateApiKey(apiKey)
+    if (!apiKeyValidation.isValid) {
+      setError(apiKeyValidation.message || 'Invalid API key')
       return
     }
 
@@ -208,7 +230,8 @@ export default function EnhancedAISEOEditor() {
 
       // Step 1: Generate Content
       setCurrentStep(1)
-      updateStepStatus('generate', 'processing', 25)
+      logStepProgress('generate', 'Starting AI content generation with current events integration')
+      updateStepStatus('generate', 'processing', 10)
       
       const contentResponse = await fetch('/api/blog/enhanced-seo-generator', {
         method: 'POST',
@@ -229,13 +252,16 @@ export default function EnhancedAISEOEditor() {
         throw new Error(errorData.error || 'Failed to generate content')
       }
 
+      updateStepStatus('generate', 'processing', 75)
       const contentData = await contentResponse.json()
       setGeneratedContent(contentData.content)
+      logStepProgress('generate', 'Content generation completed successfully', { wordCount: contentData.content.wordCount })
       updateStepStatus('generate', 'completed', 100, contentData.content)
 
       // Step 2: SEO Analysis
       setCurrentStep(2)
-      updateStepStatus('analyze', 'processing', 25)
+      logStepProgress('analyze', 'Starting advanced SEO analysis and optimization')
+      updateStepStatus('analyze', 'processing', 15)
       
       const seoResponse = await fetch('/api/seo-optimizer', {
         method: 'POST',
@@ -252,12 +278,15 @@ export default function EnhancedAISEOEditor() {
         })
       })
 
+      updateStepStatus('analyze', 'processing', 75)
       const seoData = await seoResponse.json()
       setSeoAnalysis(seoData.analysis)
+      logStepProgress('analyze', 'SEO analysis completed', { score: seoData.analysis.score })
       updateStepStatus('analyze', 'completed', 100, seoData.analysis)
 
       // Step 3: Google Bot Optimization (NEW - 95%+ Target)
       setCurrentStep(3)
+      logStepProgress('google-bot', 'Starting Google Bot readability optimization (95%+ target)')
       updateStepStatus('google-bot', 'processing', 10)
       
       console.log('🤖 Starting Google Bot Readability Analysis & Optimization...')
@@ -676,15 +705,26 @@ export default function EnhancedAISEOEditor() {
               </div>
             )}
 
-            {/* Recency Notice */}
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
-              <div className="flex items-center gap-2 text-green-800">
+            {/* Advanced SEO Features Notice */}
+            <div className="bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded-lg p-4 mb-6">
+              <div className="flex items-center gap-2 text-green-800 mb-3">
                 <Clock className="h-5 w-5" />
-                <span className="font-semibold">Current & Up-to-Date Content</span>
+                <span className="font-semibold">Advanced SEO Features (2024/2025)</span>
               </div>
-              <p className="text-sm text-green-700 mt-1">
-                Our AI generates content with the most current information available, including recent developments, latest trends, and up-to-date insights to provide maximum value to your readers.
-              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                <div className="text-green-700">
+                  <strong>🚀 Current Content:</strong> Real-time news integration, latest trends, up-to-date statistics
+                </div>
+                <div className="text-blue-700">
+                  <strong>🤖 Google Bot Optimization:</strong> 95%+ keyword understanding, NLP algorithm compliance
+                </div>
+                <div className="text-purple-700">
+                  <strong>⚡ Instant Indexing:</strong> Search Console submission, sitemap pings, RSS updates
+                </div>
+                <div className="text-orange-700">
+                  <strong>🎯 E-A-T Signals:</strong> Expertise markers, authority building, trustworthiness indicators
+                </div>
+              </div>
             </div>
 
             {/* Action Button */}

@@ -89,23 +89,43 @@ export default function ModernArticlePage({
     const tempDiv = document.createElement('div')
     tempDiv.innerHTML = formatContentForTOC(post.content)
     
-    // Extract TOC items
-    const headers = tempDiv.querySelectorAll('h1, h2, h3')
+    // Extract TOC items from both markdown headers and HTML headers
+    const headers = tempDiv.querySelectorAll('h1, h2, h3, h4, h5, h6')
     const tocItems: TableOfContentsItem[] = []
     
-    headers.forEach((header) => {
-      if (!header.id) {
-        const id = header.textContent?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || ''
-        header.id = id
-      }
-      
-      tocItems.push({
-        id: header.id,
-        text: header.textContent || '',
-        level: parseInt(header.tagName.charAt(1))
-      })
-    })
+    // Also check for markdown-style headers in the raw content
+    const markdownHeaders = post.content.match(/^#{1,6}\s+.+$/gm) || []
     
+    if (headers.length === 0 && markdownHeaders.length > 0) {
+      // If no HTML headers found, create TOC from markdown headers
+      markdownHeaders.forEach((header, index) => {
+        const level = (header.match(/^#+/) || [''])[0].length
+        const text = header.replace(/^#+\s+/, '').trim()
+        const id = text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || `section-${index}`
+        
+        tocItems.push({
+          id,
+          text,
+          level
+        })
+      })
+    } else {
+      // Use HTML headers
+      headers.forEach((header, index) => {
+        if (!header.id) {
+          const id = header.textContent?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || `section-${index}`
+          header.id = id
+        }
+        
+        tocItems.push({
+          id: header.id,
+          text: header.textContent || '',
+          level: parseInt(header.tagName.charAt(1))
+        })
+      })
+    }
+    
+    console.log('Table of Contents extracted:', tocItems)
     setTableOfContents(tocItems)
 
     // Extract FAQs only if there's no dedicated FAQ section in the content

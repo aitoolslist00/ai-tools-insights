@@ -116,12 +116,28 @@ E-A-A-T REQUIREMENTS (Google HCU Priority):
 - **Trust**: Be transparent about methodology and sources
 
 TECHNICAL SEO ELEMENTS:
-- Use proper H1/H2/H3 hierarchy
+- Use proper H1/H2/H3 hierarchy (CRITICAL for table of contents)
 - Include keyword in first paragraph (within first 100 words)
 - Add 1-2 bulleted lists with practical tips
 - Include 1-2 comparison tables if applicable
 - Format important information as callout boxes
 - Use short paragraphs (2-3 sentences max) for readability
+
+HEADING STRUCTURE (MANDATORY for Table of Contents):
+- Use markdown headers: ## for H2, ### for H3, #### for H4
+- Each major section MUST have a clear H2 heading
+- Subsections should use H3 headings
+- Make headings descriptive and keyword-rich
+- Example structure:
+  ## Introduction to [Keyword]
+  ## Key Features and Benefits
+  ### Feature 1: [Specific Feature]
+  ### Feature 2: [Specific Feature]
+  ## How to Get Started
+  ### Step 1: [Action]
+  ### Step 2: [Action]
+  ## Frequently Asked Questions
+  ## Conclusion
 
 FEATURED SNIPPET OPTIMIZATION:
 - First section should answer the "what is" question (0-60 words)
@@ -131,11 +147,20 @@ FEATURED SNIPPET OPTIMIZATION:
 
 CONTENT QUALITY STANDARDS:
 - Original research and insights (not rehashing competitors)
-- Current information (use latest data and trends)
+- Current information (use latest data and trends from ${month} ${year})
 - Practical value (readers can implement immediately)
 - Clear organization (easy to scan and find info)
 - Comprehensive coverage (answers all user intents)
 - Well-sourced (cite studies, reports, expert quotes)
+
+CURRENT EVENTS INTEGRATION (MANDATORY):
+- Include recent developments from the news context provided above
+- Reference specific dates and recent announcements
+- Mention current market trends and statistics
+- Include "as of ${month} ${year}" references
+- Cite recent industry reports and studies
+- Reference latest product releases or updates
+- Include current pricing and availability information
 
 STRUCTURE OUTPUT AS JSON:
 {
