@@ -51,15 +51,15 @@ const nextConfig = {
   // Server external packages (moved from experimental)
   serverExternalPackages: ['sharp'],
   
-  // Turbopack configuration (moved from experimental.turbo)
-  turbopack: {
-    rules: {
-      '*.svg': {
-        loaders: ['@svgr/webpack'],
-        as: '*.js',
-      },
-    },
-  },
+  // Turbopack configuration (commented out to fix build)
+  // turbopack: {
+  //   rules: {
+  //     '*.svg': {
+  //       loaders: ['@svgr/webpack'],
+  //       as: '*.js',
+  //     },
+  //   },
+  // },
   
   // Bundle analyzer and optimization
   webpack: (config, { dev, isServer }) => {

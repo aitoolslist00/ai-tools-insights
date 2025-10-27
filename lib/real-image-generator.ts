@@ -501,3 +501,40 @@ export class RealImageGenerator {
     }
   }
 }
+
+// Export convenience function for backward compatibility
+export async function generateImageWithRealAPI(keyword: string, content?: string): Promise<any> {
+  const generator = new RealImageGenerator()
+  
+  try {
+    const result = await generator.generateImage({
+      keyword,
+      style: 'corporate',
+      aspectRatio: '16:9',
+      width: 1200,
+      height: 675
+    })
+    
+    return {
+      url: result.url,
+      alt: result.alt,
+      title: keyword,
+      caption: `Professional image for ${keyword}`,
+      width: result.width,
+      height: result.height,
+      format: 'jpg'
+    }
+  } catch (error) {
+    console.warn(`Failed to generate image for "${keyword}":`, error)
+    // Return placeholder data
+    return {
+      url: `/generated-images/${keyword.toLowerCase().replace(/\s+/g, '-')}-placeholder.jpg`,
+      alt: keyword,
+      title: keyword,
+      caption: `Image for ${keyword}`,
+      width: 1200,
+      height: 675,
+      format: 'jpg'
+    }
+  }
+}
