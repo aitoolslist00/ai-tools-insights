@@ -48,6 +48,10 @@ export interface EnhancedBlogPost {
     headers: string[]
     rows: Array<Record<string, string>>
   }
+  summaryTable?: {
+    headers: string[]
+    rows: Array<Record<string, string>>
+  }
   faq: Array<{
     question: string
     answer: string
@@ -140,6 +144,7 @@ export async function generateEnhancedBlogArticle(options: BlogGenerationOptions
     schemas,
     tableOfContents: articleContent.tableOfContents,
     comparisonTable: articleContent.comparisonTable,
+    summaryTable: articleContent.summaryTable,
     faq: articleContent.faq,
     eeatSignals
   }
@@ -212,11 +217,12 @@ ${newsData ? formatNewsForPrompt(newsData) : ''}
 
 Create a ${targetWordCount}+ word article about "${keyword}" that follows these EXACT requirements:
 
-## TITLE REQUIREMENTS:
+## TITLE REQUIREMENTS (CRITICAL):
 - Create a compelling, click-worthy title that includes the focus keyword "${focusKeyword}"
+- **MAXIMUM 60 characters** - titles longer than 60 characters will be truncated in search results
 - Format: **Main Title**: Subtitle for Maximum Impact
-- Must be 50-60 characters for optimal SEO
 - Include current year (2025) if relevant
+- Prioritize focus keyword placement at the beginning
 
 ## CONTENT STRUCTURE (MANDATORY):
 1. **Introduction (300+ words)**
@@ -235,17 +241,24 @@ Create a ${targetWordCount}+ word article about "${keyword}" that follows these 
    - Include secondary keywords naturally
    - Add practical examples and case studies
 
-4. **Comparison Table**
-   - Compare top 5-7 tools/options
-   - Include: Name, Best For, Pricing, Rating, Key Features
-   - Use HTML table format with proper styling
+4. **Comparison Table (MANDATORY)**
+   - Compare top 5-7 tools/options related to the topic
+   - Include columns: Name, Best For, Pricing, Rating, Key Features
+   - Use markdown table format: | Column | Column |
+   - Add a summary table at the end with key takeaways
+   - Tables must be comprehensive and data-rich
 
 5. **FAQ Section (8-10 questions)**
    - Address common user queries
    - Include long-tail keywords
    - Provide detailed answers (50-100 words each)
 
-6. **Conclusion (200+ words)**
+6. **Summary Table (MANDATORY)**
+   - Create a final summary table with key points
+   - Include: Feature/Aspect, Best Option, Why, Price Range
+   - Help readers make quick decisions
+
+7. **Conclusion (200+ words)**
    - Summarize key points
    - Include clear call-to-action
    - Reinforce main benefits
@@ -278,18 +291,29 @@ Create a ${targetWordCount}+ word article about "${keyword}" that follows these 
 - Provide unique value and perspectives
 - Ensure factual accuracy
 
+## META DESCRIPTION REQUIREMENTS (CRITICAL):
+- Create a compelling meta description that includes the focus keyword
+- **MAXIMUM 155 characters** - descriptions longer than 155 characters will be truncated in SERPs
+- Must be engaging and encourage clicks
+- Include a clear value proposition
+- Use active voice and action words
+
 ## OUTPUT FORMAT:
 Return the content in this exact JSON structure:
 {
-  "title": "Your optimized title here",
-  "excerpt": "Compelling 150-word summary",
+  "title": "Your optimized title here (MAX 60 chars)",
+  "excerpt": "Compelling meta description (MAX 155 chars)",
   "content": "Full article content with proper markdown formatting",
   "tableOfContents": [
     {"title": "Section Title", "href": "#section-slug", "level": 2}
   ],
   "comparisonTable": {
-    "headers": ["Tool", "Best For", "Pricing", "Rating"],
-    "rows": [{"Tool": "Name", "Best For": "Use case", "Pricing": "$X/mo", "Rating": "4.5/5"}]
+    "headers": ["Tool", "Best For", "Pricing", "Rating", "Key Features"],
+    "rows": [{"Tool": "Name", "Best For": "Use case", "Pricing": "$X/mo", "Rating": "4.5/5", "Key Features": "Feature list"}]
+  },
+  "summaryTable": {
+    "headers": ["Feature/Aspect", "Best Option", "Why", "Price Range"],
+    "rows": [{"Feature/Aspect": "Aspect", "Best Option": "Tool name", "Why": "Reason", "Price Range": "$X-Y/mo"}]
   },
   "faq": [
     {"question": "Question here?", "answer": "Detailed answer here"}
@@ -316,6 +340,7 @@ function parseGeneratedContent(content: string, keyword: string) {
         content: parsed.content || content,
         tableOfContents: parsed.tableOfContents || [],
         comparisonTable: parsed.comparisonTable || null,
+        summaryTable: parsed.summaryTable || null,
         faq: parsed.faq || []
       }
     }
@@ -330,6 +355,7 @@ function parseGeneratedContent(content: string, keyword: string) {
     content: enhanceContentFormatting(content),
     tableOfContents: extractTableOfContents(content),
     comparisonTable: extractComparisonTable(content),
+    summaryTable: extractSummaryTable(content),
     faq: extractFAQ(content)
   }
 }
@@ -400,125 +426,7 @@ async function generateArticleImages(keyword: string, articleContent: any): Prom
   return images
 }
 
-/**
- * Generates SEO metadata
- */
-function generateSEOMetadata(articleContent: any, focusKeyword: string, secondaryKeywords: string[]) {
-  const title = articleContent.title
-  const excerpt = articleContent.excerpt
-  
-  return {
-    metaTitle: title.length > 60 ? title.substring(0, 57) + '...' : title,
-    metaDescription: excerpt.length > 160 ? excerpt.substring(0, 157) + '...' : excerpt,
-    keywords: [focusKeyword, ...secondaryKeywords].join(', '),
-    focusKeyword,
-    canonicalUrl: `https://www.aitoolsinsights.com/blog/${generateSlug(title)}`
-  }
-}
 
-/**
- * Generates structured data schemas
- */
-function generateStructuredData(articleContent: any, keyword: string) {
-  const currentDate = new Date().toISOString()
-  
-  return {
-    article: {
-      "@context": "https://schema.org",
-      "@type": "BlogPosting",
-      "headline": articleContent.title,
-      "description": articleContent.excerpt,
-      "author": {
-        "@type": "Person",
-        "name": "AI Tools Expert",
-        "jobTitle": "AI Technology Specialist",
-        "knowsAbout": ["Artificial Intelligence", "Machine Learning", "AI Tools", "Technology"]
-      },
-      "publisher": {
-        "@type": "Organization",
-        "name": "AI Tools Insights",
-        "logo": {
-          "@type": "ImageObject",
-          "url": "https://www.aitoolsinsights.com/logo.png"
-        }
-      },
-      "datePublished": currentDate,
-      "dateModified": currentDate,
-      "mainEntityOfPage": {
-        "@type": "WebPage",
-        "@id": `https://www.aitoolsinsights.com/blog/${generateSlug(articleContent.title)}`
-      }
-    },
-    faq: articleContent.faq.length > 0 ? {
-      "@context": "https://schema.org",
-      "@type": "FAQPage",
-      "mainEntity": articleContent.faq.map((item: any) => ({
-        "@type": "Question",
-        "name": item.question,
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": item.answer
-        }
-      }))
-    } : null,
-    breadcrumb: {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        {
-          "@type": "ListItem",
-          "position": 1,
-          "name": "Home",
-          "item": "https://www.aitoolsinsights.com"
-        },
-        {
-          "@type": "ListItem",
-          "position": 2,
-          "name": "Blog",
-          "item": "https://www.aitoolsinsights.com/blog"
-        },
-        {
-          "@type": "ListItem",
-          "position": 3,
-          "name": articleContent.title,
-          "item": `https://www.aitoolsinsights.com/blog/${generateSlug(articleContent.title)}`
-        }
-      ]
-    }
-  }
-}
-
-/**
- * Generates E-E-A-T signals
- */
-function generateEEATSignals(contentType: string, keyword: string) {
-  return {
-    expertise: [
-      "In-depth technical knowledge of AI tools and technologies",
-      "Comprehensive analysis of market trends and developments",
-      "Detailed comparison of features and capabilities",
-      "Expert evaluation of use cases and applications"
-    ],
-    experience: [
-      "Hands-on testing and evaluation of AI tools",
-      "Real-world implementation examples and case studies",
-      "Practical insights from industry professionals",
-      "User feedback and community insights"
-    ],
-    authoritativeness: [
-      "Citations from reputable industry sources",
-      "References to official documentation and research",
-      "Quotes from industry experts and thought leaders",
-      "Links to authoritative websites and resources"
-    ],
-    trustworthiness: [
-      "Transparent methodology and evaluation criteria",
-      "Honest assessment of pros and cons",
-      "Regular updates to maintain accuracy",
-      "Clear disclosure of any affiliations or partnerships"
-    ]
-  }
-}
 
 // Helper functions
 function countWords(text: string): number {
@@ -566,7 +474,7 @@ function extractTableOfContents(content: string): Array<{title: string, href: st
 }
 
 function extractComparisonTable(content: string): any {
-  // Look for table patterns in the content
+  // Look for comparison table patterns in the content
   const tableMatch = content.match(/\|(.+)\|[\s\S]*?\|(.+)\|/g)
   if (tableMatch && tableMatch.length > 1) {
     const headers = tableMatch[0].split('|').map(h => h.trim()).filter(h => h)
@@ -580,6 +488,49 @@ function extractComparisonTable(content: string): any {
     })
     return { headers, rows }
   }
+  return null
+}
+
+function extractSummaryTable(content: string): any {
+  // Look for summary table patterns (usually at the end of content)
+  const summarySection = content.match(/## Summary[\s\S]*?(?=##|$)/i) || 
+                         content.match(/## Key Takeaways[\s\S]*?(?=##|$)/i) ||
+                         content.match(/## Final Recommendations[\s\S]*?(?=##|$)/i)
+  
+  if (summarySection) {
+    const tableMatch = summarySection[0].match(/\|(.+)\|[\s\S]*?\|(.+)\|/g)
+    if (tableMatch && tableMatch.length > 1) {
+      const headers = tableMatch[0].split('|').map(h => h.trim()).filter(h => h)
+      const rows = tableMatch.slice(2).map(row => {
+        const cells = row.split('|').map(c => c.trim()).filter(c => c)
+        const rowObj: Record<string, string> = {}
+        headers.forEach((header, index) => {
+          rowObj[header] = cells[index] || ''
+        })
+        return rowObj
+      })
+      return { headers, rows }
+    }
+  }
+  
+  // Fallback: look for any table in the last part of content
+  const contentParts = content.split('##')
+  const lastParts = contentParts.slice(-3).join('##') // Last 3 sections
+  const tableMatch = lastParts.match(/\|(.+)\|[\s\S]*?\|(.+)\|/g)
+  
+  if (tableMatch && tableMatch.length > 1) {
+    const headers = tableMatch[0].split('|').map(h => h.trim()).filter(h => h)
+    const rows = tableMatch.slice(2).map(row => {
+      const cells = row.split('|').map(c => c.trim()).filter(c => c)
+      const rowObj: Record<string, string> = {}
+      headers.forEach((header, index) => {
+        rowObj[header] = cells[index] || ''
+      })
+      return rowObj
+    })
+    return { headers, rows }
+  }
+  
   return null
 }
 
@@ -598,4 +549,165 @@ function extractFAQ(content: string): Array<{question: string, answer: string}> 
       answer: answerMatch ? answerMatch[1].trim() : ''
     }
   }).filter(item => item.question && item.answer)
+}
+
+/**
+ * Generates SEO metadata with proper length constraints
+ */
+function generateSEOMetadata(articleContent: any, focusKeyword: string, secondaryKeywords: string[]) {
+  // Generate optimized title (max 60 characters)
+  let title = articleContent.title || `Ultimate Guide to ${focusKeyword} 2025`
+  if (title.length > 60) {
+    // Truncate and add ellipsis, keeping focus keyword
+    const words = title.split(' ')
+    let truncated = ''
+    for (const word of words) {
+      if ((truncated + ' ' + word).length <= 57) { // Leave room for "..."
+        truncated += (truncated ? ' ' : '') + word
+      } else {
+        break
+      }
+    }
+    title = truncated + '...'
+  }
+
+  // Generate optimized meta description (max 155 characters)
+  let metaDescription = articleContent.excerpt || `Comprehensive guide to ${focusKeyword} with expert insights and practical recommendations.`
+  if (metaDescription.length > 155) {
+    // Truncate at word boundary, keeping focus keyword
+    const words = metaDescription.split(' ')
+    let truncated = ''
+    for (const word of words) {
+      if ((truncated + ' ' + word).length <= 152) { // Leave room for "..."
+        truncated += (truncated ? ' ' : '') + word
+      } else {
+        break
+      }
+    }
+    metaDescription = truncated + '...'
+  }
+
+  return {
+    title,
+    metaDescription,
+    keywords: [focusKeyword, ...secondaryKeywords].slice(0, 10), // Limit to 10 keywords
+    focusKeyword,
+    secondaryKeywords: secondaryKeywords.slice(0, 5) // Limit secondary keywords
+  }
+}
+
+/**
+ * Generates structured data schemas for SEO
+ */
+function generateStructuredData(articleContent: any, keyword: string) {
+  const baseUrl = 'https://www.aitoolsinsights.com'
+  const slug = generateSlug(articleContent.title)
+  
+  const article = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "@id": `${baseUrl}/blog/${slug}#article`,
+    "headline": articleContent.title,
+    "description": articleContent.excerpt,
+    "image": `${baseUrl}/generated-images/${slug}-featured.jpg`,
+    "author": {
+      "@type": "Person",
+      "name": "AI Tools Expert",
+      "url": `${baseUrl}/about`
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "AI Tools Insights",
+      "logo": {
+        "@type": "ImageObject",
+        "url": `${baseUrl}/logo.png`
+      }
+    },
+    "datePublished": new Date().toISOString(),
+    "dateModified": new Date().toISOString(),
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": `${baseUrl}/blog/${slug}`
+    },
+    "keywords": keyword,
+    "articleSection": "AI Tools",
+    "wordCount": countWords(articleContent.content)
+  }
+
+  const breadcrumb = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": baseUrl
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Blog",
+        "item": `${baseUrl}/blog`
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": articleContent.title,
+        "item": `${baseUrl}/blog/${slug}`
+      }
+    ]
+  }
+
+  const schemas: any = { article, breadcrumb }
+
+  // Add FAQ schema if FAQs exist
+  if (articleContent.faq && articleContent.faq.length > 0) {
+    schemas.faq = {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": articleContent.faq.map((item: any) => ({
+        "@type": "Question",
+        "name": item.question,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": item.answer
+        }
+      }))
+    }
+  }
+
+  return schemas
+}
+
+/**
+ * Generates E-E-A-T signals for content authority
+ */
+function generateEEATSignals(contentType: string, keyword: string) {
+  return {
+    expertise: [
+      "Deep technical knowledge of AI tools and technologies",
+      "Hands-on experience with leading AI platforms",
+      "Understanding of industry best practices and standards",
+      "Continuous research and analysis of emerging AI trends"
+    ],
+    experience: [
+      "Hands-on testing and evaluation of AI tools",
+      "Real-world implementation examples and case studies",
+      "Practical insights from industry professionals",
+      "User feedback and community insights"
+    ],
+    authoritativeness: [
+      "Citations from reputable industry sources",
+      "References to official documentation and research",
+      "Quotes from industry experts and thought leaders",
+      "Links to authoritative websites and resources"
+    ],
+    trustworthiness: [
+      "Transparent methodology and evaluation criteria",
+      "Honest assessment of pros and cons",
+      "Regular updates to maintain accuracy",
+      "Clear disclosure of any affiliations or partnerships"
+    ]
+  }
 }

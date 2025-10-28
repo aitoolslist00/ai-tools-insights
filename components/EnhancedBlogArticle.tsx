@@ -93,22 +93,38 @@ export default function EnhancedBlogArticle({ post, relatedPosts = [] }: Enhance
 
   // Smooth scroll to section
   const scrollToSection = (id: string) => {
-    const element = document.getElementById(id.replace('#', ''))
+    // Remove # if present and generate proper slug
+    const cleanId = id.replace('#', '')
+    const element = document.getElementById(cleanId)
     if (element) {
-      const yOffset = -100
+      const yOffset = -120 // Increased offset for better visibility
       const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset
       window.scrollTo({ top: y, behavior: 'smooth' })
     }
   }
 
-  // Format content with proper HTML structure
+  // Format content with proper HTML structure and slug generation
   const formatContent = (content: string) => {
+    // Helper function to generate proper slugs
+    const generateSlug = (text: string) => {
+      return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+    }
+
     return content
       .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
       .replace(/\*([^*]+)\*/g, '<em>$1</em>')
-      .replace(/^# (.+)$/gm, '<h1 id="$1">$1</h1>')
-      .replace(/^## (.+)$/gm, '<h2 id="$1">$1</h2>')
-      .replace(/^### (.+)$/gm, '<h3 id="$1">$1</h3>')
+      .replace(/^# (.+)$/gm, (match, headerText) => {
+        const slug = generateSlug(headerText.trim())
+        return `<h1 id="${slug}" style="scroll-margin-top: 120px;">${headerText}</h1>`
+      })
+      .replace(/^## (.+)$/gm, (match, headerText) => {
+        const slug = generateSlug(headerText.trim())
+        return `<h2 id="${slug}" style="scroll-margin-top: 120px;">${headerText}</h2>`
+      })
+      .replace(/^### (.+)$/gm, (match, headerText) => {
+        const slug = generateSlug(headerText.trim())
+        return `<h3 id="${slug}" style="scroll-margin-top: 120px;">${headerText}</h3>`
+      })
       .replace(/^- (.+)$/gm, '<li>$1</li>')
       .replace(/(<li>[\s\S]*?<\/li>)/g, '<ul>$1</ul>')
       .replace(/^\d+\. (.+)$/gm, '<li>$1</li>')
@@ -402,15 +418,18 @@ export default function EnhancedBlogArticle({ post, relatedPosts = [] }: Enhance
             {/* Comparison Table */}
             {post.comparisonTable && (
               <div className="my-12 bg-gray-50 rounded-xl p-8 border border-gray-200">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
+                <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center flex items-center justify-center">
+                  <svg className="w-6 h-6 mr-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
                   Comprehensive Comparison
                 </h2>
                 <div className="overflow-x-auto">
-                  <table className="w-full text-sm border-collapse">
+                  <table className="w-full text-sm border-collapse bg-white rounded-lg shadow-sm">
                     <thead>
-                      <tr className="bg-white border-b-2 border-gray-300">
+                      <tr className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
                         {post.comparisonTable.headers.map((header, index) => (
-                          <th key={index} className="text-left py-4 px-6 font-semibold text-gray-900">
+                          <th key={index} className="text-left py-4 px-6 font-semibold first:rounded-tl-lg last:rounded-tr-lg">
                             {header}
                           </th>
                         ))}
@@ -418,9 +437,45 @@ export default function EnhancedBlogArticle({ post, relatedPosts = [] }: Enhance
                     </thead>
                     <tbody>
                       {post.comparisonTable.rows.map((row, index) => (
-                        <tr key={index} className="border-b border-gray-200 hover:bg-white transition-colors">
+                        <tr key={index} className="border-b border-gray-200 hover:bg-blue-50 transition-colors">
                           {post.comparisonTable!.headers.map((header, cellIndex) => (
                             <td key={cellIndex} className="py-4 px-6 text-gray-700">
+                              {row[header]}
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {/* Summary Table */}
+            {post.summaryTable && (
+              <div className="my-12 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-8 border border-green-200">
+                <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center flex items-center justify-center">
+                  <svg className="w-6 h-6 mr-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Key Takeaways Summary
+                </h2>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm border-collapse bg-white rounded-lg shadow-sm">
+                    <thead>
+                      <tr className="bg-gradient-to-r from-green-600 to-emerald-600 text-white">
+                        {post.summaryTable.headers.map((header, index) => (
+                          <th key={index} className="text-left py-4 px-6 font-semibold first:rounded-tl-lg last:rounded-tr-lg">
+                            {header}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {post.summaryTable.rows.map((row, index) => (
+                        <tr key={index} className="border-b border-gray-200 hover:bg-green-50 transition-colors">
+                          {post.summaryTable!.headers.map((header, cellIndex) => (
+                            <td key={cellIndex} className="py-4 px-6 text-gray-700 font-medium">
                               {row[header]}
                             </td>
                           ))}
