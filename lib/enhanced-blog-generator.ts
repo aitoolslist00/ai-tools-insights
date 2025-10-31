@@ -221,7 +221,7 @@ Create a ${targetWordCount}+ word article about "${keyword}" that follows these 
 - Create a compelling, click-worthy title that includes the focus keyword "${focusKeyword}"
 - **MAXIMUM 60 characters** - titles longer than 60 characters will be truncated in search results
 - Format: **Main Title**: Subtitle for Maximum Impact
-- Include current year (2025) if relevant
+- Include current year if relevant to the topic
 - Prioritize focus keyword placement at the beginning
 
 ## CONTENT STRUCTURE (MANDATORY):
@@ -290,6 +290,8 @@ Create a ${targetWordCount}+ word article about "${keyword}" that follows these 
 - Include actionable insights
 - Provide unique value and perspectives
 - Ensure factual accuracy
+- Reference current year trends and developments without specific month/day dates
+- Focus on recent developments and current industry status
 
 ## META DESCRIPTION REQUIREMENTS (CRITICAL):
 - Create a compelling meta description that includes the focus keyword

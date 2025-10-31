@@ -120,23 +120,15 @@ export function formatNewsForPrompt(newsData: NewsData): string {
     return ''
   }
 
-  const today = new Date().toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  })
+  const currentYear = new Date().getFullYear()
 
-  let prompt = `\n\n=== CURRENT INFORMATION (Fetched on ${today}) ===\n\n`
+  let prompt = `\n\n=== CURRENT INFORMATION (Latest ${currentYear} Data) ===\n\n`
   prompt += `Based on ${newsData.articles.length} recent news articles:\n\n`
 
   newsData.articles.forEach((article, index) => {
-    const publishDate = new Date(article.publishedAt).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    })
+    const publishYear = new Date(article.publishedAt).getFullYear()
     
-    prompt += `${index + 1}. [${publishDate}] ${article.title}\n`
+    prompt += `${index + 1}. [${publishYear}] ${article.title}\n`
     prompt += `   Source: ${article.source}\n`
     if (article.description) {
       prompt += `   ${article.description}\n`
@@ -146,8 +138,8 @@ export function formatNewsForPrompt(newsData: NewsData): string {
 
   prompt += `=== END OF CURRENT INFORMATION ===\n\n`
   prompt += `IMPORTANT: Use the above recent information to write an accurate, up-to-date article. `
-  prompt += `Include specific dates, recent developments, and current statistics from these sources. `
-  prompt += `This ensures your content is genuinely current as of ${today}.\n\n`
+  prompt += `Include recent developments and current statistics from these sources. `
+  prompt += `This ensures your content reflects the latest ${currentYear} information and trends.\n\n`
 
   return prompt
 }
@@ -256,20 +248,19 @@ async function fetchNewsWithGemini(keyword: string, apiKey: string): Promise<New
 function generateCurrentContext(keyword: string): NewsData {
   const currentDate = new Date()
   const currentYear = currentDate.getFullYear()
-  const currentMonth = currentDate.toLocaleString('default', { month: 'long' })
   
   // Generate realistic current context articles
   const articles: NewsArticle[] = [
     {
-      title: `${keyword} Market Trends and Developments in ${currentMonth} ${currentYear}`,
+      title: `${keyword} Market Trends and Developments in ${currentYear}`,
       description: `Latest market analysis and industry developments for ${keyword} technology, including recent innovations and adoption trends.`,
       url: `https://example.com/news/${keyword.replace(/\s+/g, '-')}-trends-${currentYear}`,
       publishedAt: new Date(currentDate.getTime() - 24 * 60 * 60 * 1000).toISOString(),
       source: 'Industry Analysis',
-      content: `Current market trends and developments in ${keyword} technology for ${currentMonth} ${currentYear}.`
+      content: `Current market trends and developments in ${keyword} technology for ${currentYear}.`
     },
     {
-      title: `Breaking: New ${keyword} Innovations Announced This Week`,
+      title: `Latest ${keyword} Innovations and Breakthrough Developments`,
       description: `Recent announcements and breakthrough developments in ${keyword} technology, featuring the latest innovations from industry leaders.`,
       url: `https://example.com/news/${keyword.replace(/\s+/g, '-')}-innovations-${currentYear}`,
       publishedAt: new Date(currentDate.getTime() - 48 * 60 * 60 * 1000).toISOString(),
