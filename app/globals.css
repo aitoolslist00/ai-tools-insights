@@ -224,5 +224,50 @@ button, a {
   }
 }
 
+/* AI Generated Table Styles */
+.table-container {
+  @apply my-8 overflow-x-auto bg-white rounded-lg shadow-sm border border-gray-200;
+}
+
+.comparison-table {
+  @apply w-full border-collapse;
+}
+
+.comparison-table th {
+  @apply bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 text-left text-sm font-semibold text-gray-900 border-b border-gray-200;
+}
+
+.comparison-table td {
+  @apply px-6 py-4 text-sm text-gray-700 border-b border-gray-100;
+}
+
+.comparison-table tr:hover {
+  @apply bg-gray-50;
+}
+
+.comparison-table .highlight-cell {
+  @apply bg-green-50 font-medium text-green-800;
+}
+
+.table-header {
+  @apply bg-gradient-to-r from-purple-50 to-blue-50;
+}
+
+.table-row:nth-child(even) {
+  @apply bg-gray-50;
+}
+
+/* Responsive table styles */
+@media (max-width: 768px) {
+  .table-container {
+    @apply mx-4;
+  }
+  
+  .comparison-table th,
+  .comparison-table td {
+    @apply px-3 py-2 text-xs;
+  }
+}
+
 /* Modern Article Styles */
 @import '../styles/modern-article.css';

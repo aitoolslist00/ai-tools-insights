@@ -138,6 +138,13 @@ export default function EnhancedAISEOEditor() {
       progress: 0
     },
     {
+      id: 'table-generation',
+      title: 'AI Summary & Comparison Table Generation',
+      description: 'Creating intelligent summary and comparison tables using Gemini AI and inserting them into article content',
+      status: 'pending',
+      progress: 0
+    },
+    {
       id: 'schema',
       title: 'Comprehensive Schema Generation',
       description: 'Generating advanced JSON-LD structured data for maximum search visibility',
@@ -419,8 +426,69 @@ export default function EnhancedAISEOEditor() {
         })
       }
 
-      // Step 5: Schema Generation
+      // Step 5: AI Summary & Comparison Table Generation
       setCurrentStep(5)
+      updateStepStatus('table-generation', 'processing', 10)
+      
+      console.log('📊 Starting AI Summary & Comparison Table Generation...')
+      
+      try {
+        const tableResponse = await fetch('/api/blog/generate-tables', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            title: contentData.content.title,
+            content: contentData.content.content,
+            keywords: contentData.content.keywords,
+            primaryKeyword: keyword.trim(),
+            category: category,
+            apiKey: apiKey.trim()
+          })
+        })
+
+        if (tableResponse.ok) {
+          const tableData = await tableResponse.json()
+          
+          if (tableData.success && tableData.enhancedContent) {
+            console.log('✅ Tables generated and inserted successfully')
+            
+            // Update content with enhanced version that includes tables
+            contentData.content.content = tableData.enhancedContent
+            setGeneratedContent(contentData.content)
+            
+            updateStepStatus('table-generation', 'completed', 100, {
+              success: true,
+              tablesGenerated: tableData.tablesGenerated,
+              insertionPoints: tableData.insertionPoints,
+              enhancedContent: tableData.enhancedContent
+            })
+          } else {
+            console.log('⚠️ Table generation completed with warnings')
+            updateStepStatus('table-generation', 'completed', 100, {
+              warning: 'Table generation skipped',
+              reason: tableData.reason || 'No suitable content for tables'
+            })
+          }
+        } else {
+          console.error('Table generation failed, continuing without tables')
+          updateStepStatus('table-generation', 'completed', 100, {
+            warning: 'Table generation failed',
+            error: 'API error'
+          })
+        }
+      } catch (tableError) {
+        console.error('Table generation error:', tableError)
+        updateStepStatus('table-generation', 'completed', 100, {
+          warning: 'Table generation failed',
+          error: tableError instanceof Error ? tableError.message : 'Unknown error'
+        })
+      }
+
+      // Step 6: Schema Generation
+      setCurrentStep(6)
       updateStepStatus('schema', 'processing', 25)
       
       const schemaResponse = await fetch('/api/schema-generator', {
@@ -440,8 +508,8 @@ export default function EnhancedAISEOEditor() {
       setSchemaData(schemaDataResult.schemas)
       updateStepStatus('schema', 'completed', 100, schemaDataResult.schemas)
 
-      // Step 6: AI Image Generation
-      setCurrentStep(6)
+      // Step 7: AI Image Generation
+      setCurrentStep(7)
       updateStepStatus('images', 'processing', 25)
       
       // Generate image prompts from content
@@ -478,8 +546,8 @@ export default function EnhancedAISEOEditor() {
         updateStepStatus('images', 'completed', 100, { images: [], count: 0, warning: 'Image generation failed' })
       }
 
-      // Step 7: Smart Publishing
-      setCurrentStep(7)
+      // Step 8: Smart Publishing
+      setCurrentStep(8)
       updateStepStatus('publish', 'processing', 25)
       
       // Extract Google Bot optimization data from workflow steps
@@ -514,7 +582,7 @@ export default function EnhancedAISEOEditor() {
       setError(errorMessage)
       
       // Mark current step as error
-      const stepIds = ['generate', 'analyze', 'google-bot', 'regenerate', 'schema', 'images', 'publish']
+      const stepIds = ['generate', 'analyze', 'google-bot', 'regenerate', 'table-generation', 'schema', 'images', 'publish']
       if (currentStep > 0 && currentStep <= stepIds.length) {
         updateStepStatus(stepIds[currentStep - 1], 'error', 0)
       }
