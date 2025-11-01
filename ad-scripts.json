@@ -97,5 +97,41 @@
     "position": "head",
     "createdAt": "2025-10-24T16:49:26.242Z",
     "updatedAt": "2025-10-24T16:49:26.242Z"
+  },
+  {
+    "id": "ad-1761954664618",
+    "name": "montage ventage",
+    "code": "<script>(function(s){s.dataset.zone='10013122',s.src='https://gizokraijaw.net/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>",
+    "active": true,
+    "position": "head",
+    "createdAt": "2025-10-31T23:51:04.631Z",
+    "updatedAt": "2025-10-31T23:51:04.631Z"
+  },
+  {
+    "id": "ad-1761954719417",
+    "name": "montage inpage",
+    "code": "<script>(function(s){s.dataset.zone='10013279',s.src='https://forfrogadiertor.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>",
+    "active": true,
+    "position": "head",
+    "createdAt": "2025-10-31T23:51:59.425Z",
+    "updatedAt": "2025-10-31T23:51:59.425Z"
+  },
+  {
+    "id": "ad-1761955494417",
+    "name": "montage one click",
+    "code": "<script>(function(s){s.dataset.zone='10124718',s.src='https://al5sm.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>",
+    "active": true,
+    "position": "head",
+    "createdAt": "2025-11-01T00:04:54.424Z",
+    "updatedAt": "2025-11-01T00:04:54.424Z"
+  },
+  {
+    "id": "ad-1761955613823",
+    "name": "montage intresteller",
+    "code": "<script>(function(s){s.dataset.zone='10124723',s.src='https://groleegni.net/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>",
+    "active": true,
+    "position": "head",
+    "createdAt": "2025-11-01T00:06:53.832Z",
+    "updatedAt": "2025-11-01T00:06:53.832Z"
   }
 ]
