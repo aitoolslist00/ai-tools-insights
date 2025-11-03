@@ -102,6 +102,10 @@ export default function EnhancedAISEOEditor() {
   const [schemaData, setSchemaData] = useState<SchemaData | null>(null)
   const [publishResult, setPublishResult] = useState<any>(null)
   
+  // New steps data
+  const [entitiesKeywords, setEntitiesKeywords] = useState<any>(null)
+  const [topicalCluster, setTopicalCluster] = useState<any>(null)
+  
   // UI state
   const [activeTab, setActiveTab] = useState('generate')
   const [error, setError] = useState('')
@@ -110,9 +114,23 @@ export default function EnhancedAISEOEditor() {
   // Workflow steps
   const [workflowSteps, setWorkflowSteps] = useState<WorkflowStep[]>([
     {
+      id: 'entities-keywords',
+      title: 'Entities, LSI Keywords, Semantic Keywords',
+      description: 'Extracting top 100 LSI keywords, 100 entity keywords, and 100 semantic keywords using Gemini 2.5 Flash and News API',
+      status: 'pending',
+      progress: 0
+    },
+    {
+      id: 'topical-cluster',
+      title: 'Topical Cluster',
+      description: 'Generating 20 authoritative H2 headings and 40 unique H3 headings covering all aspects of the topic',
+      status: 'pending',
+      progress: 0
+    },
+    {
       id: 'generate',
       title: 'AI Content Generation with Current Events',
-      description: 'Creating ultra-current, SEO-optimized content using Gemini 2.5 Flash with real-time news integration',
+      description: 'Creating ultra-current, SEO-optimized content using Gemini 2.5 Flash with real-time news integration and all extracted keywords/headings',
       status: 'pending',
       progress: 0
     },
@@ -242,8 +260,74 @@ export default function EnhancedAISEOEditor() {
         throw new Error('Authentication required. Please refresh and log in again.')
       }
 
-      // Step 1: Generate Content
+      // Step 1: Entities, LSI Keywords, Semantic Keywords
       setCurrentStep(1)
+      logStepProgress('entities-keywords', 'Starting entities and keywords extraction')
+      updateStepStatus('entities-keywords', 'processing', 10)
+      
+      const entitiesResponse = await fetch('/api/blog/entities-keywords', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          keyword: keyword.trim(),
+          category: category,
+          apiKey: apiKey.trim()
+        })
+      })
+
+      if (!entitiesResponse.ok) {
+        const errorData = await entitiesResponse.json()
+        throw new Error(errorData.error || 'Failed to extract entities and keywords')
+      }
+
+      updateStepStatus('entities-keywords', 'processing', 75)
+      const entitiesData = await entitiesResponse.json()
+      setEntitiesKeywords(entitiesData)
+      logStepProgress('entities-keywords', 'Entities and keywords extraction completed', { 
+        lsiCount: entitiesData.lsiKeywords?.length,
+        entityCount: entitiesData.entityKeywords?.length,
+        semanticCount: entitiesData.semanticKeywords?.length
+      })
+      updateStepStatus('entities-keywords', 'completed', 100, entitiesData)
+
+      // Step 2: Topical Cluster
+      setCurrentStep(2)
+      logStepProgress('topical-cluster', 'Starting topical cluster generation')
+      updateStepStatus('topical-cluster', 'processing', 10)
+      
+      const clusterResponse = await fetch('/api/blog/topical-cluster', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          keyword: keyword.trim(),
+          category: category,
+          apiKey: apiKey.trim(),
+          entitiesKeywords: entitiesData
+        })
+      })
+
+      if (!clusterResponse.ok) {
+        const errorData = await clusterResponse.json()
+        throw new Error(errorData.error || 'Failed to generate topical cluster')
+      }
+
+      updateStepStatus('topical-cluster', 'processing', 75)
+      const clusterData = await clusterResponse.json()
+      setTopicalCluster(clusterData)
+      logStepProgress('topical-cluster', 'Topical cluster generation completed', { 
+        h2Count: clusterData.h2Headings?.length,
+        h3Count: clusterData.h3Headings?.length
+      })
+      updateStepStatus('topical-cluster', 'completed', 100, clusterData)
+
+      // Step 3: Generate Content
+      setCurrentStep(3)
       logStepProgress('generate', 'Starting AI content generation with current events integration')
       updateStepStatus('generate', 'processing', 10)
       
@@ -257,7 +341,9 @@ export default function EnhancedAISEOEditor() {
           keyword: keyword.trim(),
           category: category,
           apiKey: apiKey.trim(),
-          workflow: 'complete'
+          workflow: 'complete',
+          entitiesKeywords: entitiesData,
+          topicalCluster: clusterData
         })
       })
 
@@ -272,8 +358,8 @@ export default function EnhancedAISEOEditor() {
       logStepProgress('generate', 'Content generation completed successfully', { wordCount: contentData.content.wordCount })
       updateStepStatus('generate', 'completed', 100, contentData.content)
 
-      // Step 2: SEO Analysis
-      setCurrentStep(2)
+      // Step 4: SEO Analysis
+      setCurrentStep(4)
       logStepProgress('analyze', 'Starting advanced SEO analysis and optimization')
       updateStepStatus('analyze', 'processing', 15)
       
@@ -298,8 +384,8 @@ export default function EnhancedAISEOEditor() {
       logStepProgress('analyze', 'SEO analysis completed', { score: seoData.analysis.score })
       updateStepStatus('analyze', 'completed', 100, seoData.analysis)
 
-      // Step 3: Google Bot Optimization (NEW - 95%+ Target)
-      setCurrentStep(3)
+      // Step 5: Google Bot Optimization (NEW - 95%+ Target)
+      setCurrentStep(5)
       logStepProgress('google-bot', 'Starting Google Bot readability optimization (95%+ target)')
       updateStepStatus('google-bot', 'processing', 10)
       
@@ -358,8 +444,8 @@ export default function EnhancedAISEOEditor() {
         }
       }
 
-      // Step 4: AI Content Regeneration Based on Google Bot Findings (NEW STEP)
-      setCurrentStep(4)
+      // Step 6: AI Content Regeneration Based on Google Bot Findings (NEW STEP)
+      setCurrentStep(6)
       updateStepStatus('regenerate', 'processing', 25)
       
       console.log('🔄 Starting AI Content Regeneration based on Google Bot findings...')
@@ -433,8 +519,8 @@ export default function EnhancedAISEOEditor() {
         })
       }
 
-      // Step 5: E-E-A-T Compliance Optimization
-      setCurrentStep(5)
+      // Step 7: E-E-A-T Compliance Optimization
+      setCurrentStep(7)
       updateStepStatus('eeat-compliance', 'processing', 10)
       
       console.log('🎯 Starting E-E-A-T Compliance Optimization...')
@@ -509,8 +595,8 @@ export default function EnhancedAISEOEditor() {
         })
       }
 
-      // Step 6: AI Summary & Comparison Table Generation
-      setCurrentStep(6)
+      // Step 8: AI Summary & Comparison Table Generation
+      setCurrentStep(8)
       updateStepStatus('table-generation', 'processing', 10)
       
       console.log('📊 Starting AI Summary & Comparison Table Generation...')
@@ -570,8 +656,8 @@ export default function EnhancedAISEOEditor() {
         })
       }
 
-      // Step 7: Schema Generation
-      setCurrentStep(7)
+      // Step 9: Schema Generation
+      setCurrentStep(9)
       updateStepStatus('schema', 'processing', 25)
       
       const schemaResponse = await fetch('/api/schema-generator', {
@@ -591,8 +677,8 @@ export default function EnhancedAISEOEditor() {
       setSchemaData(schemaDataResult.schemas)
       updateStepStatus('schema', 'completed', 100, schemaDataResult.schemas)
 
-      // Step 8: AI Image Generation
-      setCurrentStep(8)
+      // Step 10: AI Image Generation
+      setCurrentStep(10)
       updateStepStatus('images', 'processing', 25)
       
       // Generate image prompts from content
@@ -629,8 +715,8 @@ export default function EnhancedAISEOEditor() {
         updateStepStatus('images', 'completed', 100, { images: [], count: 0, warning: 'Image generation failed' })
       }
 
-      // Step 9: Smart Publishing
-      setCurrentStep(9)
+      // Step 11: Smart Publishing
+      setCurrentStep(11)
       updateStepStatus('publish', 'processing', 25)
       
       // Extract Google Bot optimization data from workflow steps
@@ -665,7 +751,7 @@ export default function EnhancedAISEOEditor() {
       setError(errorMessage)
       
       // Mark current step as error
-      const stepIds = ['generate', 'analyze', 'google-bot', 'regenerate', 'eeat-compliance', 'table-generation', 'schema', 'images', 'publish']
+      const stepIds = ['entities-keywords', 'topical-cluster', 'generate', 'analyze', 'google-bot', 'regenerate', 'eeat-compliance', 'table-generation', 'schema', 'images', 'publish']
       if (currentStep > 0 && currentStep <= stepIds.length) {
         updateStepStatus(stepIds[currentStep - 1], 'error', 0)
       }

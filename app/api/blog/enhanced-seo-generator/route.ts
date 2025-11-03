@@ -20,6 +20,15 @@ interface ContentGenerationRequest {
   targetAudience?: string
   contentLength?: 'short' | 'medium' | 'long'
   tone?: 'professional' | 'casual' | 'technical' | 'friendly'
+  entitiesKeywords?: {
+    lsiKeywords: string[]
+    entityKeywords: string[]
+    semanticKeywords: string[]
+  }
+  topicalCluster?: {
+    h2Headings: string[]
+    h3Headings: string[]
+  }
 }
 
 interface GeneratedContent {
@@ -76,7 +85,9 @@ export async function POST(request: NextRequest) {
       additionalContext,
       targetAudience,
       contentLength,
-      tone
+      tone,
+      entitiesKeywords: body.entitiesKeywords,
+      topicalCluster: body.topicalCluster
     })
 
     // Generate images automatically if imagePrompts are available
@@ -176,8 +187,17 @@ async function generateEnhancedSEOContent(params: {
   targetAudience?: string
   contentLength: 'short' | 'medium' | 'long'
   tone: 'professional' | 'casual' | 'technical' | 'friendly'
+  entitiesKeywords?: {
+    lsiKeywords: string[]
+    entityKeywords: string[]
+    semanticKeywords: string[]
+  }
+  topicalCluster?: {
+    h2Headings: string[]
+    h3Headings: string[]
+  }
 }): Promise<GeneratedContent> {
-  const { keyword, category, apiKey, additionalContext, targetAudience, contentLength, tone } = params
+  const { keyword, category, apiKey, additionalContext, targetAudience, contentLength, tone, entitiesKeywords, topicalCluster } = params
 
   // Determine content specifications based on length
   const contentSpecs = {
@@ -205,6 +225,31 @@ async function generateEnhancedSEOContent(params: {
     console.log(`⚠️ No news data available - Using AI training data only`)
   }
 
+  // Prepare entities and keywords context
+  let entitiesContext = ''
+  if (entitiesKeywords) {
+    entitiesContext = `
+EXTRACTED KEYWORDS FOR COMPREHENSIVE COVERAGE:
+LSI Keywords (use naturally throughout): ${entitiesKeywords.lsiKeywords?.slice(0, 50).join(', ')}
+Entity Keywords (mention relevant ones): ${entitiesKeywords.entityKeywords?.slice(0, 30).join(', ')}
+Semantic Keywords (incorporate contextually): ${entitiesKeywords.semanticKeywords?.slice(0, 30).join(', ')}
+
+IMPORTANT: Use these keywords naturally throughout the content. Do NOT stuff keywords. Integrate them contextually where they make sense.
+`
+  }
+
+  // Prepare topical cluster context
+  let topicalContext = ''
+  if (topicalCluster) {
+    topicalContext = `
+REQUIRED ARTICLE STRUCTURE (USE ALL HEADINGS):
+H2 Headings (must include all 20): ${topicalCluster.h2Headings?.join(' | ')}
+H3 Headings (distribute under H2s): ${topicalCluster.h3Headings?.join(' | ')}
+
+CRITICAL: Your article MUST include ALL the H2 and H3 headings provided above. Structure the content to cover every heading comprehensively. Each heading should have substantial content (200-400 words per section).
+`
+  }
+
   // 🔥 MODERN SEO PROMPT - 2024-2025 APPROACH
   // Replaces old keyword-stuffing approach with user-intent focused strategy
   // This fixes Issue #1: Keyword Stuffing that causes Google penalties
@@ -214,7 +259,7 @@ async function generateEnhancedSEOContent(params: {
     contentLength,
     tone: tone || 'professional',
     targetAudience: targetAudience || 'professionals and enthusiasts interested in AI tools',
-    additionalContext: additionalContext || 'Focus on practical applications and current trends',
+    additionalContext: `${additionalContext || 'Focus on practical applications and current trends'}${entitiesContext}${topicalContext}`,
     newsContext
   })
 
