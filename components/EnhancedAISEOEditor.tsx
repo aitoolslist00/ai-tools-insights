@@ -138,6 +138,13 @@ export default function EnhancedAISEOEditor() {
       progress: 0
     },
     {
+      id: 'eeat-compliance',
+      title: 'E-E-A-T Compliance Optimization',
+      description: 'Ensuring full Experience, Expertise, Authoritativeness, and Trustworthiness compliance using Gemini 2.5 Flash and NewsAPI',
+      status: 'pending',
+      progress: 0
+    },
+    {
       id: 'table-generation',
       title: 'AI Summary & Comparison Table Generation',
       description: 'Creating intelligent summary and comparison tables using Gemini AI and inserting them into article content',
@@ -426,8 +433,84 @@ export default function EnhancedAISEOEditor() {
         })
       }
 
-      // Step 5: AI Summary & Comparison Table Generation
+      // Step 5: E-E-A-T Compliance Optimization
       setCurrentStep(5)
+      updateStepStatus('eeat-compliance', 'processing', 10)
+      
+      console.log('🎯 Starting E-E-A-T Compliance Optimization...')
+      
+      try {
+        const eeatResponse = await fetch('/api/blog/eeat-compliance', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            content: {
+              title: contentData.content.title,
+              content: contentData.content.content,
+              metaDescription: contentData.content.metaDescription,
+              excerpt: contentData.content.excerpt,
+              keywords: contentData.content.keywords,
+              slug: contentData.content.slug
+            },
+            primaryKeyword: keyword.trim(),
+            category: category,
+            apiKey: apiKey.trim(),
+            seoAnalysis: seoData.analysis,
+            googleBotAnalysis: workflowSteps.find(step => step.id === 'google-bot')?.result
+          })
+        })
+
+        if (eeatResponse.ok) {
+          const eeatData = await eeatResponse.json()
+          
+          if (eeatData.success && eeatData.optimizedContent) {
+            console.log('✅ E-E-A-T compliance optimization completed successfully')
+            
+            // Update content with E-E-A-T optimized version
+            contentData.content = {
+              ...contentData.content,
+              ...eeatData.optimizedContent
+            }
+            
+            setGeneratedContent(contentData.content)
+            
+            updateStepStatus('eeat-compliance', 'completed', 100, {
+              success: true,
+              eeatScore: eeatData.eeatScore,
+              improvements: eeatData.improvements,
+              complianceAreas: eeatData.complianceAreas,
+              authoritativeSources: eeatData.authoritativeSources,
+              expertiseIndicators: eeatData.expertiseIndicators,
+              trustworthinessSignals: eeatData.trustworthinessSignals,
+              experienceElements: eeatData.experienceElements
+            })
+          } else {
+            console.log('⚠️ E-E-A-T compliance optimization completed with warnings')
+            updateStepStatus('eeat-compliance', 'completed', 100, {
+              warning: 'E-E-A-T optimization skipped',
+              reason: eeatData.reason || 'Content already meets E-E-A-T standards'
+            })
+          }
+        } else {
+          console.error('E-E-A-T compliance optimization failed, continuing with current content')
+          updateStepStatus('eeat-compliance', 'completed', 100, {
+            warning: 'E-E-A-T optimization failed',
+            error: 'API error'
+          })
+        }
+      } catch (eeatError) {
+        console.error('E-E-A-T compliance error:', eeatError)
+        updateStepStatus('eeat-compliance', 'completed', 100, {
+          warning: 'E-E-A-T optimization failed',
+          error: eeatError instanceof Error ? eeatError.message : 'Unknown error'
+        })
+      }
+
+      // Step 6: AI Summary & Comparison Table Generation
+      setCurrentStep(6)
       updateStepStatus('table-generation', 'processing', 10)
       
       console.log('📊 Starting AI Summary & Comparison Table Generation...')
@@ -487,8 +570,8 @@ export default function EnhancedAISEOEditor() {
         })
       }
 
-      // Step 6: Schema Generation
-      setCurrentStep(6)
+      // Step 7: Schema Generation
+      setCurrentStep(7)
       updateStepStatus('schema', 'processing', 25)
       
       const schemaResponse = await fetch('/api/schema-generator', {
@@ -508,8 +591,8 @@ export default function EnhancedAISEOEditor() {
       setSchemaData(schemaDataResult.schemas)
       updateStepStatus('schema', 'completed', 100, schemaDataResult.schemas)
 
-      // Step 7: AI Image Generation
-      setCurrentStep(7)
+      // Step 8: AI Image Generation
+      setCurrentStep(8)
       updateStepStatus('images', 'processing', 25)
       
       // Generate image prompts from content
@@ -546,8 +629,8 @@ export default function EnhancedAISEOEditor() {
         updateStepStatus('images', 'completed', 100, { images: [], count: 0, warning: 'Image generation failed' })
       }
 
-      // Step 8: Smart Publishing
-      setCurrentStep(8)
+      // Step 9: Smart Publishing
+      setCurrentStep(9)
       updateStepStatus('publish', 'processing', 25)
       
       // Extract Google Bot optimization data from workflow steps
@@ -582,7 +665,7 @@ export default function EnhancedAISEOEditor() {
       setError(errorMessage)
       
       // Mark current step as error
-      const stepIds = ['generate', 'analyze', 'google-bot', 'regenerate', 'table-generation', 'schema', 'images', 'publish']
+      const stepIds = ['generate', 'analyze', 'google-bot', 'regenerate', 'eeat-compliance', 'table-generation', 'schema', 'images', 'publish']
       if (currentStep > 0 && currentStep <= stepIds.length) {
         updateStepStatus(stepIds[currentStep - 1], 'error', 0)
       }
