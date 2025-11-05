@@ -266,14 +266,16 @@ export default function AIContentOptimizer({
           section.setAttribute('data-ai-topic', extractTopicFromContent(section, keywords))
         })
 
-        // Add content relationship markers
-        const links = document.querySelectorAll('a[href^="/"]')
-        links.forEach(link => {
-          link.setAttribute('data-ai-relation', 'internal-link')
-          if (keywords.some(keyword => link.textContent?.toLowerCase().includes(keyword.toLowerCase()))) {
-            link.setAttribute('data-ai-relevance', 'high')
-          }
-        })
+        // Add content relationship markers (after hydration to prevent mismatch)
+        setTimeout(() => {
+          const links = document.querySelectorAll('a[href^="/"]')
+          links.forEach(link => {
+            link.setAttribute('data-ai-relation', 'internal-link')
+            if (keywords.some(keyword => link.textContent?.toLowerCase().includes(keyword.toLowerCase()))) {
+              link.setAttribute('data-ai-relevance', 'high')
+            }
+          })
+        }, 1000)
       }
 
       addPageStructuredData()

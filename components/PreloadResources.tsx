@@ -42,14 +42,7 @@ export default function PreloadResources() {
     ]
 
     criticalPages.forEach(page => {
-      // Use preload for immediate pages (higher priority than prefetch)
-      const preloadLink = document.createElement('link')
-      preloadLink.rel = 'preload'
-      preloadLink.as = 'document'
-      preloadLink.href = page
-      document.head.appendChild(preloadLink)
-      
-      // Also add prefetch as fallback
+      // Use prefetch for pages (preload with 'document' is not supported)
       const prefetchLink = document.createElement('link')
       prefetchLink.rel = 'prefetch'
       prefetchLink.href = page

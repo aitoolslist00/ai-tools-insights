@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Display Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .image-test { margin: 20px 0; padding: 20px; border: 1px solid #ccc; }
+        img { max-width: 100%; height: auto; }
+        .error { color: red; }
+        .success { color: green; }
+    </style>
+</head>
+<body>
+    <h1>Image Display Test</h1>
+    
+    <div class="image-test">
+        <h2>Test 1: Direct Image Path</h2>
+        <img src="/generated-images/ai-tools-2025-trends-1760656193801.jpg" 
+             alt="AI Tools 2025 Trends" 
+             onload="document.getElementById('test1').innerHTML = 'SUCCESS: Image loaded'"
+             onerror="document.getElementById('test1').innerHTML = 'ERROR: Image failed to load'">
+        <p id="test1">Loading...</p>
+    </div>
+
+    <div class="image-test">
+        <h2>Test 2: Another Generated Image</h2>
+        <img src="/generated-images/ai-tools-2025-trends-1759413525494.jpg" 
+             alt="AI Tools 2025 Trends Alternative" 
+             onload="document.getElementById('test2').innerHTML = 'SUCCESS: Image loaded'"
+             onerror="document.getElementById('test2').innerHTML = 'ERROR: Image failed to load'">
+        <p id="test2">Loading...</p>
+    </div>
+
+    <div class="image-test">
+        <h2>Test 3: Check if images directory is accessible</h2>
+        <img src="/generated-images/ai-agents-1759416364639.jpg" 
+             alt="AI Agents" 
+             onload="document.getElementById('test3').innerHTML = 'SUCCESS: Image loaded'"
+             onerror="document.getElementById('test3').innerHTML = 'ERROR: Image failed to load'">
+        <p id="test3">Loading...</p>
+    </div>
+
+    <script>
+        // Test if we can fetch the image directly
+        fetch('/generated-images/ai-tools-2025-trends-1760656193801.jpg')
+            .then(response => {
+                if (response.ok) {
+                    document.getElementById('fetch-test').innerHTML = 'SUCCESS: Image is accessible via fetch';
+                } else {
+                    document.getElementById('fetch-test').innerHTML = 'ERROR: Image not accessible via fetch - Status: ' + response.status;
+                }
+            })
+            .catch(error => {
+                document.getElementById('fetch-test').innerHTML = 'ERROR: Fetch failed - ' + error.message;
+            });
+    </script>
+    
+    <div class="image-test">
+        <h2>Test 4: Fetch Test</h2>
+        <p id="fetch-test">Testing fetch...</p>
+    </div>
+</body>
+</html>

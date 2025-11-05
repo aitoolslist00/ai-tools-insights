@@ -22,7 +22,8 @@ export async function POST(request: NextRequest) {
       // New parameters for workflow-based generation
       prompts,
       articleTitle,
-      style = 'tech'
+      style = 'tech',
+      unsplashApiKey
     } = await request.json();
     
     // Handle workflow-based generation (when called from EnhancedAISEOEditor)
@@ -31,7 +32,8 @@ export async function POST(request: NextRequest) {
         prompts,
         articleTitle,
         keywords: keywords || [],
-        style
+        style,
+        unsplashApiKey
       });
     }
     
@@ -212,15 +214,17 @@ async function handleWorkflowImageGeneration({
   prompts,
   articleTitle,
   keywords,
-  style
+  style,
+  unsplashApiKey
 }: {
   prompts: string[];
   articleTitle: string;
   keywords: string[];
   style: string;
+  unsplashApiKey?: string;
 }) {
   try {
-    const realImageGenerator = new RealImageGenerator();
+    const realImageGenerator = new RealImageGenerator(unsplashApiKey);
     const generatedImages = [];
 
     // Generate images based on the provided prompts

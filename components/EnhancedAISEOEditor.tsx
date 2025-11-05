@@ -87,12 +87,87 @@ const BLOG_CATEGORIES = [
   { value: 'development', label: 'Development' }
 ]
 
+/**
+ * Fallback image generation with simpler prompts and multiple retry strategies
+ */
+async function tryFallbackImageGeneration(title: string, keywords: string[], token: string, unsplashApiKey: string): Promise<any[]> {
+  const fallbackStrategies = [
+    // Strategy 1: Use basic keywords
+    {
+      prompts: [
+        `${keywords[0] || title}`,
+        `${keywords[1] || 'technology'}`,
+        `${keywords[2] || 'business'}`
+      ],
+      style: 'corporate'
+    },
+    // Strategy 2: Use generic tech terms
+    {
+      prompts: [
+        'technology',
+        'business',
+        'digital innovation'
+      ],
+      style: 'tech'
+    },
+    // Strategy 3: Use very basic terms
+    {
+      prompts: [
+        'computer',
+        'office',
+        'modern'
+      ],
+      style: 'minimalist'
+    }
+  ]
+
+  for (const strategy of fallbackStrategies) {
+    try {
+      console.log(`Trying fallback strategy with prompts:`, strategy.prompts)
+      
+      const response = await fetch('/api/generate-images', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          prompts: strategy.prompts,
+          articleTitle: title,
+          keywords: keywords,
+          style: strategy.style,
+          unsplashApiKey: unsplashApiKey
+        })
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        const images = data.images || []
+        
+        if (images.length > 0) {
+          console.log(`Fallback strategy succeeded with ${images.length} images`)
+          return images
+        }
+      } else {
+        console.warn(`Fallback strategy failed:`, response.status, await response.text())
+      }
+    } catch (error) {
+      console.warn(`Fallback strategy error:`, error)
+    }
+  }
+
+  console.error('All fallback image generation strategies failed')
+  return []
+}
+
 export default function EnhancedAISEOEditor() {
   // Core state
   const [keyword, setKeyword] = useState('')
   const [category, setCategory] = useState('ai-tools')
   const [apiKey, setApiKey] = useState('')
+  const [unsplashApiKey, setUnsplashApiKey] = useState('')
   const [showApiKey, setShowApiKey] = useState(false)
+  const [showUnsplashApiKey, setShowUnsplashApiKey] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
   const [currentStep, setCurrentStep] = useState(0)
   
@@ -192,11 +267,15 @@ export default function EnhancedAISEOEditor() {
     }
   ])
 
-  // Auto-save API key to localStorage
+  // Auto-save API keys to localStorage
   useEffect(() => {
     const savedApiKey = localStorage.getItem('gemini-api-key')
+    const savedUnsplashApiKey = localStorage.getItem('unsplash-api-key')
     if (savedApiKey) {
       setApiKey(savedApiKey)
+    }
+    if (savedUnsplashApiKey) {
+      setUnsplashApiKey(savedUnsplashApiKey)
     }
   }, [])
 
@@ -205,6 +284,12 @@ export default function EnhancedAISEOEditor() {
       localStorage.setItem('gemini-api-key', apiKey)
     }
   }, [apiKey])
+
+  useEffect(() => {
+    if (unsplashApiKey) {
+      localStorage.setItem('unsplash-api-key', unsplashApiKey)
+    }
+  }, [unsplashApiKey])
 
   // Enhanced validation functions
   const validateKeyword = (keyword: string): { isValid: boolean; message?: string } => {
@@ -218,6 +303,12 @@ export default function EnhancedAISEOEditor() {
     if (!apiKey.trim()) return { isValid: false, message: 'API key is required' }
     if (!apiKey.startsWith('AIza')) return { isValid: false, message: 'Invalid Gemini API key format' }
     if (apiKey.length < 30) return { isValid: false, message: 'API key appears to be incomplete' }
+    return { isValid: true }
+  }
+
+  const validateUnsplashApiKey = (apiKey: string): { isValid: boolean; message?: string } => {
+    if (!apiKey.trim()) return { isValid: false, message: 'Unsplash API key is required' }
+    if (apiKey.length < 20) return { isValid: false, message: 'Unsplash API key appears to be incomplete' }
     return { isValid: true }
   }
 
@@ -244,6 +335,12 @@ export default function EnhancedAISEOEditor() {
     const apiKeyValidation = validateApiKey(apiKey)
     if (!apiKeyValidation.isValid) {
       setError(apiKeyValidation.message || 'Invalid API key')
+      return
+    }
+
+    const unsplashApiKeyValidation = validateUnsplashApiKey(unsplashApiKey)
+    if (!unsplashApiKeyValidation.isValid) {
+      setError(unsplashApiKeyValidation.message || 'Invalid Unsplash API key')
       return
     }
 
@@ -677,42 +774,105 @@ export default function EnhancedAISEOEditor() {
       setSchemaData(schemaDataResult.schemas)
       updateStepStatus('schema', 'completed', 100, schemaDataResult.schemas)
 
-      // Step 10: AI Image Generation
+      // Step 10: AI Image Generation (Enhanced Integration)
       setCurrentStep(10)
       updateStepStatus('images', 'processing', 25)
       
-      // Generate image prompts from content
-      const imagePrompts = [
-        `Professional tech illustration for "${contentData.content.title}" featuring ${contentData.content.keywords.slice(0, 3).join(', ')}, modern digital design, clean and minimalist style`,
-        `Conceptual illustration showing ${contentData.content.keywords[0]} technology, abstract tech elements, blue and purple gradient background`,
-        `Visual representation of ${contentData.content.excerpt.slice(0, 100)}, modern tech aesthetic, professional design`
-      ]
-
-      const imageResponse = await fetch('/api/generate-images', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          prompts: imagePrompts,
-          articleTitle: contentData.content.title,
-          keywords: contentData.content.keywords,
-          style: 'tech'
-        })
-      })
-
+      // Check if images are already integrated in content from enhanced-seo-generator
+      const hasImagesInContent = contentData.content.content.includes('<img') || contentData.content.content.includes('<picture')
+      const hasImageMetadata = contentData.content.images && contentData.content.images.length > 0
+      
       let generatedImages = []
-      console.log('Image generation response status:', imageResponse.status)
-      if (imageResponse.ok) {
-        const imageData = await imageResponse.json()
-        console.log('Image generation response data:', imageData)
-        generatedImages = imageData.images || []
-        updateStepStatus('images', 'completed', 100, { images: generatedImages, count: generatedImages.length })
+      
+      if (hasImagesInContent && hasImageMetadata) {
+        // Images already integrated from enhanced-seo-generator
+        console.log('✅ Images already integrated in content from enhanced-seo-generator')
+        generatedImages = contentData.content.images
+        updateStepStatus('images', 'completed', 100, { 
+          images: generatedImages, 
+          count: generatedImages.length,
+          source: 'enhanced-seo-generator'
+        })
       } else {
-        const errorText = await imageResponse.text()
-        console.error('Image generation failed:', imageResponse.status, errorText)
-        updateStepStatus('images', 'completed', 100, { images: [], count: 0, warning: 'Image generation failed' })
+        // Generate images using fallback method and integrate them
+        console.log('🔄 Generating and integrating images using fallback method...')
+        
+        const imagePrompts = [
+          `Professional tech illustration for "${contentData.content.title}" featuring ${contentData.content.keywords.slice(0, 3).join(', ')}, modern digital design, clean and minimalist style`,
+          `Conceptual illustration showing ${contentData.content.keywords[0]} technology, abstract tech elements, blue and purple gradient background`,
+          `Visual representation of ${contentData.content.excerpt.slice(0, 100)}, modern tech aesthetic, professional design`
+        ]
+
+        const imageResponse = await fetch('/api/generate-images', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            prompts: imagePrompts,
+            articleTitle: contentData.content.title,
+            keywords: contentData.content.keywords,
+            style: 'tech',
+            unsplashApiKey: unsplashApiKey.trim()
+          })
+        })
+
+        console.log('Image generation response status:', imageResponse.status)
+        
+        if (imageResponse.ok) {
+          const imageData = await imageResponse.json()
+          console.log('Image generation response data:', imageData)
+          generatedImages = imageData.images || []
+          
+          if (generatedImages.length > 0) {
+            // Integrate images into content using ContentImageOptimizer
+            try {
+              const optimizeResponse = await fetch('/api/blog/optimize-content-images', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                  content: contentData.content.content,
+                  images: generatedImages,
+                  title: contentData.content.title
+                })
+              })
+              
+              if (optimizeResponse.ok) {
+                const optimizedData = await optimizeResponse.json()
+                contentData.content.content = optimizedData.optimizedContent
+                console.log('✅ Successfully integrated images into content')
+              }
+            } catch (optimizeError) {
+              console.warn('Content optimization failed, images generated but not integrated:', optimizeError)
+            }
+            
+            updateStepStatus('images', 'completed', 100, { images: generatedImages, count: generatedImages.length })
+          } else {
+            // Try fallback image generation with simpler prompts
+            console.log('No images generated, trying fallback approach...')
+            updateStepStatus('images', 'processing', 50, 'Trying fallback image generation...')
+            generatedImages = await tryFallbackImageGeneration(contentData.content.title, contentData.content.keywords, token, unsplashApiKey.trim())
+            updateStepStatus('images', 'completed', 100, { images: generatedImages, count: generatedImages.length })
+          }
+        } else {
+          const errorText = await imageResponse.text()
+          console.error('Image generation failed:', imageResponse.status, errorText)
+          
+          // Try fallback image generation
+          console.log('Primary image generation failed, trying fallback approach...')
+          updateStepStatus('images', 'processing', 50, 'Trying fallback image generation...')
+          generatedImages = await tryFallbackImageGeneration(contentData.content.title, contentData.content.keywords, token, unsplashApiKey.trim())
+          
+          if (generatedImages.length > 0) {
+            updateStepStatus('images', 'completed', 100, { images: generatedImages, count: generatedImages.length })
+          } else {
+            updateStepStatus('images', 'completed', 100, { images: [], count: 0, warning: 'Image generation failed - please check Unsplash API configuration' })
+          }
+        }
       }
 
       // Step 11: Smart Publishing
@@ -930,6 +1090,45 @@ export default function EnhancedAISEOEditor() {
                   </a>
                 </p>
               </div>
+
+              {/* Unsplash API Key */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <Globe className="h-4 w-4 inline mr-1" />
+                  Unsplash API Key
+                </label>
+                <div className="relative">
+                  <input
+                    type={showUnsplashApiKey ? 'text' : 'password'}
+                    value={unsplashApiKey}
+                    onChange={(e) => setUnsplashApiKey(e.target.value)}
+                    placeholder="Enter your Unsplash API key"
+                    className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowUnsplashApiKey(!showUnsplashApiKey)}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  >
+                    {showUnsplashApiKey ? (
+                      <EyeOff className="h-5 w-5 text-gray-400" />
+                    ) : (
+                      <Eye className="h-5 w-5 text-gray-400" />
+                    )}
+                  </button>
+                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  Get your API key from{' '}
+                  <a 
+                    href="https://unsplash.com/developers" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-purple-600 hover:text-purple-700"
+                  >
+                    Unsplash Developers
+                  </a>
+                </p>
+              </div>
             </div>
 
             {/* Error Display */}
@@ -968,7 +1167,7 @@ export default function EnhancedAISEOEditor() {
             <div className="text-center">
               <button
                 onClick={runCompleteWorkflow}
-                disabled={isProcessing || !keyword.trim() || !category.trim() || !apiKey.trim()}
+                disabled={isProcessing || !keyword.trim() || !category.trim() || !apiKey.trim() || !unsplashApiKey.trim()}
                 className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
               >
                 {isProcessing ? (

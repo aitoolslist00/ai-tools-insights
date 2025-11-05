@@ -111,10 +111,23 @@ export default function ModernArticlePage({
       })
     } else {
       // Use HTML headers
+      const usedIds = new Set<string>()
       headers.forEach((header, index) => {
         if (!header.id) {
-          const id = header.textContent?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || `section-${index}`
+          let baseId = header.textContent?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || `section-${index}`
+          let id = baseId
+          let counter = 1
+          
+          // Ensure unique ID
+          while (usedIds.has(id)) {
+            id = `${baseId}-${counter}`
+            counter++
+          }
+          
+          usedIds.add(id)
           header.id = id
+        } else {
+          usedIds.add(header.id)
         }
         
         tocItems.push({
@@ -328,35 +341,69 @@ export default function ModernArticlePage({
 
           {/* Featured Image */}
           {post.image && !post.image.includes('placeholder') ? (
-            <div className="mb-16 group">
+            <div className="mb-16 group" style={{background: '#e7f3ff', padding: '20px', border: '3px solid #0066cc', borderRadius: '10px'}}>
+              <p style={{color: '#0066cc', fontWeight: 'bold', marginBottom: '10px', textAlign: 'center'}}>FEATURED IMAGE SECTION</p>
+              <p style={{color: '#666', fontSize: '14px', textAlign: 'center', marginBottom: '15px'}}>Image URL: {post.image}</p>
               <div className="relative overflow-hidden rounded-2xl shadow-2xl">
-                <Image
-                  src={post.image}
-                  alt={post.images && post.images.length > 0 ? post.images[0].alt : post.title}
-                  width={1200}
-                  height={675}
-                  className="w-full h-64 md:h-96 lg:h-[28rem] object-cover transition-transform duration-700 group-hover:scale-105"
-                  priority
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.style.display = 'none';
-                    const parent = target.parentElement?.parentElement;
-                    if (parent) {
-                      parent.innerHTML = `
-                        <div class="bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 h-64 md:h-96 lg:h-[28rem] rounded-2xl flex items-center justify-center">
-                          <div class="text-center text-white p-8">
-                            <svg class="w-24 h-24 mx-auto mb-4 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
-                            </svg>
-                            <h3 class="text-2xl font-bold mb-2">${post.title.replace(/^#+\s*/, '').substring(0, 60)}</h3>
-                            <p class="text-sm opacity-90">${post.category}</p>
+                {/* Use regular img tag for local generated images to avoid Next.js Image optimization issues */}
+                {post.image.startsWith('/generated-images/') ? (
+                  <img
+                    src={post.image}
+                    alt={post.images && post.images.length > 0 ? post.images[0].alt : post.title}
+                    className="w-full h-64 md:h-96 lg:h-[28rem] object-cover transition-transform duration-700 group-hover:scale-105"
+                    loading="eager"
+                    style={{ display: 'block !important', border: '4px solid #00cc66' }}
+                    onError={(e) => {
+                      console.error('Featured image failed to load:', post.image);
+                      const target = e.target as HTMLImageElement;
+                      target.style.border = '4px solid red';
+                      target.alt = 'FEATURED IMAGE FAILED TO LOAD: ' + post.image;
+                      const parent = target.parentElement?.parentElement;
+                      if (parent) {
+                        parent.innerHTML = `
+                          <div class="bg-gradient-to-br from-red-500 via-orange-500 to-yellow-500 h-64 md:h-96 lg:h-[28rem] rounded-2xl flex items-center justify-center" style="border: 4px solid red;">
+                            <div class="text-center text-white p-8">
+                              <h3 class="text-2xl font-bold mb-2">FEATURED IMAGE FAILED TO LOAD</h3>
+                              <p class="text-sm opacity-90">URL: ${post.image}</p>
+                              <p class="text-sm opacity-90">Category: ${post.category}</p>
+                            </div>
                           </div>
-                        </div>
-                      `;
-                    }
-                  }}
-                />
+                        `;
+                      }
+                    }}
+                  />
+                ) : (
+                  <Image
+                    src={post.image}
+                    alt={post.images && post.images.length > 0 ? post.images[0].alt : post.title}
+                    width={1200}
+                    height={675}
+                    className="w-full h-64 md:h-96 lg:h-[28rem] object-cover transition-transform duration-700 group-hover:scale-105"
+                    priority
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw"
+                    style={{ border: '4px solid #ff6600' }}
+                    onError={(e) => {
+                      console.error('Next.js Image failed to load:', post.image);
+                      const target = e.target as HTMLImageElement;
+                      target.style.border = '4px solid red';
+                      target.alt = 'NEXT.JS IMAGE FAILED TO LOAD: ' + post.image;
+                      const parent = target.parentElement?.parentElement;
+                      if (parent) {
+                        parent.innerHTML = `
+                          <div class="bg-gradient-to-br from-red-500 via-purple-500 to-pink-500 h-64 md:h-96 lg:h-[28rem] rounded-2xl flex items-center justify-center" style="border: 4px solid red;">
+                            <div class="text-center text-white p-8">
+                              <svg class="w-24 h-24 mx-auto mb-4 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                              </svg>
+                              <h3 class="text-2xl font-bold mb-2">${post.title.replace(/^#+\s*/, '').substring(0, 60)}</h3>
+                              <p class="text-sm opacity-90">${post.category}</p>
+                            </div>
+                          </div>
+                        `;
+                      }
+                    }}
+                  />
+                )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               </div>
             </div>
@@ -379,7 +426,7 @@ export default function ModernArticlePage({
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="flex flex-col lg:flex-row gap-16">
           {/* Table of Contents Sidebar */}
           {tableOfContents.length > 0 && (
@@ -404,9 +451,9 @@ export default function ModernArticlePage({
                         exit={{ height: 0, opacity: 0 }}
                         className="space-y-2 overflow-hidden"
                       >
-                        {tableOfContents.map((item) => (
+                        {tableOfContents.map((item, index) => (
                           <a
-                            key={item.id}
+                            key={`${item.id}-${index}`}
                             href={`#${item.id}`}
                             onClick={(e) => scrollToSection(item.id, e)}
                             className={`block py-2 px-3 rounded-lg text-sm transition-all duration-200 ${
@@ -432,8 +479,8 @@ export default function ModernArticlePage({
           )}
 
           {/* Main Content */}
-          <div className="flex-1 max-w-none">
-            <article ref={contentRef} className="prose prose-lg max-w-none">
+          <div className="flex-1 min-w-0">
+            <article ref={contentRef} className="prose prose-lg prose-blue max-w-4xl mx-auto">
               {/* Article Content */}
               <div 
                 className="article-content"

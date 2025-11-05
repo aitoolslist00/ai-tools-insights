@@ -114,7 +114,9 @@ a {
 /* Enhanced typography and reading experience */
 .prose {
   color: #374151;
-  max-width: none;
+  max-width: 65ch; /* Optimal reading width for better readability */
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .prose h1, .prose h2, .prose h3, .prose h4 {

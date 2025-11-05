@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Images</title>
+</head>
+<body>
+    <h1>Testing Image Display</h1>
+    
+    <h2>Test 1: Direct image path</h2>
+    <img src="/generated-images/ai-tools-2025-trends-1760656193801.jpg" alt="Test Image 1" style="max-width: 300px;" onerror="this.style.border='2px solid red'; this.alt='IMAGE NOT FOUND';">
+    
+    <h2>Test 2: Another image from the directory</h2>
+    <img src="/generated-images/ai-tools-1759849301170.jpg" alt="Test Image 2" style="max-width: 300px;" onerror="this.style.border='2px solid red'; this.alt='IMAGE NOT FOUND';">
+    
+    <h2>Test 3: Check if directory is accessible</h2>
+    <img src="/generated-images/ai-agents-1759416364639.jpg" alt="Test Image 3" style="max-width: 300px;" onerror="this.style.border='2px solid red'; this.alt='IMAGE NOT FOUND';">
+    
+    <script>
+        // Log image load events
+        document.querySelectorAll('img').forEach((img, index) => {
+            img.onload = () => console.log(`Image ${index + 1} loaded successfully: ${img.src}`);
+            img.onerror = () => console.log(`Image ${index + 1} failed to load: ${img.src}`);
+        });
+    </script>
+</body>
+</html>

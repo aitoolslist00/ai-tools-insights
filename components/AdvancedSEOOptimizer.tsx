@@ -186,8 +186,11 @@ export default function AdvancedSEOOptimizer() {
     // Advanced font loading optimization
     if ('fonts' in document) {
       document.fonts.ready.then(() => {
-        document.body.classList.add('fonts-loaded')
-        reportMetric('FontsLoaded', performance.now())
+        // Use a more hydration-safe approach
+        requestAnimationFrame(() => {
+          document.body.classList.add('fonts-loaded')
+          reportMetric('FontsLoaded', performance.now())
+        })
       })
     }
   }

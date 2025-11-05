@@ -96,54 +96,85 @@ function injectImagesIntoContent(html: string, post: BlogPost): string {
   
   if (validImages.length === 0) return html;
   
-  // Split content into sections (by h2 headers)
-  const sections = html.split(/(<h2[^>]*>.*?<\/h2>)/gi);
-  
-  let imageIndex = 0;
+  // CRITICAL FIX: Always inject the featured image at the very beginning
+  // This ensures images appear regardless of content structure
   let result = '';
+  let imageIndex = 0;
   
+  if (validImages.length > 0) {
+    const featuredImage = validImages[0];
+    const featuredImageHtml = `<div class="my-8 text-center featured-image-container" style="background: #f0f0f0; padding: 20px; border: 2px solid #007bff; margin: 20px 0;">
+        <p style="color: #007bff; font-weight: bold; margin-bottom: 10px;">Featured Image:</p>
+        <img 
+          src="${featuredImage.url}" 
+          alt="${featuredImage.alt || post.title}" 
+          class="w-full max-w-4xl mx-auto h-auto rounded-xl shadow-lg"
+          loading="eager"
+          width="${featuredImage.width || 1200}"
+          height="${featuredImage.height || 675}"
+          style="display: block !important; margin: 0 auto; max-width: 100%; height: auto; border: 3px solid #28a745;"
+          onerror="console.error('Image failed to load:', this.src); this.style.border='3px solid red'; this.alt='IMAGE FAILED TO LOAD: ' + this.src;"
+        />
+        ${featuredImage.alt ? `<p class="text-sm text-gray-600 mt-2 italic">${featuredImage.alt}</p>` : ''}
+        <p style="color: #666; font-size: 12px; margin-top: 10px;">Image URL: ${featuredImage.url}</p>
+      </div>`;
+    result += featuredImageHtml;
+    imageIndex++;
+  }
+  
+  // Split content into sections (by h2 headers or paragraphs)
+  const sections = html.split(/(<h2[^>]*>.*?<\/h2>|<p[^>]*>.*?<\/p>)/gi);
+  
+  let sectionCount = 0;
   for (let i = 0; i < sections.length; i++) {
     result += sections[i];
     
-    // After every h2 section (except the last one), try to insert an image
-    if (i > 0 && i % 2 === 1 && imageIndex < validImages.length) {
-      const image = validImages[imageIndex];
-      const imageHtml = `
-        <div class="my-8 text-center">
-          <img 
-            src="${image.url}" 
-            alt="${image.alt}" 
-            class="w-full max-w-4xl mx-auto h-auto rounded-xl shadow-lg"
-            loading="lazy"
-            width="${image.width}"
-            height="${image.height}"
-            onerror="this.parentElement.style.display='none'"
-          />
-          ${image.alt ? `<p class="text-sm text-gray-600 mt-2 italic">${image.alt}</p>` : ''}
-        </div>
-      `;
-      result += imageHtml;
-      imageIndex++;
+    // After every 3rd section (h2 or paragraph), try to insert an image
+    if (sections[i].match(/<(h2|p)[^>]*>/i)) {
+      sectionCount++;
+      if (sectionCount % 3 === 0 && imageIndex < validImages.length) {
+        const image = validImages[imageIndex];
+        const imageHtml = `
+          <div class="my-8 text-center" style="background: #fff3cd; padding: 20px; border: 2px solid #ffc107; margin: 20px 0;">
+            <p style="color: #856404; font-weight: bold; margin-bottom: 10px;">Content Image #${imageIndex}:</p>
+            <img 
+              src="${image.url}" 
+              alt="${image.alt}" 
+              class="w-full max-w-4xl mx-auto h-auto rounded-xl shadow-lg"
+              loading="lazy"
+              width="${image.width || 1200}"
+              height="${image.height || 675}"
+              style="display: block !important; margin: 0 auto; max-width: 100%; height: auto; border: 3px solid #ffc107;"
+              onerror="console.error('Image failed to load:', this.src); this.style.border='3px solid red'; this.alt='IMAGE FAILED TO LOAD: ' + this.src;"
+            />
+            ${image.alt ? `<p class="text-sm text-gray-600 mt-2 italic">${image.alt}</p>` : ''}
+            <p style="color: #856404; font-size: 12px; margin-top: 10px;">Image URL: ${image.url}</p>
+          </div>
+        `;
+        result += imageHtml;
+        imageIndex++;
+      }
     }
   }
   
-  // If there are remaining images, add them at the end
+  // Add remaining images throughout the content
   while (imageIndex < validImages.length) {
     const image = validImages[imageIndex];
-    const imageHtml = `
-      <div class="my-8 text-center">
+    const imageHtml = `<div class="my-8 text-center additional-image-container" style="background: #d1ecf1; padding: 20px; border: 2px solid #17a2b8; margin: 20px 0;">
+        <p style="color: #0c5460; font-weight: bold; margin-bottom: 10px;">Additional Image #${imageIndex}:</p>
         <img 
           src="${image.url}" 
-          alt="${image.alt}" 
+          alt="${image.alt || post.title}" 
           class="w-full max-w-4xl mx-auto h-auto rounded-xl shadow-lg"
           loading="lazy"
-          width="${image.width}"
-          height="${image.height}"
-          onerror="this.parentElement.style.display='none'"
+          width="${image.width || 1200}"
+          height="${image.height || 675}"
+          style="display: block !important; margin: 0 auto; max-width: 100%; height: auto; border: 3px solid #17a2b8;"
+          onerror="console.error('Image failed to load:', this.src); this.style.border='3px solid red'; this.alt='IMAGE FAILED TO LOAD: ' + this.src;"
         />
         ${image.alt ? `<p class="text-sm text-gray-600 mt-2 italic">${image.alt}</p>` : ''}
-      </div>
-    `;
+        <p style="color: #0c5460; font-size: 12px; margin-top: 10px;">Image URL: ${image.url}</p>
+      </div>`;
     result += imageHtml;
     imageIndex++;
   }

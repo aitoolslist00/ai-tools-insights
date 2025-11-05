@@ -3,6 +3,62 @@
 /* Article Content Styles */
 .article-content {
   @apply text-gray-700 leading-relaxed;
+  max-width: 65ch; /* Optimal reading width: 65 characters per line */
+  margin: 0 auto;
+}
+
+/* Ensure proper content width constraints for readability */
+.prose {
+  max-width: 65ch !important; /* Override any max-w-none classes */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Responsive content width adjustments */
+@media (max-width: 768px) {
+  .article-content {
+    max-width: 100%;
+    padding: 0 1rem;
+  }
+  
+  .prose {
+    max-width: 100% !important;
+  }
+}
+
+/* Additional readability improvements */
+.prose p {
+  text-align: left;
+  hyphens: auto;
+  word-wrap: break-word;
+}
+
+/* Ensure images don't break the content width */
+.prose img {
+  max-width: 100%;
+  height: auto;
+  margin: 2rem auto;
+  display: block;
+}
+
+/* Better spacing for lists within the content width */
+.prose ul, .prose ol {
+  max-width: 100%;
+}
+
+/* Ensure tables are responsive within content width */
+.prose table {
+  max-width: 100%;
+  overflow-x: auto;
+  display: block;
+  white-space: nowrap;
+}
+
+@media (min-width: 768px) {
+  .prose table {
+    display: table;
+    white-space: normal;
+  }
 }
 
 .article-content h1 {

@@ -103,7 +103,7 @@ export default function SEOOptimizedBlogPost({
         </div>
       </header>
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
           {/* Sidebar with Table of Contents and Strategic Links */}
           <div className="lg:col-span-1">
@@ -172,7 +172,7 @@ export default function SEOOptimizedBlogPost({
 
           {/* Main Content */}
           <div className="lg:col-span-3">
-            <article className="prose prose-lg max-w-none">
+            <article className="prose prose-lg prose-blue max-w-4xl mx-auto">
               {/* Enhanced content with automatic link injection would go here */}
               <div dangerouslySetInnerHTML={{ __html: content }} />
             </article>

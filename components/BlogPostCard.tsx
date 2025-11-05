@@ -26,12 +26,17 @@ export default function BlogPostCard({ post, featured = false, compact = false }
                 src={post.image}
                 alt={post.title}
                 className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                style={{ display: 'block' }}
+                loading="eager"
                 onError={(e) => {
-                  console.log('Featured image failed to load:', post.image);
+                  console.error('Featured image failed to load:', post.image, 'Error:', e);
                   const target = e.target as HTMLImageElement;
                   target.style.display = 'none';
                   const fallback = target.nextElementSibling as HTMLElement;
-                  if (fallback) fallback.style.display = 'flex';
+                  if (fallback) {
+                    fallback.style.display = 'flex';
+                    console.log('Showing fallback for featured image');
+                  }
                 }}
                 onLoad={(e) => {
                   console.log('Featured image loaded successfully:', post.image);
@@ -235,15 +240,20 @@ export default function BlogPostCard({ post, featured = false, compact = false }
               src={post.image}
               alt={post.title}
               className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+              style={{ display: 'block' }}
+              loading="eager"
               onError={(e) => {
-                console.log('Image failed to load:', post.image);
+                console.error('Regular image failed to load:', post.image, 'Error:', e);
                 const target = e.target as HTMLImageElement;
                 target.style.display = 'none';
                 const fallback = target.nextElementSibling as HTMLElement;
-                if (fallback) fallback.style.display = 'flex';
+                if (fallback) {
+                  fallback.style.display = 'flex';
+                  console.log('Showing fallback for regular image');
+                }
               }}
               onLoad={(e) => {
-                console.log('Image loaded successfully:', post.image);
+                console.log('Regular image loaded successfully:', post.image);
                 const target = e.target as HTMLImageElement;
                 const fallback = target.nextElementSibling as HTMLElement;
                 if (fallback) fallback.style.display = 'none';

@@ -61,16 +61,16 @@ export class RealImageGenerator {
   private outputDir: string;
   private unsplashAccessKey: string;
 
-  constructor() {
+  constructor(unsplashApiKey?: string) {
     const geminiApiKey = process.env.GEMINI_API_KEY;
-    const unsplashKey = process.env.UNSPLASH_ACCESS_KEY;
+    const unsplashKey = unsplashApiKey || process.env.UNSPLASH_ACCESS_KEY;
     
     if (!geminiApiKey) {
       throw new Error('GEMINI_API_KEY environment variable is required');
     }
     
     if (!unsplashKey) {
-      throw new Error('UNSPLASH_ACCESS_KEY environment variable is required');
+      throw new Error('UNSPLASH_ACCESS_KEY environment variable or parameter is required');
     }
     
     this.genAI = new GoogleGenerativeAI(geminiApiKey);

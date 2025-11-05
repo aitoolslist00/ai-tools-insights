@@ -52,7 +52,7 @@ export default function AdvancedAnalytics({
     if (typeof window === 'undefined') return
 
     // Google Tag Manager
-    if (googleTagManagerId && !document.querySelector(`script[src*="${googleTagManagerId}"]`)) {
+    if (googleTagManagerId && googleTagManagerId !== 'GTM-XXXXXXX' && !document.querySelector(`script[src*="${googleTagManagerId}"]`)) {
       const script = document.createElement('script')
       script.src = `https://www.googletagmanager.com/gtag/js?id=${googleAnalyticsId}`
       script.async = true
@@ -73,7 +73,7 @@ export default function AdvancedAnalytics({
     }
 
     // Facebook Pixel
-    if (facebookPixelId && !window.fbq) {
+    if (facebookPixelId && facebookPixelId !== 'XXXXXXXXXX' && !window.fbq) {
       const fbScript = document.createElement('script')
       fbScript.innerHTML = `
         !function(f,b,e,v,n,t,s)
@@ -91,12 +91,12 @@ export default function AdvancedAnalytics({
     }
 
     // LinkedIn Insight Tag
-    if (linkedInPartnerId && !window.lintrk) {
+    if (linkedInPartnerId && linkedInPartnerId !== 'XXXXXXX' && !window.lintrk) {
       const linkedInScript = document.createElement('script')
       linkedInScript.innerHTML = `
-        _linkedin_partner_id = "${linkedInPartnerId}";
+        window._linkedin_partner_id = "${linkedInPartnerId}";
         window._linkedin_data_partner_ids = window._linkedin_data_partner_ids || [];
-        window._linkedin_data_partner_ids.push(_linkedin_partner_id);
+        window._linkedin_data_partner_ids.push(window._linkedin_partner_id);
         (function(l) {
         if (!l){window.lintrk = function(a,b){window.lintrk.q.push([a,b])};
         window.lintrk.q=[]}
@@ -110,7 +110,7 @@ export default function AdvancedAnalytics({
     }
 
     // Hotjar
-    if (hotjarId && !document.querySelector(`script[src*="hotjar"]`)) {
+    if (hotjarId && hotjarId !== 'XXXXXXX' && !document.querySelector(`script[src*="hotjar"]`)) {
       const hotjarScript = document.createElement('script')
       hotjarScript.innerHTML = `
         (function(h,o,t,j,a,r){
@@ -126,7 +126,7 @@ export default function AdvancedAnalytics({
     }
 
     // Microsoft Clarity
-    if (clarityId && !document.querySelector(`script[src*="clarity"]`)) {
+    if (clarityId && clarityId !== 'XXXXXXXXX' && !document.querySelector(`script[src*="clarity"]`)) {
       const clarityScript = document.createElement('script')
       clarityScript.innerHTML = `
         (function(c,l,a,r,i,t,y){

@@ -170,7 +170,7 @@ export async function POST(request: NextRequest) {
       externalLinks: content.externalLinks || [],
       imagePrompts: content.imagePrompts || [],
       headings: content.headings || [],
-      images: generatedImages.length > 0 ? generatedImages : undefined,
+      images: generatedImages,
       image: generatedImages.length > 0 ? generatedImages[0]?.url : undefined,
       googleBotScore,
       googleBotOriginalScore,

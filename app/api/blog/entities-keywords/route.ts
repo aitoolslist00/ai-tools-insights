@@ -11,6 +11,72 @@ export const dynamic = 'force-dynamic'
  * Uses Gemini 2.5 Flash + NewsAPI for comprehensive keyword research
  */
 
+/**
+ * Retry function with exponential backoff for rate limiting
+ */
+async function retryWithBackoff<T>(
+  fn: () => Promise<T>,
+  maxRetries: number = 3,
+  baseDelay: number = 1000
+): Promise<T> {
+  let lastError: Error
+  
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await fn()
+    } catch (error) {
+      lastError = error as Error
+      
+      // Check if it's a rate limit error (429)
+      if (error instanceof Error && error.message.includes('429')) {
+        if (attempt < maxRetries) {
+          const delay = baseDelay * Math.pow(2, attempt) + Math.random() * 1000
+          console.log(`Rate limit hit, retrying in ${Math.round(delay)}ms (attempt ${attempt + 1}/${maxRetries + 1})`)
+          await new Promise(resolve => setTimeout(resolve, delay))
+          continue
+        }
+      }
+      
+      // If it's not a rate limit error or we've exhausted retries, throw
+      throw error
+    }
+  }
+  
+  throw lastError!
+}
+
+/**
+ * Make a Gemini API call with rate limiting protection
+ */
+async function callGeminiAPI(prompt: string, apiKey: string): Promise<any> {
+  return retryWithBackoff(async () => {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{
+          parts: [{ text: prompt }]
+        }],
+        generationConfig: {
+          temperature: 0.4,
+          topK: 40,
+          topP: 0.95,
+          maxOutputTokens: 4096,
+        }
+      })
+    })
+
+    if (!response.ok) {
+      if (response.status === 429) {
+        throw new Error(`Gemini API rate limit exceeded (429). Please wait a moment and try again.`)
+      }
+      throw new Error(`Gemini API error: ${response.status} - ${response.statusText}`)
+    }
+
+    return response.json()
+  }, 3, 2000) // 3 retries with 2 second base delay
+}
+
 interface EntitiesKeywordsRequest {
   keyword: string
   category: string
@@ -86,27 +152,7 @@ Example format:
 Generate 100 LSI keywords for "${keyword}":
 `
 
-    const lsiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{
-          parts: [{ text: lsiPrompt }]
-        }],
-        generationConfig: {
-          temperature: 0.4,
-          topK: 40,
-          topP: 0.95,
-          maxOutputTokens: 4096,
-        }
-      })
-    })
-
-    if (!lsiResponse.ok) {
-      throw new Error(`Gemini API error for LSI keywords: ${lsiResponse.status}`)
-    }
-
-    const lsiData = await lsiResponse.json()
+    const lsiData = await callGeminiAPI(lsiPrompt, apiKey)
     const lsiText = lsiData.candidates?.[0]?.content?.parts?.[0]?.text
 
     let lsiKeywords: string[] = []
@@ -148,27 +194,10 @@ Example format:
 Generate 100 entity keywords for "${keyword}":
 `
 
-    const entityResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{
-          parts: [{ text: entityPrompt }]
-        }],
-        generationConfig: {
-          temperature: 0.4,
-          topK: 40,
-          topP: 0.95,
-          maxOutputTokens: 4096,
-        }
-      })
-    })
-
-    if (!entityResponse.ok) {
-      throw new Error(`Gemini API error for entity keywords: ${entityResponse.status}`)
-    }
-
-    const entityData = await entityResponse.json()
+    // Add delay between API calls to avoid rate limiting
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    
+    const entityData = await callGeminiAPI(entityPrompt, apiKey)
     const entityText = entityData.candidates?.[0]?.content?.parts?.[0]?.text
 
     let entityKeywords: string[] = []
@@ -211,27 +240,10 @@ Example format:
 Generate 100 semantic keywords for "${keyword}":
 `
 
-    const semanticResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{
-          parts: [{ text: semanticPrompt }]
-        }],
-        generationConfig: {
-          temperature: 0.4,
-          topK: 40,
-          topP: 0.95,
-          maxOutputTokens: 4096,
-        }
-      })
-    })
-
-    if (!semanticResponse.ok) {
-      throw new Error(`Gemini API error for semantic keywords: ${semanticResponse.status}`)
-    }
-
-    const semanticData = await semanticResponse.json()
+    // Add delay between API calls to avoid rate limiting
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    
+    const semanticData = await callGeminiAPI(semanticPrompt, apiKey)
     const semanticText = semanticData.candidates?.[0]?.content?.parts?.[0]?.text
 
     let semanticKeywords: string[] = []
@@ -268,14 +280,33 @@ Generate 100 semantic keywords for "${keyword}":
 
   } catch (error) {
     console.error('Entities and keywords extraction error:', error)
+    
+    let errorMessage = 'Unknown error occurred'
+    let statusCode = 500
+    
+    if (error instanceof Error) {
+      if (error.message.includes('429') || error.message.includes('rate limit')) {
+        errorMessage = 'Gemini API rate limit exceeded. Please wait a few minutes and try again, or check your API quota.'
+        statusCode = 429
+      } else if (error.message.includes('401') || error.message.includes('unauthorized')) {
+        errorMessage = 'Invalid Gemini API key. Please check your API key and try again.'
+        statusCode = 401
+      } else if (error.message.includes('403') || error.message.includes('forbidden')) {
+        errorMessage = 'Gemini API access denied. Please check your API key permissions.'
+        statusCode = 403
+      } else {
+        errorMessage = error.message
+      }
+    }
+    
     return NextResponse.json({
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error occurred',
+      error: errorMessage,
       lsiKeywords: [],
       entityKeywords: [],
       semanticKeywords: [],
       totalKeywords: 0
-    }, { status: 500 })
+    }, { status: statusCode })
   }
 }
 

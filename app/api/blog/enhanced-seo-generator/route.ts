@@ -15,11 +15,12 @@ interface ContentGenerationRequest {
   keyword: string
   category?: string
   apiKey: string
-  workflow: 'complete' | 'content-only'
+  workflow: 'complete' | 'content-only' | 'enhanced'
   additionalContext?: string
   targetAudience?: string
   contentLength?: 'short' | 'medium' | 'long'
   tone?: 'professional' | 'casual' | 'technical' | 'friendly'
+  regenerateImages?: boolean
   entitiesKeywords?: {
     lsiKeywords: string[]
     entityKeywords: string[]
@@ -92,7 +93,7 @@ export async function POST(request: NextRequest) {
 
     // Generate images automatically if imagePrompts are available
     let generatedImages: any[] = []
-    if (workflow === 'complete' && generatedContent.imagePrompts && generatedContent.imagePrompts.length > 0) {
+    if ((workflow === 'complete' || workflow === 'enhanced') && generatedContent.imagePrompts && generatedContent.imagePrompts.length > 0) {
       try {
         // Import image generator
         const { RealImageGenerator } = await import('@/lib/real-image-generator')
@@ -116,8 +117,103 @@ export async function POST(request: NextRequest) {
             console.warn(`Failed to generate image ${i + 1}:`, imageError)
           }
         }
+
+        // Optimize content with generated images
+        if (generatedImages.length > 0) {
+          try {
+            const { ContentImageOptimizer } = await import('@/lib/content-image-optimizer')
+            const contentOptimizer = new ContentImageOptimizer()
+            
+            // Convert GeneratedImageResult[] to GeneratedImage[] format
+            const imagesForOptimization = generatedImages.map(img => ({
+              filename: img.filename,
+              path: img.path,
+              url: img.url,
+              alt: img.alt,
+              width: img.width,
+              height: img.height,
+              optimized: img.metadata?.optimized || true
+            }))
+            
+            // Insert images into content
+            generatedContent.content = await contentOptimizer.optimizeContentWithImages(
+              generatedContent.content,
+              imagesForOptimization,
+              generatedContent.title
+            )
+            
+            console.log(`✅ Successfully integrated ${generatedImages.length} images into content`)
+          } catch (optimizeError) {
+            console.error('Content image optimization failed:', optimizeError)
+          }
+        }
       } catch (error) {
-        console.warn('Image generation failed, continuing without images:', error)
+        console.error('Image generation failed, continuing without images:', error)
+        console.error('Image generation error details:', {
+          message: error instanceof Error ? error.message : 'Unknown error',
+          stack: error instanceof Error ? error.stack : undefined,
+          workflow,
+          hasImagePrompts: generatedContent.imagePrompts?.length > 0,
+          imagePromptsCount: generatedContent.imagePrompts?.length || 0
+        })
+      }
+    } else {
+      // Log why images weren't generated
+      console.log('Images not generated because:', {
+        workflow,
+        workflowMatches: workflow === 'complete' || workflow === 'enhanced',
+        hasImagePrompts: generatedContent.imagePrompts?.length > 0,
+        imagePromptsCount: generatedContent.imagePrompts?.length || 0
+      })
+    }
+
+    // Fallback: If no images were generated but we have keywords, try to generate at least one image
+    if (generatedImages.length === 0 && (workflow === 'complete' || workflow === 'enhanced')) {
+      try {
+        console.log('🔄 Attempting fallback image generation...')
+        const { RealImageGenerator } = await import('@/lib/real-image-generator')
+        const realImageGenerator = new RealImageGenerator()
+        
+        const fallbackImage = await realImageGenerator.generateImage({
+          keyword: keyword.trim(),
+          style: 'tech' as any,
+          aspectRatio: '16:9',
+          width: 1200,
+          height: 675
+        })
+        
+        if (fallbackImage) {
+          generatedImages.push(fallbackImage)
+          console.log('✅ Fallback image generation successful')
+          
+          // Try to integrate the fallback image
+          try {
+            const { ContentImageOptimizer } = await import('@/lib/content-image-optimizer')
+            const contentOptimizer = new ContentImageOptimizer()
+            
+            const imagesForOptimization = [{
+              filename: fallbackImage.filename,
+              path: fallbackImage.path,
+              url: fallbackImage.url,
+              alt: fallbackImage.alt,
+              width: fallbackImage.width,
+              height: fallbackImage.height,
+              optimized: fallbackImage.metadata?.optimized || true
+            }]
+            
+            generatedContent.content = await contentOptimizer.optimizeContentWithImages(
+              generatedContent.content,
+              imagesForOptimization,
+              generatedContent.title
+            )
+            
+            console.log('✅ Successfully integrated fallback image into content')
+          } catch (optimizeError) {
+            console.error('Fallback image optimization failed:', optimizeError)
+          }
+        }
+      } catch (fallbackError) {
+        console.error('Fallback image generation failed:', fallbackError)
       }
     }
 
@@ -388,7 +484,18 @@ CRITICAL: Your article MUST include ALL the H2 and H3 headings provided above. S
           contentData.headings = contentData.headings || []
           contentData.internalLinks = contentData.internalLinks || []
           contentData.externalLinks = contentData.externalLinks || []
-          contentData.imagePrompts = contentData.imagePrompts || []
+          
+          // 🔥 FIX: Generate imagePrompts if AI didn't provide them
+          if (!contentData.imagePrompts || contentData.imagePrompts.length === 0) {
+            contentData.imagePrompts = [
+              `A professional illustration showing ${keyword} in action, modern tech style`,
+              `Infographic displaying key features and benefits of ${keyword}`,
+              `Screenshot or mockup of ${keyword} interface with clean, modern design`,
+              `Diagram illustrating how ${keyword} works, step-by-step process`,
+              `Comparison chart showing ${keyword} vs alternatives, professional layout`
+            ]
+            console.log(`✅ Generated fallback imagePrompts for keyword: ${keyword}`)
+          }
 
           // 🔥 ISSUE FIX #2: Inject E-A-E-T Signals
           // Generates expertise, experience, authority, trust signals
