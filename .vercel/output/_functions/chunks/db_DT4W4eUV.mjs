@@ -1,12 +1,20 @@
 import { s as supabase } from './supabase_By2Prn7o.mjs';
-import bcrypt from 'bcrypt';
+import 'bcrypt';
 
 const db = {
   prepare: (query) => ({
     get: async (params) => {
       const tableName = extractTableName(query);
       if (query.toUpperCase().includes("COUNT(*)")) {
-        const { count, error } = await supabase.from(tableName).select("*", { count: "exact", head: true });
+        let countQuery = supabase.from(tableName).select("*", { count: "exact", head: true });
+        if (query.includes("WHERE")) {
+          const whereClause = extractWhereClause(query);
+          const { column, value } = extractWhereCondition(whereClause);
+          if (column && value) {
+            countQuery = countQuery.eq(column, value);
+          }
+        }
+        const { count, error } = await countQuery;
         if (error) {
           console.error("Supabase count error:", error);
           return { count: 0 };
@@ -44,6 +52,12 @@ const db = {
         const { column, ascending } = parseOrderBy(orderClause);
         queryBuilder = queryBuilder.order(column, { ascending });
       }
+      if (query.includes("LIMIT")) {
+        const limit = extractLimit(query);
+        if (limit) {
+          queryBuilder = queryBuilder.limit(limit);
+        }
+      }
       const { data, error } = await queryBuilder;
       if (error) {
         console.error("Supabase all error:", error);
@@ -79,6 +93,13 @@ function extractColumnFromWhere(whereClause) {
   const match = whereClause.match(/(\w+)\s*=/);
   return match ? match[1] : "";
 }
+function extractWhereCondition(whereClause) {
+  const match = whereClause.match(/(\w+)\s*=\s*'([^']+)'/);
+  if (match) {
+    return { column: match[1], value: match[2] };
+  }
+  return { column: "", value: "" };
+}
 function extractOrderByClause(query) {
   const match = query.match(/ORDER BY (.+?)(?:LIMIT|$)/i);
   return match ? match[1].trim() : "";
@@ -91,6 +112,10 @@ function parseOrderBy(orderClause) {
     column,
     ascending: direction !== "DESC"
   };
+}
+function extractLimit(query) {
+  const match = query.match(/LIMIT\s+(\d+)/i);
+  return match ? parseInt(match[1], 10) : null;
 }
 async function executeQuery(query, params) {
   const normalizedQuery = query.trim().toUpperCase();
@@ -163,13 +188,6 @@ function extractUpdateColumns(query) {
     return parts[0].trim();
   });
 }
-async function initializeAdmin(username, password) {
-  const hashedPassword = bcrypt.hashSync(password, 10);
-  const { data: existingUser } = await supabase.from("users").select("id").eq("username", username).single();
-  if (!existingUser) {
-    await supabase.from("users").insert({ username, password: hashedPassword });
-  }
-}
 async function getSetting(key) {
   const { data, error } = await supabase.from("settings").select("value").eq("key", key).single();
   if (error && error.code !== "PGRST116") {
@@ -187,4 +205,4 @@ async function setSetting(key, value) {
   }
 }
 
-export { db as d, getSetting as g, initializeAdmin as i, setSetting as s };
+export { db as d, getSetting as g, setSetting as s };

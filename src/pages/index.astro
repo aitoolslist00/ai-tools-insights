@@ -4,9 +4,7 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import AnimatedCounter from '../components/AnimatedCounter';
 import NewsletterSignup from '../components/NewsletterSignup';
-import { db, initializeAdmin } from '../lib/db';
-
-await initializeAdmin('ahmedibrahim', '140796@@##');
+import { db } from '../lib/db';
 
 const recentArticles = await db.prepare('SELECT * FROM articles WHERE status = ? ORDER BY published_at DESC LIMIT 8')
   .all('published') as any[];

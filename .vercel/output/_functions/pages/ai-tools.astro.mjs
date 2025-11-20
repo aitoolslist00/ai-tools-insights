@@ -1,6 +1,6 @@
 import { f as createComponent, r as renderTemplate, k as renderComponent, m as maybeRenderHead, h as addAttribute, o as Fragment } from '../chunks/astro/server_WYUkatmq.mjs';
-import { $ as $$BaseLayout, a as $$Header, b as $$Footer } from '../chunks/Footer_c2Oz2sdU.mjs';
-import { d as db } from '../chunks/db_CbTj92s0.mjs';
+import { $ as $$BaseLayout, a as $$Header, b as $$Footer } from '../chunks/Footer_Bn3-WZQO.mjs';
+import { d as db } from '../chunks/db_DT4W4eUV.mjs';
 /* empty css                                 */
 export { renderers } from '../renderers.mjs';
 

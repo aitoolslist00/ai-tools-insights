@@ -1,7 +1,8 @@
 import { e as createAstro, f as createComponent, l as renderHead, h as addAttribute, u as unescapeHTML, r as renderTemplate } from '../../../../chunks/astro/server_WYUkatmq.mjs';
 import 'clsx';
-import { r as requireAuth } from '../../../../chunks/auth_DteQtQsy.mjs';
-import { d as db } from '../../../../chunks/db_CbTj92s0.mjs';
+/* empty css                                          */
+import { r as requireAuth } from '../../../../chunks/auth_gn-l6IWQ.mjs';
+import { d as db } from '../../../../chunks/db_DT4W4eUV.mjs';
 import { marked } from 'marked';
 export { renderers } from '../../../../renderers.mjs';
 
@@ -29,7 +30,7 @@ const $$id = createComponent(async ($$result, $$props, $$slots) => {
     breaks: true
   });
   const contentHtml = await marked(article.content);
-  return renderTemplate`<html lang="en"> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Preview: ${article.title} | Admin</title><link rel="stylesheet" href="/src/styles/global.css"><meta name="robots" content="noindex, nofollow">${renderHead()}</head> <body class="min-h-screen bg-gray-100"> <nav class="bg-white shadow-lg"> <div class="container mx-auto px-4 py-4"> <div class="flex items-center justify-between"> <div class="flex items-center space-x-4"> <a href="/admin" class="text-2xl font-bold text-blue-600">Dashboard</a> <span class="text-gray-400">/</span> <a href="/admin/articles" class="text-xl text-gray-600 hover:text-blue-600">Articles</a> <span class="text-gray-400">/</span> <h1 class="text-xl font-semibold">Preview</h1> </div> <div class="flex items-center space-x-4"> <span${addAttribute(`px-3 py-1 rounded-full text-sm font-semibold ${article.status === "published" ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"}`, "class")}> ${article.status} </span> <a${addAttribute(`/admin/articles/${article.id}`, "href")} class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+  return renderTemplate`<html lang="en"> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Preview: ${article.title} | Admin</title><meta name="robots" content="noindex, nofollow">${renderHead()}</head> <body class="min-h-screen bg-gray-100"> <nav class="bg-white shadow-lg"> <div class="container mx-auto px-4 py-4"> <div class="flex items-center justify-between"> <div class="flex items-center space-x-4"> <a href="/admin" class="text-2xl font-bold text-blue-600">Dashboard</a> <span class="text-gray-400">/</span> <a href="/admin/articles" class="text-xl text-gray-600 hover:text-blue-600">Articles</a> <span class="text-gray-400">/</span> <h1 class="text-xl font-semibold">Preview</h1> </div> <div class="flex items-center space-x-4"> <span${addAttribute(`px-3 py-1 rounded-full text-sm font-semibold ${article.status === "published" ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"}`, "class")}> ${article.status} </span> <a${addAttribute(`/admin/articles/${article.id}`, "href")} class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
 Edit
 </a> <a href="/admin/articles" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg">
 Back to List

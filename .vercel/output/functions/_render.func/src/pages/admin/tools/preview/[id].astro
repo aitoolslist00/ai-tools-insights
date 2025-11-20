@@ -1,4 +1,5 @@
 ---
+import '../../../../styles/global.css';
 import { requireAuth } from '../../../../lib/auth';
 import { db } from '../../../../lib/db';
 
@@ -30,7 +31,6 @@ if (!tool) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Preview: {tool.name} | Admin</title>
-  <link rel="stylesheet" href="/src/styles/global.css">
   <meta name="robots" content="noindex, nofollow">
 </head>
 <body class="min-h-screen bg-gray-50 dark:bg-gray-900">

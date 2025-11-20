@@ -1,8 +1,8 @@
 import { f as createComponent, k as renderComponent, x as renderScript, r as renderTemplate, m as maybeRenderHead, h as addAttribute } from '../chunks/astro/server_WYUkatmq.mjs';
-import { $ as $$BaseLayout, a as $$Header, b as $$Footer } from '../chunks/Footer_c2Oz2sdU.mjs';
+import { $ as $$BaseLayout, a as $$Header, b as $$Footer } from '../chunks/Footer_Bn3-WZQO.mjs';
 import { jsxs, jsx } from 'react/jsx-runtime';
 import { useState, useRef, useEffect } from 'react';
-import { i as initializeAdmin, d as db } from '../chunks/db_CbTj92s0.mjs';
+import { d as db } from '../chunks/db_DT4W4eUV.mjs';
 /* empty css                                 */
 export { renderers } from '../renderers.mjs';
 
@@ -123,7 +123,6 @@ function NewsletterSignup() {
 }
 
 const $$Index = createComponent(async ($$result, $$props, $$slots) => {
-  await initializeAdmin("ahmedibrahim", "140796@@##");
   const recentArticles = await db.prepare("SELECT * FROM articles WHERE status = ? ORDER BY published_at DESC LIMIT 8").all("published");
   const featuredTools = await db.prepare("SELECT * FROM ai_tools WHERE status = ? ORDER BY published_at DESC LIMIT 8").all("published");
   return renderTemplate`${renderComponent($$result, "BaseLayout", $$BaseLayout, { "title": "AI Tools Insights | Discover the Latest AI Tools, Reviews & Tutorials", "description": "Your comprehensive resource for AI tools reviews, comparisons, and tutorials. Stay updated with the latest AI technology insights.", "data-astro-cid-j7pv25f6": true }, { "default": async ($$result2) => renderTemplate`  ${maybeRenderHead()}<section class="relative overflow-hidden section-padding bg-gradient-to-br from-white via-blue-50/50 to-purple-50/50 dark:from-gray-900 dark:via-blue-900/10 dark:to-purple-900/10" data-astro-cid-j7pv25f6> <div class="absolute inset-0 bg-grid-pattern opacity-5" data-astro-cid-j7pv25f6></div> <div class="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-float" data-parallax="0.3" data-astro-cid-j7pv25f6></div> <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-float" style="animation-delay: 1s;" data-parallax="0.5" data-astro-cid-j7pv25f6></div> <div class="relative container-custom max-w-6xl mx-auto text-center" data-astro-cid-j7pv25f6> <div class="animate-fade-in" data-astro-cid-j7pv25f6> <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 text-balance" data-astro-cid-j7pv25f6>

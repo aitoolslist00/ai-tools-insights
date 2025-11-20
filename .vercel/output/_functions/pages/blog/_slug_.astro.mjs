@@ -1,7 +1,7 @@
 import { e as createAstro, f as createComponent, k as renderComponent, r as renderTemplate, h as addAttribute, u as unescapeHTML, m as maybeRenderHead } from '../../chunks/astro/server_WYUkatmq.mjs';
-import { $ as $$BaseLayout, a as $$Header, b as $$Footer } from '../../chunks/Footer_c2Oz2sdU.mjs';
+import { $ as $$BaseLayout, a as $$Header, b as $$Footer } from '../../chunks/Footer_Bn3-WZQO.mjs';
 import { F as FloatingActions, A as ArticleReader } from '../../chunks/FloatingActions_BmvwXFxr.mjs';
-import { d as db } from '../../chunks/db_CbTj92s0.mjs';
+import { d as db } from '../../chunks/db_DT4W4eUV.mjs';
 import { marked } from 'marked';
 export { renderers } from '../../renderers.mjs';
 

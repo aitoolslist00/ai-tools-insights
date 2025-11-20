@@ -3,6 +3,7 @@ import { e as createAstro, f as createComponent, r as renderTemplate, k as rende
 import { jsxs, jsx } from 'react/jsx-runtime';
 import { useState, useRef, useEffect } from 'react';
 import 'clsx';
+/* empty css                         */
 
 function CommandPalette() {
   const [isOpen, setIsOpen] = useState(false);

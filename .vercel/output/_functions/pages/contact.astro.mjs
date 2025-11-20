@@ -1,5 +1,5 @@
 import { f as createComponent, r as renderTemplate, k as renderComponent, m as maybeRenderHead } from '../chunks/astro/server_WYUkatmq.mjs';
-import { $ as $$BaseLayout, a as $$Header, b as $$Footer } from '../chunks/Footer_c2Oz2sdU.mjs';
+import { $ as $$BaseLayout, a as $$Header, b as $$Footer } from '../chunks/Footer_Bn3-WZQO.mjs';
 export { renderers } from '../renderers.mjs';
 
 var __freeze = Object.freeze;

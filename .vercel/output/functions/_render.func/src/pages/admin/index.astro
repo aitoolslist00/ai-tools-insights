@@ -1,4 +1,5 @@
 ---
+import '../../styles/global.css';
 import { requireAuth } from '../../lib/auth';
 import { db } from '../../lib/db';
 
@@ -13,6 +14,8 @@ try {
 
 const articlesCount = (await db.prepare('SELECT COUNT(*) as count FROM articles').get() as any).count;
 const toolsCount = (await db.prepare('SELECT COUNT(*) as count FROM ai_tools').get() as any).count;
+const publishedArticlesCount = (await db.prepare("SELECT COUNT(*) as count FROM articles WHERE status = 'published'").get() as any).count;
+const publishedToolsCount = (await db.prepare("SELECT COUNT(*) as count FROM ai_tools WHERE status = 'published'").get() as any).count;
 const recentArticles = await db.prepare('SELECT * FROM articles ORDER BY created_at DESC LIMIT 5').all() as any[];
 const recentTools = await db.prepare('SELECT * FROM ai_tools ORDER BY created_at DESC LIMIT 5').all() as any[];
 ---
@@ -23,7 +26,6 @@ const recentTools = await db.prepare('SELECT * FROM ai_tools ORDER BY created_at
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Dashboard | AI Tools Insights</title>
-  <link rel="stylesheet" href="/src/styles/global.css">
   <meta name="robots" content="noindex, nofollow">
 </head>
 <body class="min-h-screen bg-gray-100">
@@ -64,12 +66,12 @@ const recentTools = await db.prepare('SELECT * FROM ai_tools ORDER BY created_at
       
       <div class="bg-white rounded-lg shadow p-6">
         <h3 class="text-gray-600 text-sm font-medium mb-2">Published Articles</h3>
-        <p class="text-3xl font-bold text-purple-600">{recentArticles.filter(a => a.status === 'published').length}</p>
+        <p class="text-3xl font-bold text-purple-600">{publishedArticlesCount}</p>
       </div>
       
       <div class="bg-white rounded-lg shadow p-6">
         <h3 class="text-gray-600 text-sm font-medium mb-2">Published Tools</h3>
-        <p class="text-3xl font-bold text-orange-600">{recentTools.filter(t => t.status === 'published').length}</p>
+        <p class="text-3xl font-bold text-orange-600">{publishedToolsCount}</p>
       </div>
     </div>
 

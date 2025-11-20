@@ -1,4 +1,4 @@
-import { r as requireAuth } from '../../../chunks/auth_DteQtQsy.mjs';
+import { r as requireAuth } from '../../../chunks/auth_gn-l6IWQ.mjs';
 import { s as supabase } from '../../../chunks/supabase_By2Prn7o.mjs';
 import Database from 'better-sqlite3';
 export { renderers } from '../../../renderers.mjs';

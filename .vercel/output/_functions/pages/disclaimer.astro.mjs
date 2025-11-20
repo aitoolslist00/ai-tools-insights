@@ -1,5 +1,5 @@
 import { f as createComponent, k as renderComponent, r as renderTemplate, m as maybeRenderHead } from '../chunks/astro/server_WYUkatmq.mjs';
-import { $ as $$BaseLayout, a as $$Header, b as $$Footer } from '../chunks/Footer_c2Oz2sdU.mjs';
+import { $ as $$BaseLayout, a as $$Header, b as $$Footer } from '../chunks/Footer_Bn3-WZQO.mjs';
 export { renderers } from '../renderers.mjs';
 
 const $$Disclaimer = createComponent(($$result, $$props, $$slots) => {

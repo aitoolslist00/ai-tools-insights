@@ -1,7 +1,8 @@
 import { e as createAstro, f as createComponent, l as renderHead, h as addAttribute, r as renderTemplate, u as unescapeHTML } from '../../../../chunks/astro/server_WYUkatmq.mjs';
 import 'clsx';
-import { r as requireAuth } from '../../../../chunks/auth_DteQtQsy.mjs';
-import { d as db } from '../../../../chunks/db_CbTj92s0.mjs';
+/* empty css                                          */
+import { r as requireAuth } from '../../../../chunks/auth_gn-l6IWQ.mjs';
+import { d as db } from '../../../../chunks/db_DT4W4eUV.mjs';
 export { renderers } from '../../../../renderers.mjs';
 
 const $$Astro = createAstro("https://www.aitoolsinsights.com");
@@ -23,7 +24,7 @@ const $$id = createComponent(async ($$result, $$props, $$slots) => {
   if (!tool) {
     return Astro2.redirect("/admin/tools");
   }
-  return renderTemplate`<html lang="en"> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Preview: ${tool.name} | Admin</title><link rel="stylesheet" href="/src/styles/global.css"><meta name="robots" content="noindex, nofollow">${renderHead()}</head> <body class="min-h-screen bg-gray-50 dark:bg-gray-900"> <nav class="bg-white dark:bg-gray-800 shadow-lg sticky top-0 z-50"> <div class="container mx-auto px-4 py-4"> <div class="flex items-center justify-between"> <div class="flex items-center space-x-4"> <a href="/admin" class="text-2xl font-bold text-blue-600">Dashboard</a> <span class="text-gray-400">/</span> <a href="/admin/tools" class="text-xl text-gray-600 hover:text-blue-600">AI Tools</a> <span class="text-gray-400">/</span> <h1 class="text-xl font-semibold">Preview</h1> </div> <div class="flex items-center space-x-4"> <span${addAttribute(`px-3 py-1 rounded-full text-sm font-semibold ${tool.status === "published" ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"}`, "class")}> ${tool.status} </span> <a${addAttribute(`/admin/tools/${tool.id}`, "href")} class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+  return renderTemplate`<html lang="en"> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Preview: ${tool.name} | Admin</title><meta name="robots" content="noindex, nofollow">${renderHead()}</head> <body class="min-h-screen bg-gray-50 dark:bg-gray-900"> <nav class="bg-white dark:bg-gray-800 shadow-lg sticky top-0 z-50"> <div class="container mx-auto px-4 py-4"> <div class="flex items-center justify-between"> <div class="flex items-center space-x-4"> <a href="/admin" class="text-2xl font-bold text-blue-600">Dashboard</a> <span class="text-gray-400">/</span> <a href="/admin/tools" class="text-xl text-gray-600 hover:text-blue-600">AI Tools</a> <span class="text-gray-400">/</span> <h1 class="text-xl font-semibold">Preview</h1> </div> <div class="flex items-center space-x-4"> <span${addAttribute(`px-3 py-1 rounded-full text-sm font-semibold ${tool.status === "published" ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"}`, "class")}> ${tool.status} </span> <a${addAttribute(`/admin/tools/${tool.id}`, "href")} class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
 Edit
 </a> <a href="/admin/tools" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg">
 Back to List

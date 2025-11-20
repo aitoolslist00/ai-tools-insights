@@ -7,9 +7,19 @@ export const db = {
       const tableName = extractTableName(query);
       
       if (query.toUpperCase().includes('COUNT(*)')) {
-        const { count, error } = await supabase
+        let countQuery = supabase
           .from(tableName)
           .select('*', { count: 'exact', head: true });
+        
+        if (query.includes('WHERE')) {
+          const whereClause = extractWhereClause(query);
+          const { column, value } = extractWhereCondition(whereClause);
+          if (column && value) {
+            countQuery = countQuery.eq(column, value);
+          }
+        }
+        
+        const { count, error } = await countQuery;
         
         if (error) {
           console.error('Supabase count error:', error);
@@ -67,6 +77,13 @@ export const db = {
         queryBuilder = queryBuilder.order(column, { ascending });
       }
       
+      if (query.includes('LIMIT')) {
+        const limit = extractLimit(query);
+        if (limit) {
+          queryBuilder = queryBuilder.limit(limit);
+        }
+      }
+      
       const { data, error } = await queryBuilder;
       
       if (error) {
@@ -114,6 +131,14 @@ function extractColumnFromWhere(whereClause: string): string {
   return match ? match[1] : '';
 }
 
+function extractWhereCondition(whereClause: string): { column: string; value: string } {
+  const match = whereClause.match(/(\w+)\s*=\s*'([^']+)'/);
+  if (match) {
+    return { column: match[1], value: match[2] };
+  }
+  return { column: '', value: '' };
+}
+
 function extractOrderByClause(query: string): string {
   const match = query.match(/ORDER BY (.+?)(?:LIMIT|$)/i);
   return match ? match[1].trim() : '';
@@ -127,6 +152,11 @@ function parseOrderBy(orderClause: string): { column: string; ascending: boolean
     column,
     ascending: direction !== 'DESC'
   };
+}
+
+function extractLimit(query: string): number | null {
+  const match = query.match(/LIMIT\s+(\d+)/i);
+  return match ? parseInt(match[1], 10) : null;
 }
 
 async function executeQuery(query: string, params: any[]): Promise<any> {

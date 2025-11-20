@@ -1,4 +1,5 @@
 ---
+import '../../../styles/global.css';
 import { requireAuth } from '../../../lib/auth';
 import { db } from '../../../lib/db';
 
@@ -20,7 +21,6 @@ const tools = await db.prepare('SELECT * FROM ai_tools ORDER BY created_at DESC'
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Manage AI Tools | Admin</title>
-  <link rel="stylesheet" href="/src/styles/global.css">
   <meta name="robots" content="noindex, nofollow">
 </head>
 <body class="min-h-screen bg-gray-100">
