@@ -1,0 +1,93 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import ToolComparison from '../components/ToolComparison';
+---
+
+<BaseLayout 
+  title="Compare AI Tools | AI Tools Insights"
+  description="Compare AI tools side-by-side to find the perfect solution for your needs. Interactive comparison matrix with detailed feature analysis."
+>
+  <Header slot="header" />
+  
+  <section class="section-padding container-custom">
+    <div class="max-w-7xl mx-auto">
+      <div class="text-center mb-12 animate-fade-in">
+        <h1 class="text-4xl md:text-5xl font-bold mb-6">
+          Compare <span class="gradient-text">AI Tools</span>
+        </h1>
+        <p class="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+          Make informed decisions with our interactive comparison tool. Compare features, pricing, and capabilities side-by-side.
+        </p>
+      </div>
+      
+      <ToolComparison client:load />
+      
+      <div class="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="card p-6 text-center animate-scale-in">
+          <div class="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold mb-2">Side-by-Side</h3>
+          <p class="text-gray-600 dark:text-gray-400">
+            Compare up to 3 tools simultaneously with detailed feature breakdowns
+          </p>
+        </div>
+        
+        <div class="card p-6 text-center animate-scale-in animation-delay-200">
+          <div class="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold mb-2">Real-Time Updates</h3>
+          <p class="text-gray-600 dark:text-gray-400">
+            Get the latest information on features, pricing, and capabilities
+          </p>
+        </div>
+        
+        <div class="card p-6 text-center animate-scale-in animation-delay-400">
+          <div class="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-pink-500 to-pink-600 rounded-2xl flex items-center justify-center">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold mb-2">Detailed Analysis</h3>
+          <p class="text-gray-600 dark:text-gray-400">
+            Comprehensive feature matrix to help you make the right choice
+          </p>
+        </div>
+      </div>
+      
+      <div class="mt-16 card p-8 md:p-12 text-center bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20">
+        <h2 class="text-3xl font-bold mb-4">Need Help Choosing?</h2>
+        <p class="text-lg text-gray-600 dark:text-gray-400 mb-6 max-w-2xl mx-auto">
+          Check out our detailed reviews and guides to learn more about each tool and find the perfect fit for your needs.
+        </p>
+        <div class="flex flex-col sm:flex-row justify-center gap-4">
+          <a href="/ai-tools" class="btn btn-primary">
+            Browse All Tools
+          </a>
+          <a href="/blog" class="btn btn-outline">
+            Read Reviews
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <Footer slot="footer" />
+</BaseLayout>
+
+<style>
+  .animation-delay-200 {
+    animation-delay: 200ms;
+  }
+  
+  .animation-delay-400 {
+    animation-delay: 400ms;
+  }
+</style>

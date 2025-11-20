@@ -1,0 +1,25 @@
+# www.robotstxt.org/
+
+User-agent: *
+Allow: /
+
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 0
+
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 0
+
+User-agent: Yandex
+Allow: /
+Crawl-delay: 0
+
+User-agent: Yahoo! Slurp
+Allow: /
+Crawl-delay: 0
+
+Disallow: /admin/
+Disallow: /api/
+
+Sitemap: https://www.aitoolsinsights.com/sitemap-index.xml

@@ -1,4 +1,5 @@
 ---
+import '../../../../styles/global.css';
 import { requireAuth } from '../../../../lib/auth';
 import { db } from '../../../../lib/db';
 import { marked } from 'marked';
@@ -38,7 +39,6 @@ const contentHtml = await marked(article.content);
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Preview: {article.title} | Admin</title>
-  <link rel="stylesheet" href="/src/styles/global.css">
   <meta name="robots" content="noindex, nofollow">
 </head>
 <body class="min-h-screen bg-gray-100">
