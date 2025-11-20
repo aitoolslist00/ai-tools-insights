@@ -1,0 +1,166 @@
+---
+import '../styles/global.css';
+import CommandPalette from '../components/CommandPalette';
+
+export interface Props {
+  title: string;
+  description?: string;
+  keywords?: string[];
+  ogImage?: string;
+  canonical?: string;
+}
+
+const { 
+  title, 
+  description = "AI Tools Insights - Discover and learn about the latest AI tools, with comprehensive reviews, comparisons, and tutorials.",
+  keywords = ["AI tools", "artificial intelligence", "AI reviews", "AI comparisons", "AI tutorials"],
+  ogImage = "/og-image.jpg",
+  canonical
+} = Astro.props;
+
+const siteUrl = Astro.site || 'https://www.aitoolsinsights.com';
+const currentUrl = new URL(Astro.url.pathname, siteUrl);
+const canonicalUrl = canonical || currentUrl.href;
+---
+
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="generator" content={Astro.generator}>
+  
+  <title>{title}</title>
+  <meta name="description" content={description}>
+  <meta name="keywords" content={keywords.join(', ')}>
+  
+  <link rel="canonical" href={canonicalUrl}>
+  
+  <meta property="og:type" content="website">
+  <meta property="og:url" content={currentUrl.href}>
+  <meta property="og:title" content={title}>
+  <meta property="og:description" content={description}>
+  <meta property="og:image" content={new URL(ogImage, siteUrl).href}>
+  
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content={currentUrl.href}>
+  <meta name="twitter:title" content={title}>
+  <meta name="twitter:description" content={description}>
+  <meta name="twitter:image" content={new URL(ogImage, siteUrl).href}>
+  
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  
+  <meta name="robots" content="index, follow">
+  <meta name="googlebot" content="index, follow">
+  
+  <link rel="sitemap" href="/sitemap-index.xml">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  
+  <script is:inline>
+    const theme = (() => {
+      if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
+        return localStorage.getItem('theme');
+      }
+      if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        return 'dark';
+      }
+      return 'light';
+    })();
+    
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    
+    window.localStorage.setItem('theme', theme);
+  </script>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-white via-blue-50/30 to-purple-50/30 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+  <div id="scroll-progress" class="scroll-progress" style="width: 0%"></div>
+  
+  <div class="flex flex-col min-h-screen">
+    <slot name="header" />
+    
+    <main class="flex-grow">
+      <slot />
+    </main>
+    
+    <slot name="footer" />
+  </div>
+  
+  <CommandPalette client:load />
+  
+  <button
+    id="scroll-to-top"
+    class="fixed bottom-8 right-8 p-4 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 opacity-0 invisible hover:scale-110 focus:outline-none focus:ring-4 focus:ring-blue-500/50 z-40"
+    aria-label="Scroll to top"
+  >
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+    </svg>
+  </button>
+  
+  <div id="keyboard-hint" class="fixed bottom-24 right-8 px-4 py-2 glass-morphism rounded-lg shadow-lg opacity-0 invisible transition-all duration-300 z-40">
+    <div class="flex items-center gap-2 text-sm">
+      <kbd class="px-2 py-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded text-xs">⌘</kbd>
+      <kbd class="px-2 py-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded text-xs">K</kbd>
+      <span class="text-gray-700 dark:text-gray-300">Quick Search</span>
+    </div>
+  </div>
+  
+  <script is:inline>
+    const scrollToTopBtn = document.getElementById('scroll-to-top');
+    const scrollProgress = document.getElementById('scroll-progress');
+    const keyboardHint = document.getElementById('keyboard-hint');
+    
+    let hintTimeout;
+    
+    window.addEventListener('scroll', () => {
+      const windowHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const scrolled = (window.scrollY / windowHeight) * 100;
+      
+      if (scrollProgress) {
+        scrollProgress.style.width = scrolled + '%';
+      }
+      
+      if (window.scrollY > 300) {
+        scrollToTopBtn?.classList.remove('opacity-0', 'invisible');
+        scrollToTopBtn?.classList.add('opacity-100', 'visible');
+      } else {
+        scrollToTopBtn?.classList.add('opacity-0', 'invisible');
+        scrollToTopBtn?.classList.remove('opacity-100', 'visible');
+      }
+    });
+    
+    scrollToTopBtn?.addEventListener('click', () => {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    });
+    
+    setTimeout(() => {
+      if (!localStorage.getItem('keyboard-hint-shown')) {
+        keyboardHint?.classList.remove('opacity-0', 'invisible');
+        keyboardHint?.classList.add('opacity-100', 'visible');
+        
+        hintTimeout = setTimeout(() => {
+          keyboardHint?.classList.add('opacity-0', 'invisible');
+          keyboardHint?.classList.remove('opacity-100', 'visible');
+          localStorage.setItem('keyboard-hint-shown', 'true');
+        }, 5000);
+      }
+    }, 2000);
+    
+    keyboardHint?.addEventListener('click', () => {
+      clearTimeout(hintTimeout);
+      keyboardHint?.classList.add('opacity-0', 'invisible');
+      keyboardHint?.classList.remove('opacity-100', 'visible');
+      localStorage.setItem('keyboard-hint-shown', 'true');
+    });
+  </script>
+</body>
+</html>

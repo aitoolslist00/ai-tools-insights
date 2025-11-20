@@ -1,0 +1,9 @@
+node_modules
+\.git\
+\dist\
+\.astro\
+\.vscode\
+\-p\
+.py
+.bat
+.ps1

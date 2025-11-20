@@ -1,0 +1,197 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import ArticleReader from '../../components/ArticleReader';
+import FloatingActions from '../../components/FloatingActions';
+import { db } from '../../lib/db';
+import { marked } from 'marked';
+
+export const prerender = false;
+
+const { slug } = Astro.params;
+
+const categoryMap: Record<string, string> = {
+  'reviews': 'Reviews',
+  'comparisons': 'Comparisons',
+  'tutorials': 'Tutorials',
+  'industry-news': 'Industry News',
+  'development': 'Development'
+};
+
+const categorySlug = categoryMap[slug as string];
+
+if (categorySlug) {
+  const categoryArticles = await db.prepare('SELECT * FROM articles WHERE category = ? AND status = ? ORDER BY published_at DESC')
+    .all(categorySlug, 'published') as any[];
+  
+  return Astro.rewrite(`/blog/category/${slug}`, {
+    props: { articles: categoryArticles, category: categorySlug }
+  });
+}
+
+const article = await db.prepare('SELECT * FROM articles WHERE slug = ? AND status = ?')
+  .get(slug, 'published') as any;
+
+if (!article) {
+  return Astro.redirect('/404');
+}
+
+const relatedArticles = await db.prepare('SELECT * FROM articles WHERE category = ? AND slug != ? AND status = ? LIMIT 3')
+  .all(article.category, slug, 'published') as any[];
+
+marked.setOptions({
+  gfm: true,
+  breaks: true,
+  headerIds: true,
+  mangle: false,
+});
+
+const htmlContent = marked.parse(article.content || '', {
+  async: false,
+  gfm: true,
+  breaks: true,
+});
+---
+
+<BaseLayout 
+  title={article.meta_title || `${article.title} | AI Tools Insights`}
+  description={article.meta_description || article.excerpt}
+  keywords={article.keywords ? article.keywords.split(',') : [article.title, 'AI tools']}
+  ogImage={article.featured_image}
+  canonical={article.canonical_url}
+>
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": article.title,
+    "description": article.excerpt,
+    "image": article.featured_image,
+    "datePublished": article.published_at,
+    "dateModified": article.updated_at || article.published_at,
+    "author": {
+      "@type": "Organization",
+      "name": "AI Tools Insights"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "AI Tools Insights",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://www.aitoolsinsights.com/logo.png"
+      }
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": `https://www.aitoolsinsights.com/blog/${article.slug}`
+    }
+  })} />
+  
+  <Header slot="header" />
+  
+  <ArticleReader client:load />
+  <FloatingActions client:load title={article.title} />
+  
+  <div class="min-h-screen bg-gradient-to-b from-white via-gray-50/30 to-white dark:from-gray-900 dark:via-gray-900 dark:to-gray-800">
+    <article class="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12 py-16 sm:py-20 lg:py-24">
+      <div class="article-content-wrapper">
+        <div style="max-width: 75ch;" class="mx-auto mb-20 animate-fade-in">
+          <div class="mb-8">
+            <a 
+              href={`/blog/${article.category.toLowerCase().replace(/\s+/g, '-')}`}
+              class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 bg-blue-50 dark:bg-blue-900/20 rounded-full transition-all hover:scale-105"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+              </svg>
+              {article.category}
+            </a>
+          </div>
+          
+          <h1 class="text-3xl sm:text-4xl lg:text-5xl font-black mb-8 text-gray-900 dark:text-white leading-[1.2] tracking-tight text-balance">
+            {article.title}
+          </h1>
+          
+          {article.excerpt && (
+            <p class="text-xl sm:text-2xl text-gray-600 dark:text-gray-300 mb-10 leading-relaxed font-normal">
+              {article.excerpt}
+            </p>
+          )}
+          
+          {article.published_at && (
+            <div class="flex items-center gap-4 text-gray-500 dark:text-gray-400 text-base mb-12 pb-10 border-b border-gray-200 dark:border-gray-700">
+              <div class="flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <time datetime={article.published_at} class="font-medium">
+                  {new Date(article.published_at).toLocaleDateString('en-US', { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                  })}
+                </time>
+              </div>
+            </div>
+          )}
+        </div>
+        
+        {article.featured_image && (
+          <div class="relative overflow-hidden mb-20" style="max-width: 75ch; margin-left: auto; margin-right: auto;">
+            <img 
+              src={article.featured_image} 
+              alt={article.title} 
+              class="w-full h-auto object-cover rounded-2xl shadow-2xl" 
+            />
+          </div>
+        )}
+        
+        <div class="article-content" set:html={htmlContent} />
+      </div>
+    </article>
+  
+    {relatedArticles.length > 0 && (
+      <section class="mt-32 max-w-6xl mx-auto px-6 sm:px-8 lg:px-12 pb-24">
+        <div class="mb-16 text-center">
+          <h2 class="text-4xl sm:text-5xl font-black mb-4 text-gray-900 dark:text-white tracking-tight">
+            Related Articles
+          </h2>
+          <p class="text-lg text-gray-600 dark:text-gray-400">
+            Continue exploring these hand-picked articles
+          </p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-10">
+          {relatedArticles.map(relatedArticle => (
+            <a 
+              href={`/blog/${relatedArticle.slug}`}
+              class="group block bg-white dark:bg-gray-800/50 rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-400 transition-all duration-300 hover:shadow-2xl hover:-translate-y-1"
+            >
+              {relatedArticle.featured_image && (
+                <div class="relative overflow-hidden aspect-video bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20">
+                  <img 
+                    src={relatedArticle.featured_image} 
+                    alt={relatedArticle.title} 
+                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                  />
+                </div>
+              )}
+              <div class="p-6">
+                <div class="inline-flex items-center gap-2 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 rounded-full mb-3">
+                  {relatedArticle.category}
+                </div>
+                <h3 class="text-xl font-bold mb-3 text-gray-900 dark:text-white line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                  {relatedArticle.title}
+                </h3>
+                <p class="text-gray-600 dark:text-gray-400 text-base line-clamp-2 leading-relaxed">
+                  {relatedArticle.excerpt}
+                </p>
+              </div>
+            </a>
+          ))}
+        </div>
+      </section>
+    )}
+  </div>
+  
+  <Footer slot="footer" />
+</BaseLayout>

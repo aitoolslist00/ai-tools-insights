@@ -1,0 +1,124 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+const popularLinks = [
+  { name: 'Home', href: '/', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
+  { name: 'AI Tools', href: '/ai-tools', icon: 'M13 10V3L4 14h7v7l9-11h-7z' },
+  { name: 'Blog', href: '/blog', icon: 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253' },
+  { name: 'Compare Tools', href: '/compare', icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z' },
+];
+---
+
+<BaseLayout 
+  title="404 - Page Not Found | AI Tools Insights"
+  description="The page you're looking for doesn't exist. Explore our AI tools, articles, and resources instead."
+>
+  <Header slot="header" />
+  
+  <section class="min-h-[80vh] flex items-center justify-center section-padding container-custom">
+    <div class="max-w-4xl mx-auto text-center">
+      <div class="relative mb-12 animate-fade-in">
+        <div class="absolute inset-0 flex items-center justify-center">
+          <div class="w-64 h-64 bg-blue-500/10 rounded-full blur-3xl animate-pulse-slow"></div>
+        </div>
+        
+        <div class="relative">
+          <h1 class="text-9xl md:text-[12rem] font-bold gradient-text mb-4 leading-none animate-float">
+            404
+          </h1>
+          <div class="flex items-center justify-center gap-4 mb-6">
+            <div class="h-1 w-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full"></div>
+            <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div class="h-1 w-16 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full"></div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="mb-12 animate-scale-in">
+        <h2 class="text-3xl md:text-4xl font-bold mb-4">
+          Oops! Page Not Found
+        </h2>
+        <p class="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+          The page you're looking for seems to have wandered off into the digital void. 
+          But don't worry, we have plenty of amazing AI tools and content waiting for you!
+        </p>
+      </div>
+      
+      <div class="mb-12">
+        <div class="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 dark:bg-blue-900/20 rounded-full text-sm text-blue-600 dark:text-blue-400 mb-8">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span>Try searching with <kbd class="px-2 py-0.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded text-xs">⌘K</kbd></span>
+        </div>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-3xl mx-auto">
+          {popularLinks.map((link, index) => (
+            <a 
+              href={link.href}
+              class="card-hover p-6 group text-center animate-scale-in"
+              style={`animation-delay: ${index * 100}ms`}
+            >
+              <div class="w-12 h-12 mx-auto mb-3 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={link.icon} />
+                </svg>
+              </div>
+              <h3 class="font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                {link.name}
+              </h3>
+            </a>
+          ))}
+        </div>
+      </div>
+      
+      <div class="flex flex-col sm:flex-row justify-center gap-4">
+        <a href="/" class="btn btn-primary group">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+          </svg>
+          Go Home
+        </a>
+        <button 
+          onclick="history.back()" 
+          class="btn btn-outline group"
+        >
+          <svg class="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Go Back
+        </button>
+      </div>
+      
+      <div class="mt-16 p-8 bg-gradient-to-br from-gray-50 to-blue-50/30 dark:from-gray-800/50 dark:to-blue-900/10 rounded-2xl border border-gray-200 dark:border-gray-700">
+        <h3 class="text-xl font-bold mb-3">Need Help?</h3>
+        <p class="text-gray-600 dark:text-gray-400 mb-4">
+          If you believe this is an error or you need assistance finding something specific, please don't hesitate to reach out.
+        </p>
+        <a href="/contact" class="text-blue-600 dark:text-blue-400 hover:underline font-medium inline-flex items-center gap-1 group">
+          Contact Support
+          <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+          </svg>
+        </a>
+      </div>
+    </div>
+  </section>
+  
+  <Footer slot="footer" />
+</BaseLayout>
+
+<style>
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
+  }
+</style>
