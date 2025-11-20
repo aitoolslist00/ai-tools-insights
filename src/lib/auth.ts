@@ -1,5 +1,5 @@
 import * as jose from 'jose';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import { db } from './db';
 
 const JWT_SECRET = new TextEncoder().encode(
