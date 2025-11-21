@@ -36,36 +36,29 @@ const socialLinks = [
 ];
 ---
 
-<footer class="relative bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/30 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 border-t border-gray-200 dark:border-gray-700 mt-auto">
-  <div class="absolute inset-0 bg-grid-pattern opacity-5"></div>
-  
-  <div class="relative container mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
+<footer class="bg-gray-50 dark:bg-gray-950 border-t border-gray-200 dark:border-gray-800 mt-auto">
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl py-12">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
       <div class="sm:col-span-2 lg:col-span-1">
-        <div class="flex items-center space-x-2 mb-4">
-          <div class="relative">
-            <div class="absolute -inset-1 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg blur opacity-25"></div>
-            <div class="relative p-2 bg-white dark:bg-gray-900 rounded-lg">
-              <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-              </svg>
-            </div>
-          </div>
-          <h3 class="text-xl font-bold gradient-text">
+        <div class="flex items-center space-x-2 mb-3">
+          <svg class="w-5 h-5 text-blue-600 dark:text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+          </svg>
+          <h3 class="text-base font-semibold text-gray-900 dark:text-white">
             AI Tools Insights
           </h3>
         </div>
-        <p class="text-sm text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
+        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">
           Discover and learn about the latest AI tools with comprehensive reviews, comparisons, and tutorials.
         </p>
-        <div class="flex space-x-4">
+        <div class="flex space-x-2">
           {socialLinks.map(social => (
             <a 
               href={social.href}
-              class="p-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-400 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 group"
+              class="p-2 rounded-md border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-900 transition-colors"
               aria-label={social.name}
             >
-              <svg class="w-5 h-5 text-gray-600 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" fill="currentColor" viewBox="0 0 24 24">
+              <svg class="w-4 h-4 text-gray-600 dark:text-gray-400" fill="currentColor" viewBox="0 0 24 24">
                 <path d={social.icon} />
               </svg>
             </a>
@@ -75,18 +68,15 @@ const socialLinks = [
       
       {Object.entries(footerLinks).map(([category, links]) => (
         <div>
-          <h4 class="font-semibold text-gray-900 dark:text-white mb-4">{category}</h4>
-          <ul class="space-y-3">
+          <h4 class="font-medium text-sm text-gray-900 dark:text-white mb-3">{category}</h4>
+          <ul class="space-y-2">
             {links.map(link => (
               <li>
                 <a 
                   href={link.href}
-                  class="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors inline-flex items-center group"
+                  class="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition-colors"
                 >
-                  <span class="group-hover:translate-x-1 transition-transform duration-200">{link.name}</span>
-                  <svg class="w-4 h-4 ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                  </svg>
+                  {link.name}
                 </a>
               </li>
             ))}
@@ -95,17 +85,17 @@ const socialLinks = [
       ))}
     </div>
     
-    <div class="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
+    <div class="mt-8 pt-8 border-t border-gray-200 dark:border-gray-800">
       <div class="flex flex-col md:flex-row justify-between items-center gap-4">
         <p class="text-sm text-gray-600 dark:text-gray-400">
           &copy; {currentYear} AI Tools Insights. All rights reserved.
         </p>
-        <div class="flex flex-wrap justify-center gap-6">
-          <a href="/sitemap-index.xml" class="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+        <div class="flex items-center gap-4">
+          <a href="/sitemap-index.xml" class="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition-colors">
             Sitemap
           </a>
           <span class="text-gray-300 dark:text-gray-700">|</span>
-          <a href="/robots.txt" class="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+          <a href="/robots.txt" class="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition-colors">
             Robots.txt
           </a>
         </div>
@@ -113,12 +103,3 @@ const socialLinks = [
     </div>
   </div>
 </footer>
-
-<style>
-  .bg-grid-pattern {
-    background-image: 
-      linear-gradient(to right, rgb(156 163 175 / 0.1) 1px, transparent 1px),
-      linear-gradient(to bottom, rgb(156 163 175 / 0.1) 1px, transparent 1px);
-    background-size: 24px 24px;
-  }
-</style>

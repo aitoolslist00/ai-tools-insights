@@ -1,6 +1,6 @@
 import * as jose from 'jose';
-import bcrypt from 'bcrypt';
-import { d as db } from './db_DT4W4eUV.mjs';
+import bcrypt from 'bcryptjs';
+import { d as db } from './db_CVCqU9ns.mjs';
 
 const JWT_SECRET = new TextEncoder().encode(
   process.env.JWT_SECRET || "default_dev_secret_change_in_production"

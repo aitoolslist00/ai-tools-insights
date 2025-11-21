@@ -1,5 +1,5 @@
 import { supabase } from './supabase';
-import bcrypt from 'bcryptjs';
+import bcrypt from './bcrypt-wrapper';
 
 export const db = {
   prepare: (query: string) => ({

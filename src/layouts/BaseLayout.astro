@@ -78,7 +78,7 @@ const canonicalUrl = canonical || currentUrl.href;
     window.localStorage.setItem('theme', theme);
   </script>
 </head>
-<body class="min-h-screen bg-gradient-to-br from-white via-blue-50/30 to-purple-50/30 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+<body class="min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100">
   <div id="scroll-progress" class="scroll-progress" style="width: 0%"></div>
   
   <div class="flex flex-col min-h-screen">
@@ -95,28 +95,17 @@ const canonicalUrl = canonical || currentUrl.href;
   
   <button
     id="scroll-to-top"
-    class="fixed bottom-8 right-8 p-4 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 opacity-0 invisible hover:scale-110 focus:outline-none focus:ring-4 focus:ring-blue-500/50 z-40"
+    class="fixed bottom-6 right-6 p-3 bg-gray-900 hover:bg-gray-800 dark:bg-gray-100 dark:hover:bg-gray-200 text-white dark:text-gray-900 rounded-full shadow-sm opacity-0 invisible transition-all focus:outline-none focus:ring-2 focus:ring-gray-500 z-40"
     aria-label="Scroll to top"
   >
-    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
     </svg>
   </button>
   
-  <div id="keyboard-hint" class="fixed bottom-24 right-8 px-4 py-2 glass-morphism rounded-lg shadow-lg opacity-0 invisible transition-all duration-300 z-40">
-    <div class="flex items-center gap-2 text-sm">
-      <kbd class="px-2 py-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded text-xs">⌘</kbd>
-      <kbd class="px-2 py-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded text-xs">K</kbd>
-      <span class="text-gray-700 dark:text-gray-300">Quick Search</span>
-    </div>
-  </div>
-  
   <script is:inline>
     const scrollToTopBtn = document.getElementById('scroll-to-top');
     const scrollProgress = document.getElementById('scroll-progress');
-    const keyboardHint = document.getElementById('keyboard-hint');
-    
-    let hintTimeout;
     
     window.addEventListener('scroll', () => {
       const windowHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
@@ -140,26 +129,6 @@ const canonicalUrl = canonical || currentUrl.href;
         top: 0,
         behavior: 'smooth'
       });
-    });
-    
-    setTimeout(() => {
-      if (!localStorage.getItem('keyboard-hint-shown')) {
-        keyboardHint?.classList.remove('opacity-0', 'invisible');
-        keyboardHint?.classList.add('opacity-100', 'visible');
-        
-        hintTimeout = setTimeout(() => {
-          keyboardHint?.classList.add('opacity-0', 'invisible');
-          keyboardHint?.classList.remove('opacity-100', 'visible');
-          localStorage.setItem('keyboard-hint-shown', 'true');
-        }, 5000);
-      }
-    }, 2000);
-    
-    keyboardHint?.addEventListener('click', () => {
-      clearTimeout(hintTimeout);
-      keyboardHint?.classList.add('opacity-0', 'invisible');
-      keyboardHint?.classList.remove('opacity-100', 'visible');
-      localStorage.setItem('keyboard-hint-shown', 'true');
     });
   </script>
 </body>
