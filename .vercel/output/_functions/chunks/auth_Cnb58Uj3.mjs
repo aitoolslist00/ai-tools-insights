@@ -1,6 +1,5 @@
 import * as jose from 'jose';
-import bcrypt from 'bcryptjs';
-import { d as db } from './db_CVCqU9ns.mjs';
+import { d as db, b as bcryptjs } from './db_Cj4I5Obi.mjs';
 
 const JWT_SECRET = new TextEncoder().encode(
   process.env.JWT_SECRET || "default_dev_secret_change_in_production"
@@ -9,7 +8,7 @@ async function verifyCredentials(username, password) {
   const stmt = db.prepare("SELECT * FROM users WHERE username = ?");
   const user = await stmt.get(username);
   if (!user) return null;
-  const isValid = await bcrypt.compare(password, user.password);
+  const isValid = await bcryptjs.compare(password, user.password);
   if (!isValid) return null;
   return {
     id: user.id,

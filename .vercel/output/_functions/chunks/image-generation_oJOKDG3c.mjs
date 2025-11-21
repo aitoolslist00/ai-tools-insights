@@ -1,6 +1,6 @@
 import * as fs from 'node:fs';
 import * as path from 'path';
-import { g as getSetting } from './db_CVCqU9ns.mjs';
+import { g as getSetting } from './db_Cj4I5Obi.mjs';
 
 async function generateArticleImage(articleTitle, config = {}) {
   const geminiApiKey = await getSetting("GEMINI_API_KEY") || process.env.GEMINI_API_KEY;

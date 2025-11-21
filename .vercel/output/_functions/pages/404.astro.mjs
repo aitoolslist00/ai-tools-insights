@@ -1,5 +1,5 @@
 import { f as createComponent, k as renderComponent, r as renderTemplate, m as maybeRenderHead, h as addAttribute } from '../chunks/astro/server_t80nOXy5.mjs';
-import { $ as $$BaseLayout, a as $$Header, b as $$Footer } from '../chunks/Footer_Bv3fE-aY.mjs';
+import { $ as $$BaseLayout, a as $$Header, b as $$Footer } from '../chunks/Footer_4IicDco7.mjs';
 /* empty css                               */
 export { renderers } from '../renderers.mjs';
 
