@@ -2,7 +2,7 @@ import { e as createAstro, f as createComponent, r as renderTemplate, l as rende
 import 'piccolore';
 import 'clsx';
 /* empty css                                       */
-import { r as requireAuth } from '../../../chunks/auth_C7lEWL5y.mjs';
+import { r as requireAuth } from '../../../chunks/auth_Cnb58Uj3.mjs';
 export { renderers } from '../../../renderers.mjs';
 
 var __freeze = Object.freeze;

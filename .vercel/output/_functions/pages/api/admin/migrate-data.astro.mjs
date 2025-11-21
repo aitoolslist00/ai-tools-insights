@@ -1,4 +1,4 @@
-import { r as requireAuth } from '../../../chunks/auth_C7lEWL5y.mjs';
+import { r as requireAuth } from '../../../chunks/auth_Cnb58Uj3.mjs';
 export { renderers } from '../../../renderers.mjs';
 
 const POST = async ({ request }) => {
