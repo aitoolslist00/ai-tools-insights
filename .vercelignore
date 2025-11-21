@@ -7,3 +7,4 @@ dev.db
 *.log
 .DS_Store
 temp-ai-tools-insights
+.vercel
