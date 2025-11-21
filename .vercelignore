@@ -1,0 +1,9 @@
+node_modules
+.astro
+dist
+.env
+.env.local
+dev.db
+*.log
+.DS_Store
+temp-ai-tools-insights

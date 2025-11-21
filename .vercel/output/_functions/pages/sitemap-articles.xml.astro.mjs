@@ -1,4 +1,4 @@
-import { s as supabase } from '../chunks/supabase_B9b4B-3d.mjs';
+import { s as supabase } from '../chunks/supabase_Dxn2jk3G.mjs';
 export { renderers } from '../renderers.mjs';
 
 const GET = async ({ site }) => {

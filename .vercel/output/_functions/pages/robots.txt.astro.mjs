@@ -1,4 +1,4 @@
-import { g as getSetting } from '../chunks/db_Cj4I5Obi.mjs';
+import { g as getSetting } from '../chunks/db_CJGLAgIX.mjs';
 export { renderers } from '../renderers.mjs';
 
 const GET = async ({ site }) => {
